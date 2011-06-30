@@ -1,10 +1,10 @@
 <?php
 /**
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  *
- * Defines all the functions, actions, filters, widgets, etc., for ProGo Themes' SmallBusiness theme.
+ * Defines all the functions, actions, filters, widgets, etc., for ProGo Themes' Business Pro theme.
  *
  * Most Action / Filters hooks are set in the progo_setup function, below. overwriting that could cause quite a few things to go wrong.
  */
@@ -22,7 +22,7 @@ if ( ! function_exists( 'progo_setup' ) ):
  * @uses add_custom_background() To add support for a custom background.
  * @uses add_theme_support( 'post-thumbnails' ) To add support for post thumbnails.
  *
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_setup() {
 	// This theme styles the visual editor with editor-style.css to match the theme style
@@ -43,7 +43,7 @@ function progo_setup() {
 	
 	// Add custom actions
 	add_action( 'admin_init', 'progo_admin_init' );
-	add_action( 'widgets_init', 'progo_smallbusiness_widgets' );
+	add_action( 'widgets_init', 'progo_businesspro_widgets' );
 	add_action( 'admin_menu', 'progo_admin_menu_cleanup' );
 	add_action( 'login_head', 'progo_custom_login_logo' );
 	add_action( 'login_headerurl', 'progo_custom_login_url' );
@@ -67,7 +67,7 @@ function progo_setup() {
 		add_action( 'admin_notices', 'progo_admin_notices' );
 	} else {
 		// brick site if theme is not activated
-		if ( get_option( 'progo_smallbusiness_apiauth' ) != 100 ) {
+		if ( get_option( 'progo_businesspro_apiauth' ) != 100 ) {
 			add_action( 'template_redirect', 'progo_to_twentyten' );
 		}
 	}
@@ -80,7 +80,7 @@ if ( ! function_exists( 'progo_sitelogo' ) ):
 /**
  * prints out the HTML for the #logo area in the header of the front-end of the site
  * wrapped so child themes can overwrite if desired
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_sitelogo() {
 	$options = get_option( 'progo_options' );
@@ -98,7 +98,7 @@ endif;
 if ( ! function_exists( 'progo_posted_on' ) ):
 /**
  * Prints HTML with meta information for the current post—date/time and author.
- * @since ProGo SmallBusiness 1.0
+ * @since ProGo Business Pro 1.0
  */
 function progo_posted_on() {
 	printf( __( '<span class="meta-sep">Posted by</span> %1$s <span class="%2$s">on</span> %3$s', 'progo' ),
@@ -120,7 +120,7 @@ endif;
 if ( ! function_exists( 'progo_posted_in' ) ):
 /**
  * Prints HTML with meta information for the current post (category, tags and permalink).
- * @since ProGo SmallBusiness 1.0
+ * @since ProGo Business Pro 1.0
  */
 function progo_posted_in() {
 	/* Retrieves tag list of current post, separated by commas.
@@ -132,7 +132,7 @@ endif;
 if ( ! function_exists( 'progo_comments' ) ):
 /**
  * walker function for comment display
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_comments($comment, $args, $depth) {	
 	$GLOBALS['comment'] = $comment;
@@ -180,7 +180,7 @@ endif;
 if ( ! function_exists( 'progo_admin_menu_cleanup' ) ):
 /**
  * hooked to 'admin_menu' by add_action in progo_setup()
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_menu_cleanup() {
 	global $menu;
@@ -234,7 +234,7 @@ endif;
 if ( ! function_exists( 'progo_admin_menu_finder' ) ):
 /**
  * helper function to find the $key for the menu item with given $slug
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_menu_finder($menu, $slug) {
 	$id = 0;
@@ -248,11 +248,11 @@ function progo_admin_menu_finder($menu, $slug) {
 endif;
 if ( ! function_exists( 'progo_admin_page' ) ):
 /**
- * ProGo Themes' SmallBusiness Admin Page function
+ * ProGo Themes' Business Pro Admin Page function
  * switch statement creates Pages for Installation, Shipping, Payment, Products, Appearance
  * from admin_menu_cleanup()
  
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_page() {
 	//must check that the user has the required capability 
@@ -274,7 +274,7 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
 	?>
 	<div class="wrap">
     <div class="icon32" id="icon-themes"><br /></div>
-    <h2>ProGo SmallBusiness Theme Options</h2>
+    <h2>ProGo Business Pro Theme Options</h2>
 	<form action="options.php" method="post" enctype="multipart/form-data"><?php
 		settings_fields( 'progo_options' );
 		do_settings_sections( 'progo_api' );
@@ -357,7 +357,7 @@ endif;
 if ( ! function_exists( 'progo_custom_login_logo' ) ):
 /**
  * hooked to 'login_head' by add_action in progo_setup()
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_custom_login_logo() {
 	if ( get_option('progo_logo') != '' ) {
@@ -376,7 +376,7 @@ if ( ! function_exists( 'progo_custom_login_url' ) ):
  * hooked to 'login_headerurl' by add_action in progo_setup()
  * @uses get_option() To check if a custom logo has been uploaded to the back end
  * @return the custom URL
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_custom_login_url() {
 	if ( get_option( 'progo_logo' ) != '' ) {
@@ -389,7 +389,7 @@ if ( ! function_exists( 'progo_admin_page_styles' ) ):
 /**
  * hooked to 'admin_print_styles' by add_action in progo_setup()
  * adds thickbox js for WELCOME screen styling
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_page_styles() {
 	global $pagenow;
@@ -407,7 +407,7 @@ if ( ! function_exists( 'progo_admin_page_scripts' ) ):
 /**
  * hooked to 'admin_print_scripts' by add_action in progo_setup()
  * adds thickbox js for WELCOME screen Recommended Plugin info
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_page_scripts() {
 	global $pagenow;
@@ -425,7 +425,7 @@ if ( ! function_exists( 'progo_admin_init' ) ):
  * hooked to 'admin_init' by add_action in progo_setup()
  * sets admin action hooks
  * registers Site Settings
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_init() {
 	global $pagenow;
@@ -497,7 +497,7 @@ function progo_admin_init() {
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
 	
 	// since there does not seem to be an actual THEME_ACTIVATION hook, we'll fake it here
-	if ( get_option( 'progo_smallbusiness_installed' ) != true ) {
+	if ( get_option( 'progo_businesspro_installed' ) != true ) {
 		// also want to create a few other pages (Terms & Conditions, Privacy Policy), set up the FOOTER menu, and add these pages to it...
 		
 		$post_date = date( "Y-m-d H:i:s" );
@@ -610,12 +610,12 @@ function progo_admin_init() {
 	}
 }
 endif;
-if ( ! function_exists( 'progo_smallbusiness_init' ) ):
+if ( ! function_exists( 'progo_businesspro_init' ) ):
 /**
  * registers our "Homepage Slides" Custom Post Type
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
-function progo_smallbusiness_init() {
+function progo_businesspro_init() {
 	register_post_type( 'progo_homeslide',
 		array(
 			'labels' => array(
@@ -640,15 +640,15 @@ function progo_smallbusiness_init() {
 		)
 	);
 }
-add_action( 'init', 'progo_smallbusiness_init' );
+add_action( 'init', 'progo_businesspro_init' );
 endif;
-if ( ! function_exists( 'progo_smallbusiness_widgets' ) ):
+if ( ! function_exists( 'progo_businesspro_widgets' ) ):
 /**
  * registers a sidebar area for the WIDGETS page
  * and registers various Widgets
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
-function progo_smallbusiness_widgets() {
+function progo_businesspro_widgets() {
 	register_sidebar(array(
 		'name' => 'Main Sidebar',
 		'id' => 'main',
@@ -705,7 +705,7 @@ endif;
 if ( ! function_exists( 'progo_metabox_cleanup' ) ):
 /**
  * fires after wpsc_meta_boxes hook, so we can overwrite a lil bit
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_metabox_cleanup() {
 	global $wp_meta_boxes;
@@ -732,7 +732,7 @@ if ( ! function_exists( 'progo_sidebar_box' ) ):
  * called by add_meta_box( "progo_direct_box", "Direct Response", "progo_direct_box"...
  * in progo_admin_init()
  * @uses progo_direct_meta_defaults()
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_sidebar_box() {
 	global $post;
@@ -758,7 +758,7 @@ endif;
 if ( ! function_exists( 'progo_slidecontent_box' ) ):
 /**
  * custom metabox for Homepage Slides content area
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_slidecontent_box() {
 	global $post;
@@ -796,13 +796,13 @@ jQuery(function() {
 }
 endif;
 
-/********* core ProGo Themes' SmallBusiness functions *********/
+/********* core ProGo Themes' Business Pro functions *********/
 
 if ( ! function_exists( 'progo_add_scripts' ) ):
 /**
  * hooked to 'wp_print_scripts' by add_action in progo_setup()
  * adds front-end js
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_add_scripts() {
 	if ( ! is_admin() ) {
@@ -825,7 +825,7 @@ endif;
 if ( ! function_exists( 'progo_colorschemes' ) ):
 /**
  * @return array of Color Schemes
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_colorschemes() {
 	return array( 'Greyscale', 'LightBlue', 'DarkGreen', 'BlackOrange', 'GreenBrown' );
@@ -835,7 +835,7 @@ if ( ! function_exists( 'progo_add_styles' ) ):
 /**
  * hooked to 'wp_print_styles' by add_action in progo_setup()
  * checks for Color Scheme setting and adds appropriate front-end stylesheet
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_add_styles() {
 	if ( ! is_admin() ) {
@@ -854,7 +854,7 @@ endif;
 if ( ! function_exists( 'progo_reset_logo' ) ):
 /**
  * wipe out any custom logo image setting
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_reset_logo(){
 	check_admin_referer( 'progo_reset_logo' );
@@ -871,7 +871,7 @@ function progo_reset_logo(){
 endif;
 if ( ! function_exists( 'progo_permalink_check' ) ):
 /**
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_permalink_check( $arg ){
 	check_admin_referer( 'progo_permalink_check' );
@@ -887,11 +887,11 @@ function progo_permalink_check( $arg ){
 endif;
 if ( ! function_exists( 'progo_menus_set' ) ):
 /**
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_menus_set(){
 	check_admin_referer( 'progo_menus_set' );
-	update_option( 'progo_smallbusiness_onstep', 6);
+	update_option( 'progo_businesspro_onstep', 6);
 	
 	wp_redirect( admin_url("themes.php?page=progo_admin") );
 	exit();
@@ -903,7 +903,7 @@ if ( ! function_exists( 'progo_arraytotop' ) ):
  * @param parent array
  * @param element to bring to the top
  * @return sorted array
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_arraytotop($arr, $totop) {
 	// Backup and delete element from parent array
@@ -919,7 +919,7 @@ if ( ! function_exists( 'progo_save_meta' ) ):
  * checks for _progo (direct) meta data, and performs validation & sanitization
  * @param post_id to check meta on
  * @return post_id
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_save_meta( $post_id ){
 	// verify if this is an auto save routine. If it is,
@@ -963,7 +963,7 @@ endif;
 if ( ! function_exists( 'progo_colorscheme_switch' ) ):
 /**
  * helper function to switch the current Color Scheme
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_colorscheme_switch( $color ) {
 	$okgo = true;
@@ -988,7 +988,7 @@ function progo_colorscheme_switch( $color ) {
 endif;
 /**
  * ProGo Site Settings Options defaults
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_options_defaults() {
 	// Define default option settings
@@ -1014,9 +1014,9 @@ function progo_options_defaults() {
 		update_option( 'progo_slides', $def );
 	}
 	
-	update_option( 'progo_smallbusiness_installed', true );
-	update_option( 'progo_smallbusiness_apikey', '' );
-	update_option( 'progo_smallbusiness_apiauth', '100' );
+	update_option( 'progo_businesspro_installed', true );
+	update_option( 'progo_businesspro_apikey', '' );
+	update_option( 'progo_businesspro_apiauth', '100' );
 	
 	update_option( 'wpsc_ignore_theme', true );
 	
@@ -1036,14 +1036,14 @@ if ( ! function_exists( 'progo_validate_options' ) ):
  * also handles uploading of custom Site Logo
  * @param $input options to validate
  * @return $input after validation has taken place
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_validate_options( $input ) {
 	if( isset($input['apikey']) ) {
 		$input['apikey'] = wp_kses( $input['apikey'], array() );
 		// store API KEY in its own option
-		if ( $input['apikey'] != get_option( 'progo_smallbusiness_apikey' ) ) {
-			update_option( 'progo_smallbusiness_apikey', substr( $input['apikey'], 0, 39 ) );
+		if ( $input['apikey'] != get_option( 'progo_businesspro_apikey' ) ) {
+			update_option( 'progo_businesspro_apikey', substr( $input['apikey'], 0, 39 ) );
 		}
 	}
 	
@@ -1267,7 +1267,7 @@ if ( ! function_exists( 'progo_field_color' ) ):
 /**
  * outputs HTML for "Color Scheme" option on Site Settings page
  * @uses progo_colorschemes() for list of available Color Schemes
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_color() {
 	$options = get_option( 'progo_options' );
@@ -1299,7 +1299,7 @@ endif;
 if ( ! function_exists( 'progo_field_logo' ) ):
 /**
  * outputs HTML for custom "Logo" on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_logo() {
 	$options = get_option('progo_options');
@@ -1321,12 +1321,12 @@ endif;
 
 /**
  * outputs HTML for "API Key" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_apikey() {
-	$opt = get_option( 'progo_smallbusiness_apikey', true );
+	$opt = get_option( 'progo_businesspro_apikey', true );
 	echo '<input id="apikey" name="progo_options[apikey]" class="regular-text" type="text" value="'. esc_html( $opt ) .'" maxlength="39" />';
-	$apiauth = get_option( 'progo_smallbusiness_apiauth', true );
+	$apiauth = get_option( 'progo_businesspro_apiauth', true );
 	switch($apiauth) {
 		case 100:
 			echo ' <img src="'. get_bloginfo('template_url') .'/images/check.png" alt="aok" class="kcheck" />';
@@ -1335,12 +1335,12 @@ function progo_field_apikey() {
 			echo ' <img src="'. get_bloginfo('template_url') .'/images/x.gif" alt="X" class="kcheck" title="'. $apiauth .'" />';
 			break;
 	}
-	echo '<br /><span class="description">You API Key was sent via email when you purchased the SmallBusiness theme from ProGo Themes.</span><br /><br />ProGo Themes are Easy and Quick to Set Up using our Step-by-Step Process.<br /><a href="http://www.progo.com/resources/QuickStartGuide-SmallBusiness.pdf" target="_blank">Download the ProGo SmallBusiness Theme Quick Start Guide (PDF)</a>';
+	echo '<br /><span class="description">You API Key was sent via email when you purchased the Business Pro theme from ProGo Themes.</span><br /><br />ProGo Themes are Easy and Quick to Set Up using our Step-by-Step Process.<br /><a href="http://www.progo.com/resources/QuickStartGuide-Business Pro.pdf" target="_blank">Download the ProGo Business Pro Theme Quick Start Guide (PDF)</a>';
 }
 if ( ! function_exists( 'progo_field_blogname' ) ):
 /**
  * outputs HTML for "Site Name" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_blogname() {
 	$opt = get_option( 'blogname' );
@@ -1350,7 +1350,7 @@ endif;
 if ( ! function_exists( 'progo_field_blogdesc' ) ):
 /**
  * outputs HTML for "Slogan" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_blogdesc() {
 	$opt = get_option( 'blogdescription' ); ?>
@@ -1360,7 +1360,7 @@ endif;
 if ( ! function_exists( 'progo_field_showdesc' ) ):
 /**
  * outputs HTML for checkbox "Show/Hide Tips" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_showdesc() {
 	$options = get_option( 'progo_options' ); ?>
@@ -1376,7 +1376,7 @@ endif;
 if ( ! function_exists( 'progo_field_showtips' ) ):
 /**
  * outputs HTML for checkbox "Show Slogan" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_showtips() {
 	$options = get_option( 'progo_options' ); ?>
@@ -1391,7 +1391,7 @@ endif;
 if ( ! function_exists( 'progo_field_support' ) ):
 /**
  * outputs HTML for "Customer Support" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_support() {
 	$options = get_option( 'progo_options' );
@@ -1403,7 +1403,7 @@ endif;
 if ( ! function_exists( 'progo_field_copyright' ) ):
 /**
  * outputs HTML for "Copyright Notice" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_copyright() {
 	$options = get_option( 'progo_options' );
@@ -1415,7 +1415,7 @@ endif;
 if ( ! function_exists( 'progo_field_frontpage' ) ):
 /**
  * outputs HTML for Homepage "Displays" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_frontpage() {
 	// Latest Blog Posts, (Featured Products), Static Content
@@ -1463,7 +1463,7 @@ endif;
 if ( ! function_exists( 'progo_field_homeseconds' ) ):
 /**
  * outputs HTML for Homepage "Cycle Seconds" field on Site Settings page
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_field_homeseconds() {
 	$options = get_option( 'progo_options' );
@@ -1477,7 +1477,7 @@ if ( ! function_exists( 'progo_section_text' ) ):
  * (dummy) function called by 
  * add_settings_section( [id] , [title], 'progo_section_text', 'progo_site_settings' );
  * echos anchor link for that section
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_section_text( $args ) {
 	echo '<a name="'. $args['id'] .'"></a>';
@@ -1487,7 +1487,7 @@ if ( ! function_exists( 'progo_bodyclasses' ) ):
 /**
  * adds some additional classes to the <body> based on what page we're on
  * @param array of classes to add to the <body> tag
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_bodyclasses($classes) {
 	switch ( get_post_type() ) {
@@ -1511,7 +1511,7 @@ if ( ! function_exists( 'progo_menuclasses' ) ):
  * adds some additional classes to Menu Items
  * so we can mark active menu trails easier
  * @param array of classes to add to the <body> tag
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_menuclasses($items) {
 	$blogID = get_option('progo_blog_id');
@@ -1523,12 +1523,12 @@ function progo_menuclasses($items) {
 	return $items;
 }
 endif;
-if ( ! function_exists( 'progo_smallbusiness_completeness' ) ):
+if ( ! function_exists( 'progo_businesspro_completeness' ) ):
 /**
  * check which step / % complete current site is at
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
-function progo_smallbusiness_completeness( $onstep ) {
+function progo_businesspro_completeness( $onstep ) {
 	if ( $onstep < 1 || $onstep > 6 ) {
 		$onstep = 1;
 	}
@@ -1536,7 +1536,7 @@ function progo_smallbusiness_completeness( $onstep ) {
 	if ( $onstep < 6 ) { // ok check it
 		switch($onstep) {
 			case 1: // check API auth
-				$apiauth = get_option( 'progo_smallbusiness_apiauth', true );
+				$apiauth = get_option( 'progo_businesspro_apiauth', true );
 				if( $apiauth == '100' ) {
 					$onstep = 2;
 				}
@@ -1569,12 +1569,12 @@ endif;
  * used to display "Settings updated" message after Site Settings page has been saved
  * @uses get_option() To check if our Site Settings were just saved.
  * @uses update_option() To save the setting to only show the message once.
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_notices() {
 	global $pagenow;
 	// api auth check
-	$apiauth = get_option( 'progo_smallbusiness_apiauth', true );
+	$apiauth = get_option( 'progo_businesspro_apiauth', true );
 	if( $apiauth != '100' ) {
 	?>
 	<div class="error">
@@ -1603,11 +1603,11 @@ function progo_admin_notices() {
 		update_option('progo_settings_just_saved',false);
 	}
 	
-	$onstep = absint(get_option('progo_smallbusiness_onstep', true));
+	$onstep = absint(get_option('progo_businesspro_onstep', true));
 	
 	if ( $onstep < 6 ) {
-		$onstep = progo_smallbusiness_completeness( $onstep );
-		update_option( 'progo_smallbusiness_onstep', $onstep);
+		$onstep = progo_businesspro_completeness( $onstep );
+		update_option( 'progo_businesspro_onstep', $onstep);
 		// couldnt check step 2 before but now we have get_plugins() function
 		if ( ($onstep == 2) && ( $_REQUEST['action'] == 'install-plugin' ) ) {
 				return;
@@ -1633,10 +1633,10 @@ function progo_admin_notices() {
 				break;
 			case 5: // Main Menu
 				$pct = 95;
-				$nst = '<a href="'. admin_url('nav-menus.php') .'">Customize your site\'s Menus</a> by adding more links from the left column, and rearranging links with Drag-n-Drop. <strong>This is the last step to setting up your SmallBusiness site!</strong> When your Menus are set, <a href="'. wp_nonce_url("admin.php?progo_admin_action=menus_set", 'progo_menus_set') .'">click here to remove this message</a>.';
+				$nst = '<a href="'. admin_url('nav-menus.php') .'">Customize your site\'s Menus</a> by adding more links from the left column, and rearranging links with Drag-n-Drop. <strong>This is the last step to setting up your Business Pro site!</strong> When your Menus are set, <a href="'. wp_nonce_url("admin.php?progo_admin_action=menus_set", 'progo_menus_set') .'">click here to remove this message</a>.';
 				break;
 		}
-		echo '<p>Your ProGo SmallBusiness site is <strong>'. $pct .'% Complete</strong> - Next Step: '. $nst .'</p></div>';
+		echo '<p>Your ProGo Business Pro site is <strong>'. $pct .'% Complete</strong> - Next Step: '. $nst .'</p></div>';
 	}
 }
 
@@ -1647,7 +1647,7 @@ function progo_admin_notices() {
  * @uses get_allowed_themes() To retrieve list of all installed themes.
  * @uses wp_remote_post() To check remote URL for updates.
  * @return checked data array
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_update_check($data) {
 	if ( is_admin() == false ) {
@@ -1672,14 +1672,14 @@ function progo_update_check($data) {
 	}
 	
 	$request = array(
-		'slug' => "smallbusiness",
-		'version' => $data->checked[smallbusiness],
+		'slug' => "businesspro",
+		'version' => $data->checked[businesspro],
 		'siteurl' => get_bloginfo('url')
 	);
 	
 	// Start checking for an update
 	global $wp_version;
-	$apikey = get_option('progo_smallbusiness_apikey',true);
+	$apikey = get_option('progo_businesspro_apikey',true);
 	if ( $apikey != '' ) {
 		$apikey = substr( strtolower( str_replace( '-', '', $apikey ) ), 0, 32);
 	}
@@ -1702,12 +1702,12 @@ function progo_update_check($data) {
 		// wp_die('response:<br /><pre>'. print_r($response,true) .'</pre><br /><br />apikey: '. $apikey );
 		// only save AUTHCODE if APIKEY is not blank.
 		if ( $apikey != '' ) {
-			update_option( 'progo_smallbusiness_apiauth', $response[authcode] );
+			update_option( 'progo_businesspro_apiauth', $response[authcode] );
 		} else {
-			update_option( 'progo_smallbusiness_apiauth', 'new' );
+			update_option( 'progo_businesspro_apiauth', 'new' );
 		}
-		if ( version_compare($data->checked[smallbusiness], $response[new_version], '<') ) {
-			$data->response[smallbusiness] = array(
+		if ( version_compare($data->checked[businesspro], $response[new_version], '<') ) {
+			$data->response[businesspro] = array(
 				'new_version' => $response[new_version],
 				'url' => $response[url],
 				'package' => $response[package]
@@ -1729,7 +1729,7 @@ function progo_to_twentyten() {
 if ( ! function_exists( 'progo_admin_post_thumbnail_html' ) ):
 /**
  * hooked by add_filter to 'admin_post_thumbnail_html'
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_post_thumbnail_html($html) {
 	global $post_type;
@@ -1743,7 +1743,7 @@ endif;
 /**
  * hooked by add_filter to 'wp_before_admin_bar_render'
  * to tweak the new WP 3.1 ADMIN BAR
- * @since SmallBusiness 1.0
+ * @since Business Pro 1.0
  */
 function progo_admin_bar_render() {
 	global $wp_admin_bar;

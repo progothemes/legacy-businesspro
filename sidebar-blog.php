@@ -3,8 +3,8 @@
  * Sidebar for Blog areas.
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 ?>
 <div class="grid_4">

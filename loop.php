@@ -14,8 +14,8 @@
  * <code>get_template_part( 'loop', 'index' );</code>
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 ?>
 <?php /* If there are no posts to display, such as an empty archive page */ ?>

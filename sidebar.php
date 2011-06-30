@@ -3,8 +3,8 @@
  * The Sidebar containing the primary and secondary widget areas.
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 ?>
 <div class="grid_4">

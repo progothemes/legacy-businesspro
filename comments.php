@@ -8,8 +8,8 @@
  * located in the functions.php file.
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 ?>
 

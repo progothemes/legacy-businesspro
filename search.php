@@ -3,8 +3,8 @@
  * The template for displaying Search Results pages.
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 
 get_header(); ?>

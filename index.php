@@ -9,8 +9,8 @@
  * Learn more: http://codex.wordpress.org/Template_Hierarchy
  *
  * @package ProGo
- * @subpackage SmallBusiness
- * @since SmallBusiness 1.0
+ * @subpackage Business Pro
+ * @since Business Pro 1.0
  */
 get_header(); ?>
 <div id="container" class="container_12">
