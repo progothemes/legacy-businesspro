@@ -1,0 +1,13 @@
+body { background: url(../images/DarkGreen/bg.png) repeat 0 0 }
+#fx { background: url(../images/DarkGreen/bg-grad.png) repeat-x 0 0 }
+.custombg #fx { background: none }
+#pagetop { background: url(../images/DarkGreen/pagetop.png) repeat-y 0 0 }
+#pagetop.slides { background: #fff url(../images/DarkGreen/slidetop.png) repeat-x 0 100%; color: #333 }
+.slide .productcol a.more-link { color: #333 }
+#pagetop.slides div.price { color: #459A00 }
+.slide input.wpsc_buy_button, .slide a.morebutton { background-image: url(../images/DarkGreen/btn_buyslide.png); color: #fff }
+#pagetop.slides .slide.page-title { background: url(../images/DarkGreen/pagetop.png) repeat-y 0 0; color: #fff; margin: 0; padding: 26px 27px }
+
+#ftr, #ftr a { color: #fff }
+
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeDarkGreen a { font-weight: bold }
