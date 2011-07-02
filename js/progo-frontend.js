@@ -64,10 +64,10 @@ function progo_homecycle( lnk ) {
 			left: dir
 		}, 600, function() {
 			jQuery(this).toggleClass('on');
-		});
+		/* });
 		jQuery('#pagetop').animate({
 			height: nex.outerHeight(true)
-		}, 600, function() {
+		}, 600, function() {*/
 			jQuery('#pagetop .ar a').removeClass('off');
 			progo_scrollcheck();
 		});
@@ -92,7 +92,7 @@ jQuery(function($) {
 	var progo_ptop = $('#pagetop');
 	if(progo_ptop.hasClass('slides')) {
 		progo_ptop.children('div.ar').children('a').click(function() { return progo_homecycle($(this)); });//.next().click(function() { return progo_homecycle(false); });
-		progo_ptop.height(progo_ptop.children('.slide.on').height()).addClass('sliding');
+		progo_ptop.addClass('sliding'); //height(progo_ptop.children('.slide.on').height()).
 		$(window).bind('scroll.progo',progo_scrollcheck).trigger('scroll.progo');
 	}
 	

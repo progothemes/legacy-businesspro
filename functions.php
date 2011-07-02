@@ -1101,10 +1101,10 @@ function progo_options_defaults() {
 			"copyright" => "© Copyright 2011, All Rights Reserved",
 			"showtips" => 1,
 			"layout" => 1,
-			"headline" => "Get Your Customers What They Need Most!",
+			"headline" => "Get Your Customers\nWhat They Need Most!",
 			"form" => "[contact-form 1]",
 			"frontpage" => get_option( 'show_on_front' ),
-			"homeseconds" => 6
+			"homeseconds" => 8
 		);
 		update_option( 'progo_options', $def );
 	}
@@ -1556,9 +1556,8 @@ if ( ! function_exists( 'progo_field_headline' ) ):
  */
 function progo_field_headline() {
 	$options = get_option( 'progo_options' );
-	?>
-<input id="progo_headline" name="progo_options[headline]" value="<?php esc_html_e( $options['headline'] ); ?>" class="regular-text" type="text" />
-<span class="description">Headline for the homepage Form</span>
+	?><table><tr valign="top"><td style="padding-left: 0"><textarea id="progo_headline" name="progo_options[headline]" rows="3" cols="20"><?php esc_attr_e( $options['headline'] ); ?></textarea></td>
+    <td><span class="description">Headline for the homepage Form</span></td></tr></table>
 <?php }
 endif;
 if ( ! function_exists( 'progo_field_form' ) ):
@@ -1907,7 +1906,19 @@ function progo_admin_post_thumbnail_html($html) {
 	global $post_type;
 	global $post;
 	if( $post_type=='progo_homeslide' ) {
-		$html = str_replace(__('Set featured image').'</a>',__('Upload/Select a Background Image</a>. Recommended Size: 960px W x 330px H'), $html );
+		$options = get_option( 'progo_options' );
+		switch( $options['layout'] ) {
+			case 3:
+				$size = '305px W x 322px H';
+				break;
+			case 4:
+				$size = '647px W x 322px H';
+				break;
+			default:
+				$size = '646px W x 382px H';
+				break;
+		}
+		$html = str_replace(__('Set featured image').'</a>',__('Upload/Select a Background Image') .'</a> '. __('Recommended Size') .': '. $size, $html );
 	}
 	return $html;
 }
@@ -1925,6 +1936,7 @@ function progo_admin_bar_render() {
 	// move Appearance > Widgets & Menus submenus to below our new ones
 	$wp_admin_bar->remove_menu('widgets');
 	$wp_admin_bar->remove_menu('menus');
+	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=progo_admin') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'homeslides', 'title' => __('Homepage Slides'), 'href' => admin_url('edit.php?post_type=progo_homeslide') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'background', 'title' => __('Background'), 'href' => admin_url('themes.php?page=custom-background') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'menus', 'title' => __('Menus'), 'href' => admin_url('nav-menus.php') ) );

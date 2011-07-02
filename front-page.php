@@ -21,7 +21,7 @@ switch( $options['layout'] ) {
 }
 ?>
 <div id="container" class="container_12">
-<div id="pagetop" class="slides grid_<?php echo $pagetopW; ?>">
+<div id="pagetop" class="slides grid_<?php echo $pagetopW .' Layout'. $options['layout']; ?>">
 <?php
 $original_query = $wp_query;
 $slides = get_posts('post_type=progo_homeslide&post_status=publish&posts_per_page=-1&orderby=menu_order&order=ASC');
@@ -43,12 +43,15 @@ foreach ( $slides as $s ) {
 		$thm = get_post( $thmID );
 		$bg .= ' custombg " style="background-image: url('. $thm->guid .')';
 	}
+	/*
 	switch( $options['layout'] ) {
 		default:
-			echo '<div class="textslide slide'. $on . $bg .'"><div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
-			echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div>';
-			break;
+	*/
+	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside"><div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
+	echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div></div>';
+	/*break;
 	}
+	*/
 }
 if ( $oneon == true && $count > 1 ) { ?>
 <div class="ar"><a href="#p" title="Previous Slide"></a><a href="#n" class="n" title="Next Slide"></a></div>
@@ -60,6 +63,7 @@ progo_timing = <?php $hsecs = absint($options['homeseconds']); echo $hsecs > 0 ?
 do_action('progo_pagetop'); ?>
 </div>
 <div class="hform">
+<table class="tar" width="100%"><tr><td width="100%" height="96" align="center"><?php echo nl2br(wp_kses($options['headline'], array())); ?></td></tr></table>
 <?php echo apply_filters('the_content', $options['form']); ?>
 </div>
 <div id="main" class="grid_8">
