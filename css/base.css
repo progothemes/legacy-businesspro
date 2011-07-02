@@ -79,11 +79,11 @@ ul#nav li.hover ul { display: block }
 #hdr .hblock.support h3 { float: left; font-size: 17px; font-weight: normal; margin: 0 10px 0 0; color: #666 }
 #hdr .hblock.support .inside { float:left; font-size: 17px; color: #333 }
 /* content */
-#pagetop { float: left; width: 960px; background: url(../images/Greyscale/pagetop.jpg) no-repeat 0 0; position: relative; color: #fff }
+#pagetop { float: left; background: url(../images/Greyscale/pagetop.jpg) no-repeat 0 0; position: relative; color: #fff }
 #pagetop .page-title { float: left; width: 906px; margin: 26px 27px; font: 40px/120% Arial, Helvetica, sans-serif }
 /* homepage slides */
 #pagetop.sliding { overflow: hidden }
-#pagetop .slide { display: none; float: left; width: 960px }
+#pagetop .slide { display: none; float: left; width: 100% }
 #pagetop .slide.on { display: block }
 #pagetop.sliding .slide { display: block; position: absolute; top: 0; left: 960px; z-index: 1 }
 #pagetop.sliding .slide.on { left: 0 }
@@ -94,6 +94,7 @@ ul#nav li.hover ul { display: block }
 #pagetop .slide.textslide .content { margin: 0 27px 26px }
 .ar { float: right; display: block; width: 112px; height: 24px; position: absolute; bottom: 0; right: 10px; z-index:2; background: url(../images/ar.png) no-repeat 0 0 }
 .ar a { float: left; width: 56px; height: 24px; background: url(../images/fx.gif) repeat 0 0 }
+.hform { float: right }
 
 #main, #main input, #main textarea { color: #333; font-size: 13px; line-height: 120% }
 #main input.upd { border: none; background: none; padding: 0; cursor:pointer }

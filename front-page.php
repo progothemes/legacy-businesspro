@@ -8,9 +8,20 @@
 get_header();
 global $wp_query, $post;
 $options = get_option( 'progo_options' );
+
+switch( $options['layout'] ) {
+	case 1:
+	case 2:
+		$pagetopW = 8;
+		break;
+	case 3:
+	case 4:
+		$pagetopW = 12;
+		break;
+}
 ?>
 <div id="container" class="container_12">
-<div id="pagetop" class="slides">
+<div id="pagetop" class="slides grid_<?php echo $pagetopW; ?>">
 <?php
 $original_query = $wp_query;
 $slides = get_posts('post_type=progo_homeslide&post_status=publish&posts_per_page=-1&orderby=menu_order&order=ASC');
@@ -32,7 +43,7 @@ foreach ( $slides as $s ) {
 		$thm = get_post( $thmID );
 		$bg .= ' custombg " style="background-image: url('. $thm->guid .')';
 	}
-	switch( absint($options['layout']) ) {
+	switch( $options['layout'] ) {
 		default:
 			echo '<div class="textslide slide'. $on . $bg .'"><div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
 			echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div>';
@@ -47,6 +58,9 @@ progo_timing = <?php $hsecs = absint($options['homeseconds']); echo $hsecs > 0 ?
 <?php
 }
 do_action('progo_pagetop'); ?>
+</div>
+<div class="hform">
+<?php echo apply_filters('the_content', $options['form']); ?>
 </div>
 <div id="main" class="grid_8">
 <?php
