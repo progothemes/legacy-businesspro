@@ -297,6 +297,11 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
 				'btn' => 'Manage Homepage Slides',
 				'desc' => ''
 			),
+			'Contact Forms' => array(
+				'url' => 'admin.php?contactform=1&page=wpcf7',
+				'btn' => 'Manage Contact Forms',
+				'desc' => ''
+			),
 			'Background' => array(
 				'url' => 'themes.php?page=custom-background',
 				'btn' => 'Customize Your Background',
@@ -313,8 +318,11 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
 				'desc' => 'Customize what appears in the right column on various areas of your site.'
 			)
 		);
+		if ( is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ) === false ) {
+			unset($addl['Contact Forms']);
+		}
 		foreach ( $addl as $k => $v ) {
-			echo '<tr><th scope="row">'. wp_kses($k,array()) .'</th><td><a href="'. esc_url($v['url']) .'" class="button">'. wp_kses($v['btn'],array()) .' &raquo;</a> <span class="description">'. wp_kses($v['desc'],array()) .'</span></td></tr>';
+			echo '<tr><th scope="row">'. wp_kses($k,array()) .'</th><td><a href="'. esc_url($v['url']) .'" class="button" target="_blank">'. wp_kses($v['btn'],array()) .' &raquo;</a> <span class="description">'. wp_kses($v['desc'],array()) .'</span></td></tr>';
 		} ?>
         </table><p><br /></p>
         <h3><a name="recommended"></a>Recommended Plugins</h3>
@@ -458,6 +466,12 @@ function progo_admin_init() {
 			case 'menus_set':
 				progo_menus_set();
 				break;
+			case 'firstform':
+				progo_firstform();
+				break;
+			case 'firstform_set':
+				progo_firstform_set();
+				break;
 		}
 	}
 	
@@ -493,6 +507,9 @@ function progo_admin_init() {
 	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_info', 'progo_info' );
 
 	add_settings_section( 'progo_homepage', 'Homepage Settings', 'progo_section_text', 'progo_hometop' );
+	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
+	add_settings_field( 'progo_headline', 'Form Headline', 'progo_field_headline', 'progo_hometop', 'progo_homepage' );
+	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_frontpage', 'Display', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
 	
@@ -520,7 +537,7 @@ function progo_admin_init() {
 			// register the new menus as THE menus in theme's menu areas
 			set_theme_mod( 'nav_menu_locations' , $new_menus );
 		}
-			
+		
 		// create a few new pages, and populate some menus
 		$lipsum = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam...Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna\n\nLorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam...Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam";
 		
@@ -602,6 +619,25 @@ function progo_admin_init() {
 				}
 			}
 		}
+		// and lets also add our first HOMEPAGE SLIDE ?
+		$slide1 = wp_insert_post( array(
+			'post_title' 	=>	'BusinessPro Comes With Proven Features to Increase Conversions',
+			'post_type' 	=>	'progo_homeslide',
+			'post_name'		=>	'slide1',
+			'comment_status'=>	'closed',
+			'ping_status' 	=>	'closed',
+			'post_content' 	=>	'',
+			'post_status' 	=>	'publish',
+			'post_author' 	=>	1,
+			'menu_order'	=>	1
+		));
+		
+		$slidecontent = array(
+			'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\"><strong>View Details</strong></a>",
+			'textcolor' => 'Light'
+		);
+		update_post_meta($slide1, "_progo_slidecontent", $slidecontent);
+		
 		// set our default SITE options
 		progo_options_defaults();
 		
@@ -765,7 +801,7 @@ function progo_slidecontent_box() {
 	$custom = get_post_meta($post->ID,'_progo_slidecontent');
 	$content = (array) $custom[0];
 	if ( ! isset( $content['text'] ) ) {
-		$slidetext = '';
+		$slidetext = "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\"><strong>View Details</strong></a>";
 	} else {
 		$slidetext = $content['text'];
 	}
@@ -775,14 +811,14 @@ function progo_slidecontent_box() {
 	?>
     <div class="slidecontent" id="slidetypeTextContent">
     	<p><em>Title (above) will be used as the main text Headline for this Slide</em></p>
-        <p>Text Additional Copy (optional)<br />
-        <textarea name="progo_slidecontent[text]" rows="3" style="width: 100%"><?php echo esc_attr($slidetext); ?></textarea></p>
+        <p><strong>Additional Copy (optional)</strong><br />
+        <textarea name="progo_slidecontent[text]" rows="6" style="width: 100%"><?php echo esc_attr($slidetext); ?></textarea><br /><em>Line Breaks in the text above will be converted to "&lt;br /&gt;" on display</em></p>
     </div>
     <table id="slideTextColor"><tr><th scope="row">Slide Text Color :</th><?php
 	
 	$colors = array( 'Light', 'Dark');
 	foreach ( $colors as $c ) {
-		?><td style="padding-right: 41px"><label for="slideTextColor<?php esc_attr_e( $c ); ?>"><input type="radio" name="progo_slidecontent[textcolor]" id="slideTextColor<?php esc_attr_e( $c ); ?>" value="<?php esc_attr_e( $c ); ?>" <?php checked($content['textcolor'], $c) ?> /> <?php esc_attr_e( $c ); ?></label></td><?php
+		?><td style="padding: 0 41px"><label for="slideTextColor<?php esc_attr_e( $c ); ?>"><input type="radio" name="progo_slidecontent[textcolor]" id="slideTextColor<?php esc_attr_e( $c ); ?>" value="<?php esc_attr_e( $c ); ?>" <?php checked($content['textcolor'], $c) ?> /> <?php esc_attr_e( $c ); ?></label></td><?php
 	} ?></tr></table>
     <script type="text/javascript">
 /* <![CDATA[ */
@@ -891,9 +927,70 @@ if ( ! function_exists( 'progo_menus_set' ) ):
  */
 function progo_menus_set(){
 	check_admin_referer( 'progo_menus_set' );
-	update_option( 'progo_businesspro_onstep', 6);
+	// menus are set - proceed to next step
+	update_option( 'progo_businesspro_onstep', 7);
 	
 	wp_redirect( admin_url("themes.php?page=progo_admin") );
+	exit();
+}
+endif;
+if ( ! function_exists( 'progo_firstform' ) ):
+/**
+ * @since Business Pro 1.0
+ */
+function progo_firstform(){
+	check_admin_referer( 'progo_firstform' );
+	// update first CF7 form to use on the Homepage area
+	global $wpdb, $wpcf7;
+	
+	$form = '<label for="name">Your Name<span title="Required">*</span></label>' . "\n"
+		.'[text* name id:name class:text]' . "\n\n"
+		.'<label for="phone">Phone</label>' . "\n"
+		.'[text phone id:phone class:text]' . "\n\n"
+		.'<label for="email">Email<span title="Required">*</span></label>' . "\n"
+		.'[email* email id:email class:text]' . "\n\n"
+		.'[submit class:submit "Submit Today!"]';
+	
+	$subject = get_option( 'blogname' ) .' : Contact Form';
+	$sender = '[name] <[email]>';
+	$body = sprintf( __( 'Name: %s', 'wpcf7' ), '[name]' ) . "\n"
+		. sprintf( __( 'Phone: %s', 'wpcf7' ), '[phone]' ) . "\n\n"
+		. sprintf( __( 'Email: %s', 'wpcf7' ), '[email]' ) . "\n\n" . '--' . "\n"
+		. sprintf( __( 'This mail is sent via contact form on %1$s %2$s', 'wpcf7' ),
+			get_bloginfo( 'name' ), get_bloginfo( 'url' ) );
+	$recipient = get_option( 'admin_email' );
+	$additional_headers = '';
+	$attachments = '';
+	$use_html = 0;
+	$mail = compact( 'subject', 'sender', 'body', 'recipient', 'additional_headers', 'attachments', 'use_html' );
+	
+	$wpdb->update( $wpcf7->contactforms,
+		array(
+			'title' => 'Homepage Form',
+			'form' => $form,
+			'mail' => maybe_serialize( $mail )
+		),
+		array( 'cf7_unit_id' => 1 ),
+		array( '%s', '%s', '%s' ),
+		array( '%d' )
+	);
+	
+	update_option( 'progo_businesspro_onstep', 5);
+	
+	wp_redirect( admin_url("admin.php?page=wpcf7") );
+	exit();
+}
+endif;
+if ( ! function_exists( 'progo_firstform_set' ) ):
+/**
+ * @since Business Pro 1.0
+ */
+function progo_firstform_set(){
+	check_admin_referer( 'progo_firstform_set' );
+	// first form is set - proceed to next step
+	update_option( 'progo_businesspro_onstep', 6);
+	
+	wp_redirect( admin_url("options-permalink.php") );
 	exit();
 }
 endif;
@@ -1003,6 +1100,9 @@ function progo_options_defaults() {
 			"support" => "123-555-7890",
 			"copyright" => "© Copyright 2011, All Rights Reserved",
 			"showtips" => 1,
+			"layout" => 1,
+			"headline" => "Get Your Customers What They Need Most!",
+			"form" => "[contact-form 1]",
 			"frontpage" => get_option( 'show_on_front' ),
 			"homeseconds" => 6
 		);
@@ -1048,7 +1148,7 @@ function progo_validate_options( $input ) {
 	}
 	
 		// do validation here...
-	$arr = array( 'blogname', 'blogdescription', 'colorscheme', 'support', 'copyright' );
+	$arr = array( 'blogname', 'blogdescription', 'colorscheme', 'support', 'copyright', 'headline' );
 	foreach ( $arr as $opt ) {
 		$input[$opt] = wp_kses( $input[$opt], array() );
 	}
@@ -1083,6 +1183,13 @@ function progo_validate_options( $input ) {
 			$input[$f] = 0;
 		}
 	}
+	
+	// opt[layout] can only be an int  1 <= int <= 4
+	$intcheck = absint( $input['layout'] );
+	if ( $intcheck < 1 || $intcheck > 4 ) {
+		$intcheck = 1;
+	}
+	$input['layout'] = absint( $intcheck );
 	
 	// save blogname & blogdescription to other options as well
 	$arr = array( 'blogname', 'blogdescription' );
@@ -1318,7 +1425,37 @@ Maximum upload file size: <?php echo ini_get( "upload_max_filesize" ); ?>. Allow
 #needswork
 }
 endif;
-
+if ( ! function_exists( 'progo_field_layout' ) ):
+/**
+ * outputs HTML for "Pay Layout" option on Site Settings page
+ * @since Business Pro 1.0
+ */
+function progo_field_layout() {
+	$options = get_option( 'progo_options' );
+	$layouton = absint($options['layout']);
+	if ( $layouton < 1 || $layouton > 4 ) {
+		$layouton = 1;
+	}
+	$descriptions = array(
+		1 => 'Lots of room for Text on the Left, Form on the Right',
+		2 => 'Background Image with Text on the Left, Form on the Right',
+		3 => 'Lots of room for Text, Featured Image on the Right, Form below',
+		4 => 'Large Image on the Left, Text on the Right, Form below'
+	);
+//	echo '<pre style="display:none">'. print_r($options,true) .'</pre>';
+	?>
+    <table>
+    <tr valign="top">
+<?php
+	for ( $i=1; $i<5; $i++ ) {
+		$chk = $layouton==$i ? ' checked="checked"' : '';
+		echo '<td><input type="radio" name="progo_options[layout]" id="progolayout'. $i .'" value="'. $i .'"'. $chk .' /></td><td><label for="progolayout'. $i .'"><img src="'. get_bloginfo('template_url') .'/images/homeslideOptions/'. $i .'.jpg" /><br /><strong>Layout '. $i .'</strong></label><br /><span class="description">'. $descriptions[$i] .'</span></td>';
+		//<option value="'. $color .'"'. (($options['colorscheme']==$color) ? ' selected="selected"' : '') .'>'.esc_html($color).'</option>';
+	}
+	?></tr></table>
+	<?php
+}
+endif;
 /**
  * outputs HTML for "API Key" field on Site Settings page
  * @since Business Pro 1.0
@@ -1410,6 +1547,29 @@ function progo_field_copyright() {
 	?>
 <input id="progo_copyright" name="progo_options[copyright]" value="<?php esc_html_e( $options['copyright'] ); ?>" class="regular-text" type="text" />
 <span class="description">Copyright notice that appears on the right side of your site's footer.</span>
+<?php }
+endif;
+if ( ! function_exists( 'progo_field_headline' ) ):
+/**
+ * outputs HTML for "Customer Support" field on Site Settings page
+ * @since Business Pro 1.0
+ */
+function progo_field_headline() {
+	$options = get_option( 'progo_options' );
+	?>
+<input id="progo_headline" name="progo_options[headline]" value="<?php esc_html_e( $options['headline'] ); ?>" class="regular-text" type="text" />
+<span class="description">Headline for the homepage Form</span>
+<?php }
+endif;
+if ( ! function_exists( 'progo_field_form' ) ):
+/**
+ * outputs HTML for "Customer Support" field on Site Settings page
+ * @since Business Pro 1.0
+ */
+function progo_field_form() {
+	$options = get_option( 'progo_options' );
+	?>
+<textarea id="progo_homeform" name="progo_options[form]" rows="3" cols="100%"><?php esc_attr_e( $options['form'] ); ?></textarea>
 <?php }
 endif;
 if ( ! function_exists( 'progo_field_frontpage' ) ):
@@ -1529,11 +1689,11 @@ if ( ! function_exists( 'progo_businesspro_completeness' ) ):
  * @since Business Pro 1.0
  */
 function progo_businesspro_completeness( $onstep ) {
-	if ( $onstep < 1 || $onstep > 6 ) {
+	if ( $onstep < 1 || $onstep > 7 ) {
 		$onstep = 1;
 	}
 	
-	if ( $onstep < 6 ) { // ok check it
+	if ( $onstep < 7 ) { // ok check it
 		switch($onstep) {
 			case 1: // check API auth
 				$apiauth = get_option( 'progo_businesspro_apiauth', true );
@@ -1552,11 +1712,11 @@ function progo_businesspro_completeness( $onstep ) {
 					$onstep = 4;
 				}
 				break;
-			case 4: // Permalinks
+			case 6: // Permalinks
 				$permalink = get_option( 'permalink_structure', '' );
 				$defaultok = get_option( 'progo_permalink_checked', false );
 				if ( ( $permalink != '' ) || ( ( $permalink == '' ) &&  ( $defaultok == true ) ) ) {
-					$onstep = 5;
+					$onstep = 7;
 				}
 				break;
 		}
@@ -1605,7 +1765,7 @@ function progo_admin_notices() {
 	
 	$onstep = absint(get_option('progo_businesspro_onstep', true));
 	
-	if ( $onstep < 6 ) {
+	if ( $onstep < 7 ) {
 		$onstep = progo_businesspro_completeness( $onstep );
 		update_option( 'progo_businesspro_onstep', $onstep);
 		// couldnt check step 2 before but now we have get_plugins() function
@@ -1617,22 +1777,34 @@ function progo_admin_notices() {
 		$pct = 0;
 		$nst = '';
 		switch($onstep) {
-			case 2: // CF7 INSTALLED
+			case 1: // theme has been activated but no good API key yet
+				$pct = 15;
+				$nst = 'Activate your ProGo Theme API Key';
+				break;
+			case 2: // INSTALL CF7
 				$lnk = ( function_exists( 'wp_nonce_url' ) ) ? wp_nonce_url( 'update.php?action=install-plugin&amp;plugin=contact-form-7', 'install-plugin_contact-form-7' ) : 'plugin-install.php';
-				$pct = 50;
+				$pct = 35;
 				$nst = '<a href="'. esc_url( $lnk ) .'">Click Here to Install the Contact Form 7 Plugin</a>';
 				break;
-			case 3: // CF7 ACTIVATED
+			case 3: // ACTIVATE CF7
 				$lnk = ( function_exists( 'wp_nonce_url' ) ) ? wp_nonce_url( 'plugins.php?action=activate&amp;plugin=contact-form-7/wp-contact-form-7.php', 'activate-plugin_contact-form-7/wp-contact-form-7.php' ) : 'plugins.php';
-				$pct = 70;
+				$pct = 50;
 				$nst = '<a href="'. esc_url( $lnk ) .'">Click Here to Activate the Contact Form 7 Plugin</a>';
 				break;
-			case 4: // Permalinks
-				$pct = 90;
+			case 4: // CREATE CF7 Form1
+				$pct = 65;
+				$nst = 'The CF7 Plugin is Installed &amp; Activated! <a href="'. wp_nonce_url("admin.php?progo_admin_action=firstform", 'progo_firstform') .'">Click Here to set up the first Form for your Homepage</a>.';
+				break;
+			case 5: // Customize further
+				$pct = 75;
+				$nst = 'When you are done configuring your first Contact Form, <a href="'. wp_nonce_url("admin.php?progo_admin_action=firstform_set", 'progo_firstform_set') .'">click here to proceed to the next step</a>.';
+				break;
+			case 6: // Permalinks
+				$pct = 80;
 				$nst = 'Your <em>Permalinks</em> settings are still set to the Default option. <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_recommended", 'progo_permalink_check') .'">Use the ProGo-Recommended "Day and name" setting</a>, <a href="'. admin_url("options-permalink.php") .'">Choose another non-Default option for yourself</a>, or <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_default", 'progo_permalink_check') .'">keep the Default setting and move to the next step</a>.';
 				break;
-			case 5: // Main Menu
-				$pct = 95;
+			case 7: // Main Menu
+				$pct = 90;
 				$nst = '<a href="'. admin_url('nav-menus.php') .'">Customize your site\'s Menus</a> by adding more links from the left column, and rearranging links with Drag-n-Drop. <strong>This is the last step to setting up your Business Pro site!</strong> When your Menus are set, <a href="'. wp_nonce_url("admin.php?progo_admin_action=menus_set", 'progo_menus_set') .'">click here to remove this message</a>.';
 				break;
 		}
