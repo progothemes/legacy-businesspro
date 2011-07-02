@@ -40,6 +40,9 @@ function progo_setup() {
 	// Add support for post thumbnails
 	add_theme_support( 'post-thumbnails' );
 	add_image_size( 'large', 596, 397, true );
+	add_image_size( 'homeslide', 646, 382, true );
+	add_image_size( 'homeslide3', 305, 322, true );
+	add_image_size( 'homeslide4', 647, 322, true );
 	
 	// Add custom actions
 	add_action( 'admin_init', 'progo_admin_init' );

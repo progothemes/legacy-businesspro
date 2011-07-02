@@ -38,11 +38,25 @@ foreach ( $slides as $s ) {
 	$slidecustom = get_post_meta($s->ID,'_progo_slidecontent');
 	$slidecontent = (array) $slidecustom[0];
 	$bg = ' '. $slidecontent['textcolor'];
-	$thmID = get_post_thumbnail_id( $s->ID );
-	if ( $thmID ) {
-		$thm = get_post( $thmID );
-		$bg .= ' custombg " style="background-image: url('. $thm->guid .')';
+	if ( get_post_thumbnail_id( $s->ID ) ) {
+		switch( $options['layout'] ) {
+			case 3:
+				$imgsize = 'homeslide3';
+				break;
+			case 4:
+				$imgsize = 'homeslide4';
+				break;
+			default:
+				$imgsize = 'homeslide';
+				break;
+		}
+		
+		$thm = get_the_post_thumbnail($s->ID, $imgsize);
+		$thmsrc = strpos($thm, 'src="') + 5;
+		$thmsrc = substr($thm, $thmsrc, strpos($thm,'"',$thmsrc+1)-$thmsrc);
+		$bg .= ' custombg " style="background-image: url('. $thmsrc .')';
 	}
+	
 	/*
 	switch( $options['layout'] ) {
 		default:
