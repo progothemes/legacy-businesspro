@@ -298,27 +298,27 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
 			'Homepage Slides' => array(
 				'url' => 'edit.php?post_type=progo_homeslide',
 				'btn' => 'Manage Homepage Slides',
-				'desc' => ''
-			),
-			'Contact Forms' => array(
-				'url' => 'admin.php?contactform=1&page=wpcf7',
-				'btn' => 'Manage Contact Forms',
-				'desc' => ''
+				'desc' => 'Edit existing slides, change text, upload images, and add more slides.'
 			),
 			'Background' => array(
 				'url' => 'themes.php?page=custom-background',
 				'btn' => 'Customize Your Background',
 				'desc' => 'Change the underlying color, or upload your own custom background image.'
 			),
+			'Widgets' => array(
+				'url' => 'widgets.php',
+				'btn' => 'Manage Widgets',
+				'desc' => 'Customize what appears in the right column on various areas of your site.'
+			),
 			'Menus' => array(
 				'url' => 'nav-menus.php',
 				'btn' => 'Manage Menu Links',
 				'desc' => 'Control the links in the Header &amp; Footer area of your site.'
 			),
-			'Widgets' => array(
-				'url' => 'widgets.php',
-				'btn' => 'Manage Widgets',
-				'desc' => 'Customize what appears in the right column on various areas of your site.'
+			'Contact Forms' => array(
+				'url' => 'admin.php?contactform=1&page=wpcf7',
+				'btn' => 'Manage Contact Forms',
+				'desc' => 'Edit Contact Form 7 Forms that appear on your site, like on the Homepage.'
 			)
 		);
 		if ( is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ) === false ) {
@@ -1107,7 +1107,7 @@ function progo_options_defaults() {
 			"headline" => "Get Your Customers\nWhat They Need Most!",
 			"form" => "[contact-form 1]",
 			"frontpage" => get_option( 'show_on_front' ),
-			"homeseconds" => 8
+			"homeseconds" => 6
 		);
 		update_option( 'progo_options', $def );
 	}
@@ -1942,8 +1942,8 @@ function progo_admin_bar_render() {
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=progo_admin') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'homeslides', 'title' => __('Homepage Slides'), 'href' => admin_url('edit.php?post_type=progo_homeslide') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'background', 'title' => __('Background'), 'href' => admin_url('themes.php?page=custom-background') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'menus', 'title' => __('Menus'), 'href' => admin_url('nav-menus.php') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'widgets', 'title' => __('Widgets'), 'href' => admin_url('widgets.php') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'menus', 'title' => __('Menus'), 'href' => admin_url('nav-menus.php') ) );
 	
 	$avail = progo_colorschemes();
 	if ( count($avail) > 0 ) {

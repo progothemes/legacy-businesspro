@@ -26,6 +26,8 @@ get_header(); ?>
 <?php comments_template( '', true ); ?>
 <?php endwhile; // end of the loop. ?>
 </div><!-- #main -->
+<div class="grid_4 secondary">
 <?php get_sidebar('blog'); ?>
-		</div><!-- #container -->
+</div>
+</div><!-- #container -->
 <?php get_footer(); ?>

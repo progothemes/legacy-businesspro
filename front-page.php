@@ -76,10 +76,11 @@ progo_timing = <?php $hsecs = absint($options['homeseconds']); echo $hsecs > 0 ?
 }
 do_action('progo_pagetop'); ?>
 </div>
-<div class="hform">
-<table class="tar" width="100%"><tr><td width="100%" height="96" align="center"><?php echo nl2br(wp_kses($options['headline'], array())); ?></td></tr></table>
-<?php echo apply_filters('the_content', $options['form']); ?>
-</div>
+<?php
+if ( $options['layout'] < 3 ) {
+	get_sidebar('hform');
+}
+?>
 <div id="main" class="grid_8">
 <?php
 rewind_posts();
@@ -100,11 +101,16 @@ switch ( $options['frontpage'] ) {
 }
 ?>
 </div><!-- #main -->
-<?php 
+<div class="grid_4 secondary">
+<?php
+if ( $options['layout'] > 2 ) {
+	get_sidebar('hform');
+}
 if($options['frontpage'] == 'posts') {
 	get_sidebar('blog');
 } else {
 	get_sidebar();
 } ?>
+</div>
 </div><!-- #container -->
 <?php get_footer(); ?>

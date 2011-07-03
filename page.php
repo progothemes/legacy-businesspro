@@ -28,6 +28,8 @@ get_header();
 </div><!-- #post-## -->
 </div><!-- #main -->
 <?php endwhile; ?>
+<div class="grid_4 secondary">
 <?php get_sidebar(); ?>
+</div>
 </div><!-- #container -->
 <?php get_footer(); ?>

@@ -27,6 +27,8 @@ get_header(); ?>
 get_template_part( 'loop', 'index' );
 ?>
 </div><!-- #main -->
+<div class="grid_4 secondary">
 <?php get_sidebar('blog'); ?>
-		</div><!-- #container -->
+</div>
+</div><!-- #container -->
 <?php get_footer(); ?>
