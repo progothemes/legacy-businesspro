@@ -2,8 +2,13 @@ body { background: url(../images/BlackOrange/bg.png) repeat 0 0 }
 #fx { background: url(../images/BlackOrange/bg-grad.png) repeat-x 0 0 }
 .custombg #fx { background: none }
 #pagetop { background: url(../images/BlackOrange/pagetop.jpg) no-repeat 0 0 }
-.slide input.wpsc_buy_button, .slide a.morebutton { background-image: url(../images/BlackOrange/btn_buyslide.png); color: #fff }
-#pagetop.slides div.price { color: #000 }
+#pagetop.sliding.grid_12 { background-image: url(../images/BlackOrange/pagetop.jpg) }
+#pagetop .page-title { font-weight: normal; text-shadow: 2px 2px 2px rgba(0,0,0,0.25) }
+
+.hform { background-image: url(../images/BlackOrange/hform.jpg) }
+.hform .tar { color: #fff; text-shadow: 2px 2px 2px rgba(0,0,0,0.4) }
+.hform input.submit { background-image: url(../images/BlackOrange/submit.png); color: #fff; text-shadow: 2px 2px 2px rgba(0,0,0,0.4) }
+.secondary .hform { background-image: url(../images/BlackOrange/hform2.png) }
 
 #ftr, #ftr a { color: #fff }
 
