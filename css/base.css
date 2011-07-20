@@ -73,7 +73,7 @@ ul#nav li.current-menu-item a.first, body.wpsc ul#nav li.wpsc a.first, body.blog
 ul#nav li a:hover { font-weight: bold; text-decoration:none }
 ul#nav ul { display: none; position: absolute; top: 35px; left: -1px; width: 132px; list-style: none; background: rgba(255, 255, 255, 0.97); border: 1px solid #dfdfdf; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); z-index: 3; margin: 0; }
 ul#nav ul li { float: none; display: block; padding: 0; background: none }
-ul#nav ul li a { float: none; display: block; padding: 0; background: none !important; color: #333; font-size: 13px; line-height: 28px; height: 28px; padding: 0 10px; text-align: left }
+ul#nav ul li a { float: none; display: block; background: none !important; color: #333; font-size: 13px; line-height: 16px; height: auto; padding: 6px 10px; width: 112px; text-align: left }
 ul#nav li.hover ul { display: block }
 #hdr .hblock.support { float: right; margin-top: 40px }
 #hdr .hblock.support h3 { float: left; font-size: 17px; font-weight: normal; margin: 0 10px 0 0; color: #666 }
