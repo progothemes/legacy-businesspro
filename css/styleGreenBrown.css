@@ -7,7 +7,7 @@ ul#nav li { background-image:url(../images/GreenBrown/navli.png) }
 ul#nav li.current-menu-item a.first, body.wpsc ul#nav li.wpsc a.first, body.blog ul#nav li.blog a.first { background: url(../images/GreenBrown/navon.png) repeat-x 0 0; color: #fff }
 
 #pagetop { background-image: url(../images/GreenBrown/pagetop.jpg) }
-#pagetop.sliding { background: #fff url(../images/GreenBrown/slidetop.png) repeat-x 0 100%; color: #000 }
+#pagetop.sliding { background: #fff url(../images/GreenBrown/slidetop.png) repeat-x 0 100% }
 #pagetop a { color: #000 }
 .sliding .slide { text-shadow: none }
 .hform input.submit { background-image: url(../images/GreenBrown/submit.png); color: #fff }
