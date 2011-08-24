@@ -947,11 +947,11 @@ function progo_firstform(){
 	global $wpdb, $wpcf7;
 	
 	$form = '<label for="name">Your Name<span title="Required">*</span></label>' . "\n"
-		.'[text* name id:name class:text]' . "\n\n"
+		.'[text* name id:name class:text akismet:author]' . "\n\n"
 		.'<label for="phone">Phone</label>' . "\n"
 		.'[text phone id:phone class:text]' . "\n\n"
 		.'<label for="email">Email<span title="Required">*</span></label>' . "\n"
-		.'[email* email id:email class:text]' . "\n\n"
+		.'[email* email id:email class:text akismet:author_email]' . "\n\n"
 		.'[submit class:submit "Submit Today!"]';
 	
 	$subject = get_option( 'blogname' ) .' : Contact Form';
