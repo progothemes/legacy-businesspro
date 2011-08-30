@@ -17,7 +17,7 @@
 if ( ! dynamic_sidebar( 'header' ) ) :
 ?>
 <div class="hblock support">
-    <h3 class="title"><span class="spacer"><?php _e( 'Contact Us', 'progo' ); ?></span></h3>
+    <h3 class="title"><span class="spacer"><?php _e( 'Call Today:', 'progo' ); ?></span></h3>
     <div class="inside">
         <?php
 		$options = get_option('progo_options');

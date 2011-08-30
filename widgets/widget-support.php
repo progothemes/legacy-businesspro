@@ -33,7 +33,7 @@ class ProGo_Widget_Support extends WP_Widget {
 	 */
 	function widget( $args, $instance ) {
 		extract($args);
-		$title = apply_filters( 'widget_title', empty($instance['title']) ? __('Customer Support') : $instance['title'], $instance, $this->id_base);
+		$title = apply_filters( 'widget_title', empty($instance['title']) ? __('Call Today:') : $instance['title'], $instance, $this->id_base);
 		echo $before_widget;
 		if ( $title )
 			echo $before_title . $title . $after_title;
