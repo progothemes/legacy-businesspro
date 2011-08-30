@@ -25,7 +25,6 @@ switch( $options['layout'] ) {
 <?php
 $original_query = $wp_query;
 $slides = get_posts('post_type=progo_homeslide&post_status=publish&posts_per_page=-1&orderby=menu_order&order=ASC');
-echo '<!-- '. print_r($slides,true) .' -->';
 $count = count($slides);
 $oneon = false;
 foreach ( $slides as $s ) {
@@ -62,7 +61,7 @@ foreach ( $slides as $s ) {
 		default:
 	*/
 	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside"><div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
-	echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div></div>';
+	echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div>'. ($pagetopW==12 ? '<div class="shadow"></div>' : '') .'</div>';
 	/*break;
 	}
 	*/
@@ -74,7 +73,9 @@ progo_timing = <?php $hsecs = absint($options['homeseconds']); echo $hsecs > 0 ?
 </script>
 <?php
 }
-do_action('progo_pagetop'); ?>
+do_action('progo_pagetop');
+if ($pagetopW==8) echo '<div class="shadow"></div>';
+?>
 </div>
 <?php
 if ( $options['layout'] < 3 ) {
