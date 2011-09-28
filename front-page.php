@@ -8,7 +8,10 @@
 get_header();
 global $wp_query, $post;
 $options = get_option( 'progo_options' );
-
+if ( isset( $options['layout'] ) == false ) {
+	$options = array();
+	$options['layout'] = 1;
+}
 switch( $options['layout'] ) {
 	case 1:
 	case 2:
@@ -85,7 +88,11 @@ if ( $options['layout'] < 3 ) {
 <div id="main" class="grid_8">
 <?php
 rewind_posts();
-switch ( $options['frontpage'] ) {
+$onfront = get_option( 'show_on_front' );
+if ( isset( $options['frontpage'] ) ) {
+	$onfront = $options['frontpage'];
+}
+switch ( $onfront ) {
 	case 'posts':
 		get_template_part( 'loop', 'index' );
 		break;

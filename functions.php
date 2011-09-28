@@ -98,6 +98,17 @@ function progo_sitelogo() {
 	}
 }
 endif;
+if ( ! function_exists( 'progo_nav_fallback' ) ):
+/**
+ * fallback callback for header nav menu
+ * @since BusinessPro 1.2.1
+ */
+function progo_nav_fallback() {
+	echo '<ul class="menu" id="nav">';
+	wp_list_pages('title_li=');
+	echo '</ul>';
+}
+endif;
 if ( ! function_exists( 'progo_posted_on' ) ):
 /**
  * Prints HTML with meta information for the current post—date/time and author.
@@ -1110,8 +1121,8 @@ function progo_options_defaults() {
 			"blogname" => get_option( 'blogname' ),
 			"blogdescription" => get_option( 'blogdescription' ),
 			"showdesc" => 1,
-			"support" => "123-555-7890",
-			"copyright" => "© Copyright 2011, All Rights Reserved",
+			"support" => "(858) 555-1234",
+			"copyright" => "© Copyright ". date('Y') .", All Rights Reserved",
 			"showtips" => 1,
 			"layout" => 1,
 			"headline" => "Get Your Customers\nWhat They Need Most!",
@@ -1903,12 +1914,22 @@ function progo_update_check($data) {
 }
 
 function progo_to_twentyten() {
-	$msg = 'This ProGo Themes site is currently not Activated.';
-	
-	if(current_user_can('edit_pages')) {
-		$msg .= '<br /><br /><a href="'. trailingslashit(get_bloginfo('url')) .'wp-admin/themes.php?page=progo_admin">Click here to update your API Key</a>';
+	$brickit = true;
+	global $wp_query;
+	// check for PREVIEW theme
+	if ( isset( $wp_query->query_vars['preview'] ) ) {
+		if ( $wp_query->query_vars['preview'] == 1 ) {
+			$brickit = false;
+		}
 	}
-	wp_die($msg);
+	if ( $brickit === true ) {
+		$msg = 'This ProGo Themes site is currently not Activated.';
+		
+		if(current_user_can('edit_pages')) {
+			$msg .= '<br /><br /><a href="'. trailingslashit(get_bloginfo('url')) .'wp-admin/themes.php?page=progo_admin">Click here to update your API Key</a>';
+		}
+		wp_die($msg);
+	}
 }
 if ( ! function_exists( 'progo_admin_post_thumbnail_html' ) ):
 /**
