@@ -965,7 +965,24 @@ if ( ! function_exists( 'progo_firstform' ) ):
 function progo_firstform(){
 	check_admin_referer( 'progo_firstform' );
 	// update first CF7 form to use on the Homepage area
-	global $wpdb, $wpcf7;
+	// NOTE : as of CF7 v3.0, they no longer have own table, just use CPT, so
+	$firstform = get_posts( array(
+				'numberposts'	=> 1,
+				'post_type'		=> 'wpcf7_contact_form',
+				'order'			=> 'ASC'
+			));
+	$firstformID = $firstform->ID;
+	$hformID = wp_insert_post( array(
+				'post_title' 	=>	'Homepage Form',
+				'post_type' 	=>	'wpcf7_contact_form',
+				'post_name'		=>	'homepage-form',
+				'comment_status'=>	'open',
+				'ping_status' 	=>	'open',
+				'post_content' 	=>	'',
+				'post_status' 	=>	'publish',
+				'post_author' 	=>	1,
+				'menu_order'	=>	0
+			));
 	
 	$form = '<label for="name">Your Name<span title="Required">*</span></label>' . "\n"
 		.'[text* name id:name class:text akismet:author]' . "\n\n"
@@ -987,10 +1004,10 @@ function progo_firstform(){
 	$attachments = '';
 	$use_html = 0;
 	$mail = compact( 'subject', 'sender', 'body', 'recipient', 'additional_headers', 'attachments', 'use_html' );
-	
+	/*
 	$wpdb->update( $wpcf7->contactforms,
 		array(
-			'title' => 'Homepage Form',
+			'title' => '',
 			'form' => $form,
 			'mail' => maybe_serialize( $mail )
 		),
@@ -998,10 +1015,19 @@ function progo_firstform(){
 		array( '%s', '%s', '%s' ),
 		array( '%d' )
 	);
-	
+	*/
+	update_post_meta( $hformID, 'form', $form );
+	update_post_meta( $hformID, 'mail', $mail );
+	update_post_meta( $hformID, 'mail_2', get_post_meta( $firstformID, 'messages', true ) );
+	update_post_meta( $hformID, 'messages', get_post_meta( $firstformID, 'messages', true ) );
+	update_post_meta( $hformID, 'additional_settings', '' );
 	update_option( 'progo_businesspro_onstep', 5);
 	
-	wp_redirect( admin_url("admin.php?page=wpcf7") );
+	$opt = get_option( 'progo_options' );
+	$opt['form'] = '[contact-form-7 id="'. $hformID .'"]';
+	update_option( 'progo_options', $opt );
+	
+	wp_redirect( admin_url( 'admin.php?contactform='. $hformID .'&page=wpcf7' ) );
 	exit();
 }
 endif;
@@ -1126,7 +1152,7 @@ function progo_options_defaults() {
 			"showtips" => 1,
 			"layout" => 1,
 			"headline" => "Get Your Customers\nWhat They Need Most!",
-			"form" => "[contact-form 1]",
+			"form" => "",
 			"frontpage" => get_option( 'show_on_front' ),
 			"homeseconds" => 6
 		);
@@ -1794,6 +1820,11 @@ function progo_admin_notices() {
 		// couldnt check step 2 before but now we have get_plugins() function
 		if ( ($onstep == 2) && ( $_REQUEST['action'] == 'install-plugin' ) ) {
 				return;
+		}
+		// quick check if the ACTIVATE link was just clicked...
+		if ( ( $onstep == 3 ) && is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ) ) {
+			$onstep = 4;
+			update_option( 'progo_businesspro_onstep', $onstep);
 		}
 		
 		echo '<div class="updated progo-steps">';
