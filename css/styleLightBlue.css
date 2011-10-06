@@ -7,10 +7,10 @@ ul#nav li { background-image:url(../images/LightBlue/navli.png) }
 ul#nav li.current-menu-item a.first, body.wpsc ul#nav li.wpsc a.first, body.blog ul#nav li.blog a.first { background-image: url(../images/LightBlue/navon.png); color: #fff }
 
 #pagetop, #pagetop.sliding { background: url(../images/LightBlue/pagetop.jpg) no-repeat 0 0 }
-.hform, .secondary .hform { background: #eee url(../images/LightBlue/hform.png) no-repeat 0 0 }
-.hform .tar, .secondary .hform .tar { color: #000; text-shadow: 2px 2px 2px #fff }
-.hform label { color: #000 }
-.hform input.submit { background-image: url(../images/LightBlue/submit.png) }
+.pbpform, .secondary .pbpform { background: #eee url(../images/LightBlue/hform.png) no-repeat 0 0 }
+.pbpform .tar, .secondary .pbpform .tar { color: #000; text-shadow: 2px 2px 2px #fff }
+.pbpform label { color: #000 }
+.pbpform input.submit { background-image: url(../images/LightBlue/submit.png) }
 
 #fbar { background: #00638d url(../images/LightBlue/fbar.png) repeat-x 0 0 }
 

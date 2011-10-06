@@ -6,6 +6,6 @@ body { background: url(../images/DarkGreen/bg.png) repeat 0 0 }
 
 #pagetop { background: url(../images/DarkGreen/pagetop.png) repeat-y 0 0 }
 
-.hform input.submit { background-image: url(../images/DarkGreen/submit.png); color: #fff }
+.pbpform input.submit { background-image: url(../images/DarkGreen/submit.png); color: #fff }
 
 #wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeDarkGreen a { font-weight: bold }

@@ -52,6 +52,7 @@ sup { bottom: 1ex }
 sub { top: .5ex }
 input[type="text"], input.text, textarea { background: #fff; border: 1px solid #ccc; box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); -moz-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); padding: 2px; display: block; margin: 5px 0 }
 input.text, textarea { width: 254px; height: 25px }
+textarea { height: auto }
 span.shipping_region_name, span.shipping_country_name { background: #fff; border: 1px solid #ccc; box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); -moz-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); -webkit-box-shadow: inset 1px 1px 1px rgba(0,0,0,0.1); padding: 2px; float: left; height: 17px; margin-bottom: 10px; width: 163px; font-weight: normal; cursor: default; color: #666 }
 .zip input.text {width:58px }
 input.text.need { border-color: #f00 }
@@ -78,15 +79,15 @@ ul#nav ul a { float: none; display: block; color: #333; font-size: 13px; line-he
 ul#nav ul a:hover { font-weight: normal; text-decoration: underline }
 #nav ul a.sub { background: url(../images/arr.png) no-repeat 120px 10px } 
 #hdr .hblock.support { float: right; margin-top: 40px }
-#hdr .hblock.support h3 { float: left; font-size: 17px; font-weight: normal; margin: 0 10px 0 0; color: #666 }
-#hdr .hblock.support .inside { float:left; font-size: 17px; color: #333 }
+#hdr .hblock.support h3 { float: left; font-size: 22px; font-weight: normal; margin: 0 10px 0 0; color: #666 }
+#hdr .hblock.support .inside { float:left; font-size: 22px; color: #333 }
 /* content */
 #pagetop { float: left; background: url(../images/Greyscale/pagetop.jpg) no-repeat 0 0; position: relative; color: #fff; margin-bottom: 4px }
-#pagetop .page-title { float: left; width: 906px; margin: 26px 27px; font: bold 40px/120% Arial, Helvetica, sans-serif }
+#pagetop .page-title { float: left; width: 906px; margin: 26px 27px; font: 40px/120% Arial, Helvetica, sans-serif }
 /* homepage slides */
 #pagetop.sliding { overflow: hidden; margin: 5px 0 12px 5px; background: url(../images/Greyscale/pagetop.png) repeat-x 0 0 }
 #pagetop.grid_8 { width: 646px; height: 382px }
-#pagetop.sliding .page-title { margin: 26px 31px; width: 584px }
+#pagetop.sliding .page-title { margin: 26px 31px; width: 584px; font-weight: bold }
 #pagetop.grid_12 { width: 952px; height: 322px; margin: 4px 0 2px 4px }
 .slide { display: none; float: left; width: 100%; height: 382px; background-repeat: no-repeat; background-position: 0 0 }
 .slide.on { display: block }
@@ -107,18 +108,18 @@ ul#nav ul a:hover { font-weight: normal; text-decoration: underline }
 #pagetop.sliding.Layout4 .page-title { margin: 29px 18px 15px; width: 269px; line-height:42px; font-weight: normal }
 .Layout4 .slide .content { margin: 0 18px 31px; font-size: 18px }
 
-.hform { float: right; width: 304px; height: 382px; background: url(../images/Greyscale/hform.png) no-repeat 0 0; margin: 5px 5px 0 0 }
-.secondary .hform { margin: -6px 0 9px; position: relative; width: 298px; height: auto; border: 1px solid #ccc; background: #eee url(../images/Greyscale/hform2.png) no-repeat 0 0  }
-.hform .tar { font: 24px/32px Arial, Helvetica, sans-serif; color: #000 }
-.secondary .hform .tar { color: #fff; font-size: 22px; line-height: 27px }
-.hform .tar td {  width: 100%; height: 96px; text-align: center }
-.secondary .hform .tar td { height: 92px }
-.hform label { font-weight: bold; font-size: 13px; color: #fff }
-.secondary .hform label { color: #000 }
-.hform p { margin: 0 }
-.hform form { margin: 20px 0 0 20px }
-.hform input.submit { border: none; background: url(../images/Greyscale/submit.png) no-repeat 0 0; text-align: center; width: 265px; height: 57px; font-size: 21px; font-weight: bold; color: #000; cursor: pointer; margin: 15px -1px 0 }
-.hform div.wpcf7-response-output { background: #fff; position: absolute; top: 0; right: 5px; padding: 20px; width: 249px }
+.pbpform { float: right; width: 304px; height: 382px; background: url(../images/Greyscale/hform.png) no-repeat 0 0; margin: 5px 5px 0 0 }
+.secondary .pbpform { margin: -6px 0 9px; position: relative; width: 298px; height: auto; border: 1px solid #ccc; background: #eee url(../images/Greyscale/hform2.png) no-repeat 0 0  }
+.pbpform .tar { font: 24px/32px Arial, Helvetica, sans-serif; color: #000 }
+.secondary .pbpform .tar { color: #fff; font-size: 22px; line-height: 27px }
+.pbpform .tar td {  width: 100%; height: 96px; text-align: center }
+.secondary .pbpform .tar td { height: 92px }
+.pbpform label { font-weight: bold; font-size: 13px; color: #fff }
+.secondary .pbpform label { color: #000 }
+.pbpform p { margin: 0 }
+.pbpform form { margin: 20px 0 0 20px }
+.pbpform input.submit { border: none; background: url(../images/Greyscale/submit.png) no-repeat 0 0; text-align: center; width: 265px; height: 57px; font-size: 21px; font-weight: bold; color: #000; cursor: pointer; margin: 15px -1px 0 }
+.pbpform div.wpcf7-response-output { background: #fff; position: absolute; top: 0; right: 5px; padding: 20px; width: 249px }
 /* slide pagination arrows */
 .ar { float: right; display: block; width: 112px; height: 24px; position: absolute; bottom: 0; right: 10px; z-index:2; background: url(../images/ar.png) no-repeat 0 0 }
 .ar a { float: left; width: 56px; height: 24px; background: url(../images/fx.gif) repeat 0 0 }

@@ -82,7 +82,7 @@ if ($pagetopW==8) echo '<div class="shadow"></div>';
 </div>
 <?php
 if ( $options['layout'] < 3 ) {
-	get_sidebar('hform');
+	get_sidebar('pbpform');
 }
 ?>
 <div id="main" class="grid_8">
@@ -112,7 +112,7 @@ switch ( $onfront ) {
 <div class="grid_4 secondary">
 <?php
 if ( $options['layout'] > 2 ) {
-	get_sidebar('hform');
+	get_sidebar('pbpform');
 }
 if($options['frontpage'] == 'posts') {
 	get_sidebar('blog');

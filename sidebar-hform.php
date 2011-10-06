@@ -12,7 +12,7 @@ if ( is_array($options) == false ) {
 	$options = array();
 }
 ?>
-<div class="hform">
+<div class="pbpform"><a name="pbpform"></a>
 <table class="tar" width="100%"><tr><td><?php
 if ( isset( $options['headline'] ) ) {
 	echo nl2br(wp_kses($options['headline'], array()));
