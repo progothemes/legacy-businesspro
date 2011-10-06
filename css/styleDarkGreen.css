@@ -8,6 +8,4 @@ body { background: url(../images/DarkGreen/bg.png) repeat 0 0 }
 
 .hform input.submit { background-image: url(../images/DarkGreen/submit.png); color: #fff }
 
-#ftr, #ftr a { color: #fff }
-
 #wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeDarkGreen a { font-weight: bold }
