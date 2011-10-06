@@ -20,6 +20,9 @@ if ( is_page() ) {
 }
 if ( $sidebar == '' ) {
 	$sidebar = 'main';
+	if ( is_front_page() ) {
+		$sidebar = 'home';
+	}
 }
 if ( ! dynamic_sidebar( $sidebar ) ) : ?>
 <div class="block share">

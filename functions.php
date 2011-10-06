@@ -707,7 +707,16 @@ if ( ! function_exists( 'progo_businesspro_widgets' ) ):
  */
 function progo_businesspro_widgets() {
 	register_sidebar(array(
-		'name' => 'Main Sidebar',
+		'name' => 'Homepage Sidebar',
+		'id' => 'home',
+		'description' => 'Right column sidebar area on Homepage',
+		'before_widget' => '<div class="block %1$s %2$s">',
+		'after_widget' => '</div></div>',
+		'before_title' => '<h3 class="title"><span class="spacer">',
+		'after_title' => '</span></h3><div class="inside">'
+	));
+	register_sidebar(array(
+		'name' => 'Standard Pages',
 		'id' => 'main',
 		'description' => 'Standard right column sidebar area',
 		'before_widget' => '<div class="block %1$s %2$s">',
@@ -920,10 +929,12 @@ function progo_add_styles() {
 	do_action('progo_frontend_styles');
 }
 endif;
+if ( ! function_exists( 'progo_custombg_color' ) ):
 function progo_custombg_color() {
 	$options = get_option('progo_options');
 	echo '<style type="text/css">#ftr, #ftr a { color: #'. esc_attr($options['footercolor']) .' }</style>';
 }
+endif;
 if ( ! function_exists( 'progo_reset_logo' ) ):
 /**
  * wipe out any custom logo image setting
@@ -1220,7 +1231,7 @@ function progo_validate_options( $input ) {
 	}
 	
 	// do validation here...
-	$arr = array( 'blogname', 'blogdescription', 'colorscheme', 'support', 'copyright', 'headline' );
+	$arr = array( 'blogname', 'blogdescription', 'colorscheme', 'support', 'copyright', 'footercolor', 'headline' );
 	foreach ( $arr as $opt ) {
 		$input[$opt] = wp_kses( $input[$opt], array() );
 	}
