@@ -761,7 +761,7 @@ function progo_businesspro_widgets() {
 		'after_title' => '</div>'
 	));
 	
-	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support' );
+	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm' );
 	foreach ( $progo_widgets as $w ) {
 		require_once( 'widgets/widget-'. strtolower($w) .'.php' );
 		register_widget( 'ProGo_Widget_'. $w );
@@ -810,8 +810,8 @@ function progo_sidebar_box() {
 	$custom = get_post_meta($post->ID,'_progo_sidebar');
 	$sidebar = $custom[0];
 	
-	$ids = array('main', 'blog', 'contact');
-	$titles = array('Main Sidebar (default)', 'Blog', 'Contact');
+	$ids = array('main', 'home', 'blog', 'contact');
+	$titles = array('Standard sidebar', 'Homepage', 'Blog', 'Contact');
 	
 	if( ! in_array( $sidebar, $ids ) ) {
 		$sidebar = 'main';
@@ -1106,7 +1106,7 @@ function progo_save_meta( $post_id ){
 				if ( isset( $_POST['_progo_sidebar'] ) ) {
 					$sidebar = $_POST['_progo_sidebar'];
 					
-					if ( in_array ( $sidebar, array('main', 'blog', 'contact') ) ) {
+					if ( in_array ( $sidebar, array('main', 'home', 'blog', 'contact') ) ) {
 						update_post_meta($post_id, "_progo_sidebar", $sidebar);
 						return $sidebar;
 					}
