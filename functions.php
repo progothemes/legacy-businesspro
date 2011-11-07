@@ -57,7 +57,7 @@ function progo_setup() {
 	
 	// add custom filters
 	add_filter( 'body_class', 'progo_bodyclasses' );
-	add_filter( 'wp_nav_menu_objects', 'progo_menuclasses' );
+	add_filter( 'wp_nav_menu_objects', 'progo_menufilter', 10, 2 );
 	add_filter( 'site_transient_update_themes', 'progo_update_check' );
 	add_filter( 'admin_post_thumbnail_html', 'progo_admin_post_thumbnail_html' );
 	add_filter( 'wp_mail_content_type', 'progo_mail_content_type' );
@@ -1774,18 +1774,30 @@ function progo_bodyclasses($classes) {
 	return $classes;
 }
 endif;
-if ( ! function_exists( 'progo_menuclasses' ) ):
+if ( ! function_exists( 'progo_menufilter' ) ):
 /**
  * adds some additional classes to Menu Items
  * so we can mark active menu trails easier
  * @param array of classes to add to the <body> tag
  * @since Business Pro 1.0
  */
-function progo_menuclasses($items) {
+function progo_menufilter($items, $args) {
 	$blogID = get_option('progo_blog_id');
 	foreach ( $items as $i ) {
 		if ( $i->object_id == $blogID ) {
 			$i->classes[] = 'blog';
+		}
+	}
+	// want our MAINMENU to have MAX of 7 items
+	if ( $args->theme_location == 'mainmenu' ) {
+		$toplinks = 0;
+		foreach ( $items as $k => $v ) {
+			if ( $v->menu_item_parent == 0 ) {
+				$toplinks++;
+			}
+			if ( $toplinks > 7 ) {
+				unset($items[$k]);
+			}
 		}
 	}
 	return $items;
