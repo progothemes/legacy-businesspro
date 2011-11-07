@@ -77,7 +77,7 @@ ul#nav ul ul { top: 0; left: 132px }
 ul#nav ul li { float: none; display: block; padding: 0; background: none }
 ul#nav ul a { float: none; display: block; color: #333; font-size: 13px; line-height: 16px; height: auto; padding: 6px 10px; width: 112px; text-align: left }
 ul#nav ul a:hover { font-weight: normal; text-decoration: underline }
-#nav ul a.sub { background: url(../images/arr.png) no-repeat 120px 10px } 
+#nav ul a.sub { background: url(../images/arr.png) no-repeat 120px 10px }
 #hdr .hblock.support { float: right; margin-top: 40px }
 #hdr .hblock.support h3 { float: left; font-size: 22px; font-weight: normal; margin: 0 10px 0 0; color: #666 }
 #hdr .hblock.support .inside { float:left; font-size: 22px; color: #333 }
