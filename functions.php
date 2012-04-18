@@ -350,13 +350,15 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
                 <?php if ( function_exists( 'alex_recommends_widget' ) ) {
 					alex_recommends_widget();
 				} else { ?>
-                    <p>The following plugins can help improve various aspects of your WordPress / ProGo Themes site:</p>
+                    <p>The following plugins can help improve various aspects of your WordPress + ProGo Themes site:</p>
                     <ul style="list-style:outside; padding: 0 1em">
                     <?php
 					$pRec = array();
-					$pRec[] = array('name'=>'WordPress SEO by Yoast','stub'=>'wordpress-seo','desc'=>'Out-of-the-box SEO. Easily control your pages\' keywords / meta description, and more');
+					$pRec[] = array('name'=>'WordPress SEO by Yoast','stub'=>'wordpress-seo','desc'=>'Out-of-the-box SEO. Easily control your keywords, meta descriptions, and more');
 					$pRec[] = array('name'=>'ShareThis','stub'=>'share-this','desc'=>'Get more exposure for your site as visitors share it with their friends');
 					$pRec[] = array('name'=>'Ultimate Google Analytics','stub'=>'ultimate-google-analytics','desc'=>'Add Google Analytics to your site, with options to track external links, mailto\'s, and downloads');
+					$pRec[] = array('name'=>'NextGEN Gallery','stub'=>'nextgen-gallery','desc'=>'A fully integrated Image Gallery plugin with dozens of options and features');
+					$pRec[] = array('name'=>'Contact Form 7 to Database Extension','stub'=>'contact-form-7-to-database-extension','desc'=>'Saves submitted form data from Contact Form 7 to your database, for future reference');
 					$pRec[] = array('name'=>'WB DB Backup','stub'=>'wp-db-backup','desc'=>'On-demand backup of your WordPress database');
 					$pRec[] = array('name'=>'Duplicate Post','stub'=>'duplicate-post','desc'=>'Add functionality to Save Page As...');
 					
