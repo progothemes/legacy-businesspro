@@ -31,7 +31,8 @@ function progo_setup() {
 	// This theme uses wp_nav_menu() in two locations
 	register_nav_menus( array(
 		'mainmenu' => 'Main Menu',
-		'ftrlnx' => 'Footer Links'
+		'ftrlnx' => 'Footer Links',
+		'ppc-primary' => 'PPC Menu'
 	) );
 	
 	// Add support for custom backgrounds
@@ -525,14 +526,23 @@ function progo_admin_init() {
 	add_settings_field( 'progo_support', 'Customer Support', 'progo_field_support', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_copyright', 'Copyright Notice', 'progo_field_copyright', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_info', 'progo_info' );
+	//Business Info for Office Info Widget and Footer display.
+	add_settings_field( 'progo_businessaddy', 'Business Street Address', 'progo_field_businessaddy', 'progo_info', 'progo_info' );
+	add_settings_field( 'progo_businessCSZ', 'Business City, State, Zip', 'progo_field_businessCSZ', 'progo_info', 'progo_info' );
+	add_settings_field( 'progo_businessphone', 'Business Phone', 'progo_field_businessphone', 'progo_info', 'progo_info' );
+	add_settings_field( 'progo_businessemail', 'Business Email', 'progo_field_businessemail', 'progo_info', 'progo_info' );
+	add_settings_field( 'progo_businesshours', 'Business Hours', 'progo_field_businesshours', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_info', 'progo_info' );
-
+	
 	add_settings_section( 'progo_homepage', 'Homepage Settings', 'progo_section_text', 'progo_hometop' );
 	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_headline', 'Form Headline', 'progo_field_headline', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_frontpage', 'Display', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
+	
+	
+	
 	
 	// since there does not seem to be an actual THEME_ACTIVATION hook, we'll fake it here
 	if ( get_option( 'progo_businesspro_installed' ) != true ) {
@@ -760,6 +770,16 @@ function progo_businesspro_widgets() {
 		'before_title' => '<div class="title">',
 		'after_title' => '</div>'
 	));
+	
+	register_sidebar(array(
+			'name' => 'PPC Template',
+			'id' => 'ppc-template',
+			'description' => 'PPC Post Widgets Go Here',
+			'before_widget' => '<div class="block %1$s %2$s">',
+		'after_widget' => '</div></div>',
+		'before_title' => '<h3 class="title"><span class="spacer">',
+		'after_title' => '</span></h3><div class="inside">'
+		));
 	
 	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm' );
 	foreach ( $progo_widgets as $w ) {
@@ -1186,6 +1206,11 @@ function progo_options_defaults() {
 			"layout" => 1,
 			"headline" => "Get Your Customers\nWhat They Need Most!",
 			"form" => "",
+			"businessaddy" => "",
+			"businessCSZ" => "",
+			"businessphone" => "",
+			"businessemail" => "",
+			"businesshours" => "",
 			"frontpage" => get_option( 'show_on_front' ),
 			"homeseconds" => 6
 		);
@@ -1640,6 +1665,62 @@ function progo_field_copyright() {
 	?>
 <input id="progo_copyright" name="progo_options[copyright]" value="<?php esc_html_e( $options['copyright'] ); ?>" class="regular-text" type="text" />
 <span class="description">Copyright notice that appears on the right side of your site's footer.</span>
+<?php }
+endif;
+if (!function_exists('progo_field_businessaddy') ):
+/**
+ * outputs HTML for "Business Address" field on Site Settings page
+ * @since SmallBusiness 1.0
+ */
+function progo_field_businessaddy() {
+$options = get_option( 'progo_options' ); ?>
+<a id="offInfo"></a>
+<input id="progo_businessaddy" name="progo_options[businessaddy]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessaddy'] ); ?>"><br />
+<span class="description">This address will appear in the office info widget.</span>
+<?php }
+endif;
+if (!function_exists('progo_field_businessCSZ') ):
+/**
+ * outputs HTML for "Business City, State, Zip" field on Site Settings page
+ * @since SmallBusiness 1.0
+ */
+function progo_field_businessCSZ() {
+$options = get_option( 'progo_options' ); ?>
+<input id="progo_businessCSZ" name="progo_options[businessCSZ]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessCSZ'] ); ?>"><br />
+<span class="description">This address will appear in the office info widget under the street address above.</span>
+<?php }
+endif;
+if (!function_exists('progo_field_businessphone') ):
+/**
+ * outputs HTML for "Business Phone" field on Site Settings page
+ * @since SmallBusiness 1.0
+ */
+function progo_field_businessphone() {
+$options = get_option( 'progo_options' ); ?>
+<input id="progo_businessphone" name="progo_options[businessphone]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessphone'] ); ?>"><br />
+<span class="description">This phone will appear in the office info widget.</span>
+<?php }
+endif;
+if (!function_exists('progo_field_businessemail') ):
+/**
+ * outputs HTML for "Business Email" field on Site Settings page
+ * @since SmallBusiness 1.0
+ */
+function progo_field_businessemail() {
+$options = get_option( 'progo_options' ); ?>
+<input id="progo_businessemail" name="progo_options[businessemail]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessemail'] ); ?>"><br />
+<span class="description">This email address will appear in the office info widget.</span>
+<?php }
+endif;
+if (!function_exists('progo_field_businesshours') ):
+/**
+ * outputs HTML for "Business Hours" field on Site Settings page
+ * @since SmallBusiness 1.0
+ */
+function progo_field_businesshours() {
+$options = get_option( 'progo_options' ); ?>
+<input id="progo_businesshours" name="progo_options[businesshours]" class="regular-text" type="text" value="<?php esc_html_e( $options['businesshours'] ); ?>"><br />
+<span class="description">These hours will appear in the office info widget.</span>
 <?php }
 endif;
 if ( ! function_exists( 'progo_field_footercolor' ) ):
@@ -2098,3 +2179,326 @@ function progo_nomenu_cb() {
 	return '<ul></ul>';
 }
 endif;
+
+/*
+  ADDING CUSTOM POST TYPE TEMPLATE SELECTOR -- Begin
+  This code is dependant on this plugin (http://wordpress.org/extend/plugins/custom-post-template/) 
+  It hooks our custom post type templates into the template selector in the admin for these types.
+*/
+
+function my_cpt_post_types( $post_types ) {
+	$post_types[] = 'facebooktabs';
+	$post_types[] = 'ppc';
+	return $post_types;
+}
+add_filter( 'cpt_post_types', 'my_cpt_post_types' );
+
+// ADDING CUSTOM POST TYPE TEMPLATE SELECTOR -- End
+
+// Create Facebook Tabs Custom Post Type ----- Begin
+
+add_action('init', 'add_facebook_custom_type');
+
+function add_facebook_custom_type() 
+{
+  $FBlabels = array(
+    'name' => _x('Facebook Tabs', 'post type general name'),
+    'singular_name' => _x('Facebook Tabs', 'post type singular name'),
+    'add_new' => _x('Add New', 'Facebook Tabs'),
+    'add_new_item' => __('Add New Tab'),
+    'edit_item' => __('Edit Tab'),
+    'new_item' => __('New Tab'),
+    'view_item' => __('View Tab'),
+    'search_items' => __('Facebook'),
+    'not_found' =>  __('No Tab found'),
+    'not_found_in_trash' => __('No Tab found in Trash'), 
+    'parent_item_colon' => ''
+  );
+  $args = array(
+    'labels' => $FBlabels,
+    'public' => true,
+    'publicly_queryable' => true,
+    'show_ui' => true, 
+    'query_var' => true,
+    'rewrite' => true,
+    'capability_type' => 'post',
+    'hierarchical' => false,
+    'supports' => array('title','editor','custom-fields'),
+  ); 
+  register_post_type('facebooktabs',$args);
+}
+
+add_action( 'admin_head', 'wp_facebook_icons' );
+
+function wp_facebook_icons() {
+    ?>
+    <style type="text/css" media="screen">
+        #menu-posts-facebooktabs .wp-menu-image {
+            background: url(<?php echo get_bloginfo('template_url')?>/images/facebook_icon16.png) no-repeat 6px 7px !important;
+            opacity: 0.6;
+        }
+        #menu-posts-facebooktabs:hover .wp-menu-image, #menu-posts-facebooktabs.wp-has-current-submenu .wp-menu-image {
+            opacity: 1;
+        }
+        #icon-edit.icon32-posts-facebooktabs {background: url(<?php echo get_bloginfo('template_url')?>/images/facebook_icon.png) no-repeat center;}
+    </style>
+<?php }
+// Create Facebook Tabs Custom Post Type ----- End
+
+// Create PPC Custom Post Type ----- Begin
+
+
+add_action('init', 'add_ppc_custom_type');
+
+function add_ppc_custom_type() 
+{
+  $labels = array(
+    'name' => _x('PPC Posts', 'post type general name'),
+    'singular_name' => _x('PPC Posts', 'post type singular name'),
+    'add_new' => _x('Add New', 'PPC'),
+    'add_new_item' => __('Add New PPC'),
+    'edit_item' => __('Edit PPC'),
+    'new_item' => __('New PPC'),
+    'view_item' => __('View PPC'),
+    'search_items' => __('PPC'),
+    'not_found' =>  __('No PPC Posts found'),
+    'not_found_in_trash' => __('No PPC Posts found in Trash'), 
+    'parent_item_colon' => '',
+    'menu_name' => 'PPC Posts',
+    'description' => "Shortcodes: [keyword loc=1], [keyword loc=2], the 1st and 2nd words after ppc/."
+  );
+  $args = array(
+    'labels' => $labels,
+    'public' => true,
+    'publicly_queryable' => true,
+    'show_ui' => true, 
+    'query_var' => true,
+    'rewrite' => true,
+    'capability_type' => 'post',
+    'hierarchical' => false,
+    'supports' => array('title','editor','custom-fields', 'comments'),
+  ); 
+  register_post_type('ppc',$args);
+}
+
+
+//Add Metabox
+add_action ('add_meta_boxes', 'ppc_instructions');
+    
+function ppc_instructions(){
+    add_meta_box ('ppc_shortcodes', 'PPC Shortcodes', 'ppc_list_shortcodes', 'ppc', 'normal', 'high' );
+}
+
+function ppc_list_shortcodes(){    
+    echo "[keyword loc=1] = http://www.site.com/ppc/KEYWORD/ -- (default)";
+    echo "<br /><br /><br />";
+    echo "[keyword loc=2] = http://www.site.com/ppc/word/KEYWORD/";
+}
+
+
+add_action( 'admin_head', 'wp_DNDPPC_icons' );
+ 
+function wp_DNDPPC_icons() {
+    ?>
+    <style type="text/css" media="screen">
+        #menu-posts-ppc .wp-menu-image {
+            background: url(<?php echo get_bloginfo('template_url')?>/images/dollar_16.png) no-repeat 6px 7px !important;
+            opacity: 0.6;
+        }
+        #menu-posts-ppc:hover .wp-menu-image, #menu-posts-ppc.wp-has-current-submenu .wp-menu-image {
+            opacity: 1;
+        }
+        #icon-edit.icon32-posts-ppc {background: url(<?php echo get_bloginfo('template_url')?>/images/dollar.png) no-repeat center;}
+    </style>
+<?php }
+// Create DND PPC Custom Post Type ----- End
+
+
+//DND PPC DKI Magic --- Begin
+
+add_shortcode ('keyword', 'dnd_ppc_kw');
+
+
+function dnd_ppc_kw ($location){
+
+	$uri = get_uri();
+	
+	$kwy1 = str_replace('/','',$uri[1]);
+	$kwy1 = str_replace('-',' ',$kwy1);
+	$kwy2 = str_replace('/','',$uri[2]);
+	$kwy2 = str_replace('-',' ',$kwy2);
+
+	switch($location['loc']){
+	
+		case '2':
+			$keyword = $kwy2;
+			break;
+			default:
+			
+			$keyword = $kwy1;
+			break;
+	}
+	
+	return $keyword . " " . $request_uri;
+}
+
+
+
+
+function get_uri() {
+        $request_uri = $_SERVER['REQUEST_URI'];
+        // for consistency, check to see if trailing slash exists in URI request
+        if (substr($request_uri, -1)!="/") {
+                $request_uri = $request_uri."/";
+        }
+        preg_match_all('#[^/]+/#', $request_uri, $matches);
+        // could've used explode() above, but this is more consistent across varied WP installs
+        $uri = $matches[0];
+        return $uri;
+}
+
+
+
+function ppc_title (){
+
+	$uri = get_uri();
+	
+	$kwy1 = str_replace('/','',$uri[1]);
+	$kwy1 = str_replace('-',' ',$kwy1);
+	$kwy2 = str_replace('/','',$uri[2]);
+	$kwy2 = str_replace('-',' ',$kwy2);
+	
+	if($kwy2 != ""){
+		$title_out = $kwy1 . " | " . $kwy2;
+	} else {
+			$title_out = $kwy1;
+	}
+	
+	echo $title_out;
+}
+
+function populate_content(){
+
+	$uri = get_uri();
+	
+	$the_slug = str_replace('/','',$uri[1]);
+	$args=array(
+  	'name' => $the_slug,
+  	'post_type' => 'ppc',
+  	'post_status' => 'publish',
+  	'showposts' => 1
+  	);
+  	
+  	$lastposts = get_posts( $args );
+foreach($lastposts as $post) : setup_postdata($post); 
+ return the_content(); 
+ endforeach; 
+  	
+}
+
+add_filter( 'template_redirect', 'ppc_template' );
+remove_filter('template_redirect','redirect_canonical');
+ 
+function ppc_template() {
+        $uri = get_uri();
+        if ($uri[0]=='ppc/') {
+                //add_filter('wp_title', 'ppc_template_title', 20);
+                status_header(200);
+                include(STYLESHEETPATH . '/PPC-page.php');
+                die();
+        }
+}
+
+//DND PPC DKI Magic --- End
+
+//Office Info Widget --- Begin
+
+add_action( 'widgets_init', 'office_info_widgets' );
+
+function office_info_widgets() {
+	register_widget( 'Office_Info_Widget' );
+}
+
+class Office_Info_Widget extends WP_Widget {
+
+function Office_Info_Widget() {
+		/* Widget settings. */
+		$widget_ops = array( 'classname' => 'officeInfo', 'description' => 'A widget to easily display your offices information and directions.' );
+
+		/* Widget control settings. */
+		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'office-info-widget' );
+
+		/* Create the widget. */
+		$this->WP_Widget( 'office-info-widget', 'Office Information', $widget_ops, $control_ops );
+	}
+	
+function widget( $args ) {
+		extract( $args );
+		$options = get_option( 'progo_options' );
+		
+		$title = "Office Info";
+		$busnessaddress = $options['businessaddy'];
+		$businessCSZ = $options['businessCSZ'];
+		$businessphone = $options['businessphone'];
+		$businessemail = $options['businessemail'];
+		$businesshours = $options['businesshours'];
+		
+
+		/* Before widget (defined by themes). */
+		echo $before_widget;
+
+	if ( $title )
+			echo $before_title . $title . $after_title;
+
+		/* Display Business Address from widget settings. */
+			
+		
+		if ( $busnessaddress != ""){
+			echo '<h4>Address:</h4>';
+			echo '<span>' . $busnessaddress . '</span><br />';
+		}
+		if ( $businessCSZ != ""){
+			
+			echo '<span>' . $businessCSZ . '</span><br />';
+		}
+		
+		
+		
+		if ( $businessphone != ""){
+		
+			echo '<br /><h4>Contact:</h4>';
+			echo '<span>' . $businessphone . '</span><br />';
+		}
+		
+		if ( $businessemail != ""){
+			
+			echo '<span>' . $businessemail . '</span><br />';
+		}
+		
+		
+		
+		if ( $businesshours != ""){
+			echo '<br /><h4>Hours of Operation:</h4>';
+			echo '<span>' . $businesshours . '</span><br />';
+		}
+		
+		if($busnessaddress != "" && $businessCSZ != ""){
+		echo '<br /><h4>Directions:</h4>';
+		echo '<div style="border:1px solid #ccc; width:260px; height:260px;"><iframe width="260px" height="260px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?q=' .$busnessaddress . '+' . $businessCSZ . '&hl=en&output=embed"></iframe></div>';
+		}
+		
+		/* After widget (defined by themes). */
+		echo $after_widget;
+	}
+	
+	function form( $instance ) {
+		$options = get_option( 'progo_options' );
+		
+	?>
+	<div>Set Office Info options <a href="themes.php?page=progo_admin#offInfo">here</a></div>
+	<?php
+	
+	}
+	
+}
+//Office Info Widget --- End
