@@ -69,9 +69,12 @@ a#logo .g { display: block; width: 100%; height: 37px; position: absolute; top: 
 #slogan { float: left; margin: 45px 0 0; font-size: 14px; color: #999 }
 ul#nav { display:block; width: 100%; height: 35px; margin: 0; padding: 0; list-style: none; position: absolute; bottom: 0; left: 0; z-index: 5; background: url(../images/nav.png) repeat-x 0 0 }
 ul#nav li { float: left; position: relative; width: 132px; padding-right: 1px; background: url(../images/navli.png) no-repeat 100% 0 }
+ul#nav.autow li { width: auto }
 ul#nav a { float: left; width: 132px; text-align: center; height: 27px; color: #fff; font-size: 14px; padding: 8px 0 0 }
-ul#nav li.current-menu-item a.first, body.wpsc ul#nav li.wpsc a.first, body.blog ul#nav li.blog a.first { background: url(../images/navon.png) repeat-x 0 0; font-weight: bold; color: #000 }
+ul#nav.autow a.first { width: auto; padding: 8px 20px 0 }
+ul#nav li.current-menu-item a.first, body.blog ul#nav li.blog a.first, ul#nav li.hover a.first, ul#nav li a.first:hover { background: url(../images/navon.png) repeat-x 0 0; font-weight: bold; color: #000 }
 ul#nav a:hover { font-weight: bold; text-decoration:none }
+ul#nav.autow li.hover a.first, ul#nav.autow li a.first:hover, ul#nav.autow li.current-menu-item a.first, body.blog ul#nav.autow li.blog a.first { font-weight: normal }
 ul#nav ul { display: none; position: absolute; top: 35px; left: -1px; width: 132px; list-style: none; background: rgba(255, 255, 255, 0.97); border: 1px solid #dfdfdf; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); z-index: 3; margin: 0; }
 ul#nav ul ul { top: 0; left: 132px }
 ul#nav ul li { float: none; display: block; padding: 0; background: none }
@@ -234,3 +237,11 @@ img.avatar { float: left; margin: 0 10px 10px 0 }
 .ptip span { display: none }
 .ptip:hover { z-index: 2000; text-decoration: none }
 .ptip:hover span { display: block; width: 180px; position: absolute; top: 0; left: 25px; background-color: #eee; border: 1px solid #000; padding: 2px 4px }
+
+#ppc-sidebar {
+	margin-top:15px;
+}
+
+#ppc-content {
+	margin-top:15px;
+}

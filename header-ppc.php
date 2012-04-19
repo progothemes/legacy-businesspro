@@ -15,7 +15,7 @@
 <head>
 <meta charset="<?php bloginfo( 'charset' ); ?>" />
 <title><?php
-	ppc_title(); 
+	progo_ppc_title(); 
 	echo " | ";
 	bloginfo( 'name' );
 		
@@ -23,18 +23,6 @@
 <link rel="profile" href="http://gmpg.org/xfn/11" />
 <link rel="stylesheet" type="text/css" media="all" href="<?php bloginfo( 'stylesheet_url' ); ?>" />
 <link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
-
-
-<style type="text/css" media="all">
-#ppc-sidebar {
-		margin-top:15px;
-	}
-	
-	#ppc-content {
-		margin-top:15px;
-	}
-
-</style>
 
 <?php wp_head(); ?>
 </head>
@@ -50,5 +38,8 @@
             <div id="slogan"><?php bloginfo( 'description' ); ?></div>
             <?php } ?>
             </div>
-            <?php wp_nav_menu( array('menu' => 'PPC Menu', 'theme_location' => 'ppc-primary', 'menu_id' => 'nav' )); ?>
+            <?php
+			$menuclass = 'menu';
+			if ( $options['menuwidth'] == 'auto' ) $menuclass .= ' autow';
+			wp_nav_menu( array('container' => 'false', 'theme_location' => 'ppcmenu', 'menu_id' => 'nav', 'menu_class' => $menuclass, 'fallback_cb' => 'progo_nav_fallback' )); ?>
         </div>

@@ -33,7 +33,7 @@ function progo_setup() {
 		'mainmenu' => 'Main Menu',
 		'fbarlnx' => 'Footer Bar Links',
 		'ftrlnx' => 'Footer Links',
-		'ppc-primary' => 'PPC Menu',
+		'ppcmenu' => 'PPC Menu',
 	) );
 	
 	// Add support for custom backgrounds
@@ -553,6 +553,7 @@ function progo_admin_init() {
 
 	
 	add_settings_section( 'progo_adv', 'Advanced Options', 'progo_section_text', 'progo_adv' );
+	add_settings_field( 'progo_field_menuwidth', 'Main Menu Item Width', 'progo_field_menuwidth', 'progo_adv', 'progo_adv' );
 	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_adv', 'progo_adv' );
 	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_adv', 'progo_adv' );
 	add_settings_field( 'progo_field_showfbtabs', 'Facebook Tabs', 'progo_field_showfbtabs', 'progo_adv', 'progo_adv' );
@@ -571,6 +572,7 @@ function progo_admin_init() {
 			'mainmenu' => 'Main Menu',
 			'fbarlnx' => 'Bottom Bar Links',
 			'ftrlnx' => 'Footer Links',
+			'ppcmenu' => 'PPC Primary Menu',
 		);
 		$aok = 1;
 		foreach ( $new_menus as $k => $m ) {
@@ -593,37 +595,37 @@ function progo_admin_init() {
 				'title' => __( 'Home', 'progo' ),
 				'content' => "<h3>This is your Homepage</h3>$lipsum",
 				'id' => '',
-				'menu' => 'mainmenu'
+				'menus' => array( 'mainmenu', 'ppcmenu' )
 			),
 			'about' => array(
 				'title' => __( 'About', 'progo' ),
 				'content' => "<h3>This Page could have info about your site/store</h3>$lipsum",
 				'id' => '',
-				'menu' => 'mainmenu'
+				'menus' => array( 'mainmenu', 'fbarlnx', 'ppcmenu' )
 			),
 			'blog' => array(
 				'title' => __( 'Blog', 'progo' ),
 				'content' => "This Page pulls in your Blog posts",
 				'id' => '',
-				'menu' => 'mainmenu'
+				'menus' => array( 'mainmenu', 'fbarlnx' )
 			),
 			'terms' => array(
 				'title' => __( 'Terms & Conditions', 'progo' ),
 				'content' => "<h3>List your Terms and Conditions here</h3>$lipsum",
 				'id' => '',
-				'menu' => 'ftrlnx'
+				'menus' => array( 'ftrlnx' )
 			),
 			'privacy' => array(
 				'title' => __( 'Privacy Policy', 'progo' ),
 				'content' => "<h3>Put your Privacy Policy here</h3>$lipsum",
 				'id' => '',
-				'menu' => 'ftrlnx'
+				'menus' => array( 'ftrlnx' )
 			),
 			'customer-service' => array(
 				'title' => __( 'Customer Service', 'progo' ),
 				'content' => "<h3>This Page could have Customer Service info on it</h3>$lipsum",
 				'id' => '',
-				'menu' => 'ftrlnx'
+				'menus' => array( 'ftrlnx' )
 			)
 		);
 		foreach ( $new_pages as $slug => $page ) {
@@ -649,7 +651,8 @@ function progo_admin_init() {
 					case 'blog':
 						update_option( 'page_for_posts', $new_pages[$slug]['id'] );
 						update_option( 'progo_blog_id', $new_pages[$slug]['id'] );
-						// also add SAMPLE PAGE (pageid=2) to MAINMENU
+						
+						// also add SAMPLE PAGE (pageid=2) to menus, before BLOG
 						$menu_args = array(
 							'menu-item-object-id' => 2,
 							'menu-item-object' => 'page',
@@ -658,9 +661,12 @@ function progo_admin_init() {
 							'menu-item-title' => 'Sample Page',
 							'menu-item-status' => 'publish',
 						);
-						$menu_id = $new_menus[$new_pages[$slug]['menu']];
-						if ( is_numeric( $menu_id ) ) {
-							wp_update_nav_menu_item( $menu_id , 0, $menu_args );
+						$samplemenus = array( 'mainmenu', 'ppcmenu' );
+						foreach ( $samplemenus as $sm ) {
+							$menu_id = $new_menus[$sm];
+							if ( is_numeric( $menu_id ) ) {
+								wp_update_nav_menu_item( $menu_id , 0, $menu_args );
+							}
 						}
 						break;
 				}
@@ -673,14 +679,8 @@ function progo_admin_init() {
 					'menu-item-title' => $page['title'],
 					'menu-item-status' => 'publish',
 				);
-				$menu_id = $new_menus[$new_pages[$slug]['menu']];
-				if ( is_numeric( $menu_id ) ) {
-					wp_update_nav_menu_item( $menu_id , 0, $menu_args );
-				}
-				
-				// also add ABOUT and Blog to BOTTOMBAR menu
-				if ( in_array( $slug, array( 'about', 'blog' ) ) ) {
-					$menu_id = $new_menus['fbarlnx'];
+				foreach ( $new_pages[$slug]['menus'] as $menu_key ) {
+					$menu_id = $new_menus[$menu_key];
 					if ( is_numeric( $menu_id ) ) {
 						wp_update_nav_menu_item( $menu_id , 0, $menu_args );
 					}
@@ -1324,6 +1324,7 @@ function progo_options_defaults() {
 			"frontpage" => get_option( 'show_on_front' ),
 			"homeseconds" => 6,
 			// ADVANCED OPTIONS
+			"menuwidth" => "fixed",
 			"footercolor" => "",
 			"showtips" => 1,
 			"fbtabs" => 0,
@@ -1394,7 +1395,7 @@ function progo_validate_options( $input ) {
 	
 	$choices = array(
 		'posts',
-		'page'
+		'page',
 	);
 	if ( ! in_array( $input['frontpage'], $choices ) ) {
 		$input['frontpage'] = get_option('show_on_front');
@@ -1408,7 +1409,13 @@ function progo_validate_options( $input ) {
 			update_option( 'page_on_front', get_option('progo_homepage_id') );
 			break;
 	}
-	
+	$choices = array(
+		'fixed',
+		'auto',
+	);
+	if ( ! in_array( $input['menuwidth'], $choices ) ) {
+		$input['frontpage'] = 'fixed';
+	}
 	// opt[showdesc] can only be 1 or 0
 	$bincheck = array( 'showdesc', 'showtips', 'fbtabs', 'ppcposts' );
 	foreach( $bincheck as $f ) {
@@ -1953,6 +1960,33 @@ function progo_frontpage_msg() {
 </script>
 <?php }
 endif;
+if ( ! function_exists( 'progo_field_menuwidth' ) ):
+/**
+ * outputs HTML for Adv Option "Main Menu Width" field on Site Settings page
+ * @since Business Pro 1.2.6
+ */
+function progo_field_menuwidth() {
+	// Latest Blog Posts, (Featured Products), Static Content
+	$choices = array(
+		'fixed' => 'Fixed Width',
+		'auto' => 'Auto'
+	);
+	
+	$options = get_option( 'progo_options' );
+	// check just in case show_on_front changed since this was last updated?
+	// $options['frontpage'] = get_option('show_on_front');
+	
+	?><select id="progo_menuwidth" name="progo_options[menuwidth]"><?php
+    foreach ( $choices as $k => $c ) {
+		echo '<option value="'. $k .'"';
+		if( $k == $options['menuwidth'] ) {
+			echo ' selected="selected"';
+		}
+		echo '>'. esc_attr($c) .'</option>';
+	}
+    ?></select><span class="description">Would you like the top links in the Main Menu on your site to be Fixed Width or Auto Width?</span>
+<?php }
+endif;
 if ( ! function_exists( 'progo_field_homeseconds' ) ):
 /**
  * outputs HTML for Homepage "Cycle Seconds" field on Site Settings page
@@ -2338,18 +2372,11 @@ function progo_cpt_post_types( $post_types ) {
 endif;
 add_filter( 'cpt_post_types', 'progo_cpt_post_types' );
 
-// Create PPC Custom Post Type ----- Begin
-
-
-
 //DND PPC DKI Magic --- Begin
-
-add_shortcode('keyword', 'dnd_ppc_kw');
-
-
-function dnd_ppc_kw ($location){
-
-	$uri = get_uri();
+add_shortcode('keyword', 'progo_ppc_kw');
+if ( !function_exists( 'progo_ppc_kw' ) ):
+function progo_ppc_kw ($location){
+	$uri = progo_get_kw_uri();
 	
 	$kwy1 = str_replace('/','',$uri[1]);
 	$kwy1 = str_replace('-',' ',$kwy1);
@@ -2357,23 +2384,19 @@ function dnd_ppc_kw ($location){
 	$kwy2 = str_replace('-',' ',$kwy2);
 
 	switch($location['loc']){
-	
 		case '2':
 			$keyword = $kwy2;
 			break;
-			default:
-			
+		default:
 			$keyword = $kwy1;
 			break;
 	}
 	
 	return $keyword . " " . $request_uri;
 }
-
-
-
-
-function get_uri() {
+endif;
+if ( !function_exists( 'progo_get_kw_uri' ) ):
+function progo_get_kw_uri() {
         $request_uri = $_SERVER['REQUEST_URI'];
         // for consistency, check to see if trailing slash exists in URI request
         if (substr($request_uri, -1)!="/") {
@@ -2384,57 +2407,51 @@ function get_uri() {
         $uri = $matches[0];
         return $uri;
 }
-
-
-
-function ppc_title (){
-
-	$uri = get_uri();
+endif;
+if ( !function_exists( 'progo_ppc_title' ) ):
+function progo_ppc_title (){
+	$uri = progo_get_kw_uri();
 	
 	$kwy1 = str_replace('/','',$uri[1]);
 	$kwy1 = str_replace('-',' ',$kwy1);
 	$kwy2 = str_replace('/','',$uri[2]);
 	$kwy2 = str_replace('-',' ',$kwy2);
 	
-	if($kwy2 != ""){
-		$title_out = $kwy1 . " | " . $kwy2;
-	} else {
-			$title_out = $kwy1;
-	}
+	$title_out = $kwy1 . ( ($kwy2 != "") ? ' | '. $kwy2 : '' );
 	
 	echo $title_out;
 }
-
-function populate_content(){
-
-	$uri = get_uri();
+endif;
+if ( !function_exists( 'progo_populate_ppc_content' ) ):
+function progo_populate_ppc_content(){
+	$uri = progo_get_kw_uri();
 	
 	$the_slug = str_replace('/','',$uri[1]);
 	$args=array(
-  	'name' => $the_slug,
-  	'post_type' => 'progo_ppc',
-  	'post_status' => 'publish',
-  	'showposts' => 1
-  	);
-  	
-  	$lastposts = get_posts( $args );
-foreach($lastposts as $post) : setup_postdata($post); 
- return the_content(); 
- endforeach; 
-  	
+		'name' => $the_slug,
+		'post_type' => 'progo_ppc',
+		'post_status' => 'publish',
+		'showposts' => 1
+	);
+	
+	$lastposts = get_posts( $args );
+	foreach($lastposts as $post) {
+		setup_postdata($post); 
+		return the_content(); 
+	}
 }
-
-add_filter( 'template_redirect', 'ppc_template' );
+endif;
+add_filter( 'template_redirect', 'progo_ppc_template' );
 remove_filter('template_redirect','redirect_canonical');
- 
-function ppc_template() {
-        $uri = get_uri();
-        if ($uri[0]=='ppc/') {
-                //add_filter('wp_title', 'ppc_template_title', 20);
-                status_header(200);
-                include(STYLESHEETPATH . '/PPC-page.php');
-                die();
-        }
+if ( !function_exists( 'progo_ppc_template' ) ):
+function progo_ppc_template() {
+	$uri = progo_get_kw_uri();
+	if ($uri[0]=='ppc/') {
+		//add_filter('wp_title', 'ppc_template_title', 20);
+		status_header(200);
+		include(STYLESHEETPATH . '/PPC-page.php');
+		die();
+	}
 }
-
+endif;
 //DND PPC DKI Magic --- End

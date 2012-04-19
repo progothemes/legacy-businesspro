@@ -35,5 +35,7 @@
             <?php } ?>
             </div>
             <?php get_sidebar('header');
-			wp_nav_menu( array( 'container' => 'false', 'theme_location' => 'mainmenu', 'menu_id' => 'nav', 'fallback_cb' => 'progo_nav_fallback' ) ); ?>
+			$menuclass = 'menu';
+			if ( $options['menuwidth'] == 'auto' ) $menuclass .= ' autow';
+			wp_nav_menu( array( 'container' => 'false', 'theme_location' => 'mainmenu', 'menu_id' => 'nav', 'menu_class' => $menuclass, 'fallback_cb' => 'progo_nav_fallback' ) ); ?>
         </div>
