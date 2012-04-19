@@ -23,3 +23,21 @@ tr.status-notdirect { display: none; }
 
 div.updated.progo-steps { border-width: 2px; padding-right: 7%; background: #FFFFE0 url(../images/logo_admin.png) no-repeat 99% 50% }
 #adminmenu .menu-icon-progo div.wp-menu-image { background: url(../images/logo_menu.png) no-repeat 50% 50% }
+
+#menu-posts-progo_ppc .wp-menu-image {
+	background: url(../images/dollar_16.png) no-repeat 6px 7px !important;
+	opacity: 0.6;
+}
+#menu-posts-progo_ppc:hover .wp-menu-image, #menu-posts-progo_ppc.wp-has-current-submenu .wp-menu-image {
+	opacity: 1;
+}
+#icon-edit.icon32-posts-progo_ppc {background: url(../images/dollar.png) no-repeat center;}
+
+#menu-posts-progo_facebooktabs .wp-menu-image {
+	background: url(../images/facebook_icon16.png) no-repeat 6px 7px !important;
+	opacity: 0.6;
+}
+#menu-posts-progo_facebooktabs:hover .wp-menu-image, #menu-posts-progo_facebooktabs.wp-has-current-submenu .wp-menu-image {
+	opacity: 1;
+}
+#icon-edit.icon32-posts-progo_facebooktabs {background: url(../images/facebook_icon.png) no-repeat center;}

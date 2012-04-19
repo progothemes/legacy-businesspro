@@ -12,7 +12,7 @@
 ?>
 <div id="fbar">
 <?php if(!dynamic_sidebar('fbar')) {
-	wp_nav_menu( array( 'container_class' => 'fblock widget_nav_menu', 'theme_location' => 'mainmenu' ) );
+	wp_nav_menu( array( 'container_class' => 'fblock widget_nav_menu', 'theme_location' => 'fbarlnx' ) );
 } ?>
 </div>
 	</div><!-- #page -->

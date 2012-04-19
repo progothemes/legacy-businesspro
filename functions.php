@@ -31,8 +31,9 @@ function progo_setup() {
 	// This theme uses wp_nav_menu() in two locations
 	register_nav_menus( array(
 		'mainmenu' => 'Main Menu',
+		'fbarlnx' => 'Footer Bar Links',
 		'ftrlnx' => 'Footer Links',
-		'ppc-primary' => 'PPC Menu'
+		'ppc-primary' => 'PPC Menu',
 	) );
 	
 	// Add support for custom backgrounds
@@ -247,8 +248,8 @@ function progo_admin_menu_order($menu_ord) {
 		// to do : GRAVITY FORMS and TESTIMONIALS
 		'separator2',
 		'edit.php?post_type=page', // Pages
-		'edit.php?post_type=facebooktabs',
-		'edit.php?post_type=ppc',
+		'edit.php?post_type=progo_facebooktabs',
+		'edit.php?post_type=progo_ppc',
 		'edit.php', // Posts
 		'upload.php', // Media
 		'edit-comments.php', // Comments
@@ -547,13 +548,15 @@ function progo_admin_init() {
 	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_headline', 'Form Headline', 'progo_field_headline', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_frontpage', 'Display', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
+	add_settings_field( 'progo_frontpage', 'Homepage Contet Displays', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
 
 	
 	add_settings_section( 'progo_adv', 'Advanced Options', 'progo_section_text', 'progo_adv' );
 	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_adv', 'progo_adv' );
 	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_adv', 'progo_adv' );
+	add_settings_field( 'progo_field_showfbtabs', 'Facebook Tabs', 'progo_field_showfbtabs', 'progo_adv', 'progo_adv' );
+	add_settings_field( 'progo_field_showppcposts', 'PPC Posts', 'progo_field_showppcposts', 'progo_adv', 'progo_adv' );
 	
 	
 	// since there does not seem to be an actual THEME_ACTIVATION hook, we'll fake it here
@@ -566,7 +569,8 @@ function progo_admin_init() {
 		// create new menus in the Menu system
 		$new_menus = array(
 			'mainmenu' => 'Main Menu',
-			'ftrlnx' => 'Footer Links'
+			'fbarlnx' => 'Bottom Bar Links',
+			'ftrlnx' => 'Footer Links',
 		);
 		$aok = 1;
 		foreach ( $new_menus as $k => $m ) {
@@ -645,6 +649,19 @@ function progo_admin_init() {
 					case 'blog':
 						update_option( 'page_for_posts', $new_pages[$slug]['id'] );
 						update_option( 'progo_blog_id', $new_pages[$slug]['id'] );
+						// also add SAMPLE PAGE (pageid=2) to MAINMENU
+						$menu_args = array(
+							'menu-item-object-id' => 2,
+							'menu-item-object' => 'page',
+							'menu-item-parent-id' => 0,
+							'menu-item-type' => 'post_type',
+							'menu-item-title' => 'Sample Page',
+							'menu-item-status' => 'publish',
+						);
+						$menu_id = $new_menus[$new_pages[$slug]['menu']];
+						if ( is_numeric( $menu_id ) ) {
+							wp_update_nav_menu_item( $menu_id , 0, $menu_args );
+						}
 						break;
 				}
 				
@@ -659,6 +676,14 @@ function progo_admin_init() {
 				$menu_id = $new_menus[$new_pages[$slug]['menu']];
 				if ( is_numeric( $menu_id ) ) {
 					wp_update_nav_menu_item( $menu_id , 0, $menu_args );
+				}
+				
+				// also add ABOUT and Blog to BOTTOMBAR menu
+				if ( in_array( $slug, array( 'about', 'blog' ) ) ) {
+					$menu_id = $new_menus['fbarlnx'];
+					if ( is_numeric( $menu_id ) ) {
+						wp_update_nav_menu_item( $menu_id , 0, $menu_args );
+					}
 				}
 			}
 		}
@@ -695,29 +720,86 @@ if ( ! function_exists( 'progo_businesspro_init' ) ):
  * @since Business Pro 1.0
  */
 function progo_businesspro_init() {
+	// HOMESLIDER SLIDES
 	register_post_type( 'progo_homeslide',
 		array(
 			'labels' => array(
-				'name' => 'Homepage Slides',
-				'singular_name' => 'Slide',
-				'add_new_item' => 'Add New Slide',
-				'edit_item' => 'Edit Slide',
-				'new_item' => 'New Slide',
-				'view_item' => 'View Slide',
-				'search_items' => 'Search Slides',
-				'not_found' =>  'No slides found',
-				'not_found_in_trash' => 'No slides found in Trash', 
+				'name' => _x('Homepage Slides', 'post type general name'),
+				'singular_name' => _x('Slide', 'post type singular name'),
+				'add_new_item' => _x('Add New Slide', 'Homepage Slides'),
+				'edit_item' => __('Edit Slide'),
+				'new_item' => __('New Slide'),
+				'view_item' => __('View Slide'),
+				'search_items' => __('Search Slides'),
+				'not_found' =>  __('No slides found'),
+				'not_found_in_trash' => __('No slides found in Trash'), 
 				'parent_item_colon' => '',
-				'menu_name' => 'Homepage Slides'
+				'menu_name' => __('Homepage Slides')
 			),
 			'public' => true,
 			'public_queryable' => true,
 			'exclude_from_search' => true,
 			'show_in_menu' => 'themes.php',
 			'hierarchical' => true,
-			'supports' => array( 'title', 'thumbnail', 'revisions', 'page-attributes' )
+			'supports' => array( 'title', 'thumbnail', 'revisions', 'page-attributes' ),
 		)
 	);
+
+	$options = get_option( 'progo_options' );
+	if ( (int) $options['fbtabs'] == 1 ) {
+	// Facebook Tabs
+	register_post_type( 'progo_facebooktabs', array(
+		'labels' => array(
+			'name' => _x('Facebook Tabs', 'post type general name'),
+			'singular_name' => _x('Facebook Tabs', 'post type singular name'),
+			'add_new' => _x('Add New', 'Facebook Tabs'),
+			'add_new_item' => __('Add New Tab'),
+			'edit_item' => __('Edit Tab'),
+			'new_item' => __('New Tab'),
+			'view_item' => __('View Tab'),
+			'search_items' => __('Facebook'),
+			'not_found' =>  __('No Tab found'),
+			'not_found_in_trash' => __('No Tab found in Trash'), 
+			'parent_item_colon' => ''
+		),
+		'public' => true,
+		'publicly_queryable' => true,
+		'show_ui' => true, 
+		'query_var' => true,
+		'rewrite' => true,
+		'capability_type' => 'post',
+		'hierarchical' => false,
+		'supports' => array( 'title', 'editor', 'custom-fields' ),
+	));
+	}
+	if ( (int) $options['ppcposts'] == 1 ) {
+	// PPC POSTS
+	register_post_type( 'progo_ppc', array(
+		'labels' =>  array(
+			'name' => _x('PPC Posts', 'post type general name'),
+			'singular_name' => _x('PPC Posts', 'post type singular name'),
+			'add_new' => _x('Add New', 'PPC'),
+			'add_new_item' => __('Add New PPC'),
+			'edit_item' => __('Edit PPC'),
+			'new_item' => __('New PPC'),
+			'view_item' => __('View PPC'),
+			'search_items' => __('PPC'),
+			'not_found' =>  __('No PPC Posts found'),
+			'not_found_in_trash' => __('No PPC Posts found in Trash'), 
+			'parent_item_colon' => '',
+			'menu_name' => 'PPC Posts',
+			'description' => "Shortcodes: [keyword loc=1], [keyword loc=2], the 1st and 2nd words after ppc/."
+		),
+		'public' => true,
+		'publicly_queryable' => true,
+		'show_ui' => true, 
+		'query_var' => true,
+		'rewrite' => true,
+		'capability_type' => 'post',
+		'hierarchical' => false,
+		'supports' => array( 'title', 'editor', 'custom-fields', 'comments' ),
+	));
+	}
 }
 add_action( 'init', 'progo_businesspro_init' );
 endif;
@@ -782,16 +864,15 @@ function progo_businesspro_widgets() {
 		'before_title' => '<div class="title">',
 		'after_title' => '</div>'
 	));
-	
 	register_sidebar(array(
-			'name' => 'PPC Template',
-			'id' => 'ppc-template',
-			'description' => 'PPC Post Widgets Go Here',
-			'before_widget' => '<div class="block %1$s %2$s">',
+		'name' => 'PPC Template',
+		'id' => 'ppc-template',
+		'description' => 'PPC Post Widgets Go Here',
+		'before_widget' => '<div class="block %1$s %2$s">',
 		'after_widget' => '</div></div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
 		'after_title' => '</span></h3><div class="inside">'
-		));
+	));
 	
 	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm', 'OfficeInfo' );
 	foreach ( $progo_widgets as $w ) {
@@ -823,6 +904,9 @@ function progo_metabox_cleanup() {
 			break;
 		case 'progo_testimonials':
 			if(isset($wp_meta_boxes['progo_testimonials']['normal']['high']['wpseo_meta'])) unset($wp_meta_boxes['progo_testimonials']['normal']['high']['wpseo_meta']);
+			break;
+		case 'progo_ppc':
+			add_meta_box ('progo_ppc_shortcodes', 'PPC Shortcodes', 'progo_ppc_list_shortcodes', 'progo_ppc', 'normal', 'high' );
 			break;
 	}
 }
@@ -895,6 +979,18 @@ jQuery(function() {
 });
 /* ]]> */
 	</script>
+    <?php
+}
+endif;
+if ( ! function_exists( 'progo_ppc_list_shortcodes' ) ):
+/**
+ * custom metabox for PPC Posts, explaining Shortcodes
+ * @since Business Pro 1.2.6
+ */
+function progo_ppc_list_shortcodes() {
+	?>
+    <p>[keyword loc=1] = http://www.site.com/ppc/KEYWORD/ -- (default)<br /><br /><br />
+    [keyword loc=2] = http://www.site.com/ppc/word/KEYWORD/</p>
     <?php
 }
 endif;
@@ -1206,25 +1302,32 @@ function progo_options_defaults() {
 	$tmp = get_option( 'progo_options' );
     if ( ! is_array( $tmp ) ) {
 		$def = array(
+			// THEME CUSTOMIZATION
 			"colorscheme" => "Greyscale",
 			"logo" => "",
+			// GENERAL SITE INFORMATION
 			"blogname" => get_option( 'blogname' ),
 			"blogdescription" => get_option( 'blogdescription' ),
 			"showdesc" => 1,
 			"support" => "(858) 555-1234",
 			"copyright" => "© Copyright ". date('Y') .", All Rights Reserved",
-			"footercolor" => "",
-			"showtips" => 1,
-			"layout" => 1,
-			"headline" => "Get Your Customers\nWhat They Need Most!",
-			"form" => "",
+			// OFFICE INFORMATION
 			"businessaddy" => "",
 			"businessCSZ" => "",
 			"businessphone" => "",
 			"businessemail" => "",
 			"businesshours" => "",
+			// HOMEPAGE SETTINGS
+			"layout" => 1,
+			"headline" => "Get Your Customers\nWhat They Need Most!",
+			"form" => "",
 			"frontpage" => get_option( 'show_on_front' ),
-			"homeseconds" => 6
+			"homeseconds" => 6,
+			// ADVANCED OPTIONS
+			"footercolor" => "",
+			"showtips" => 1,
+			"fbtabs" => 0,
+			"ppcposts" => 0,
 		);
 		update_option( 'progo_options', $def );
 	}
@@ -1307,7 +1410,7 @@ function progo_validate_options( $input ) {
 	}
 	
 	// opt[showdesc] can only be 1 or 0
-	$bincheck = array( 'showdesc', 'showtips' );
+	$bincheck = array( 'showdesc', 'showtips', 'fbtabs', 'ppcposts' );
 	foreach( $bincheck as $f ) {
 		if ( (int) $input[$f] != 1 ) {
 			$input[$f] = 0;
@@ -1653,6 +1756,36 @@ function progo_field_showtips() {
 		echo ' checked="checked"';
 	} ?> />
 Show ProGo Tips <img src="<?php bloginfo('template_url'); ?>/images/tip.png" alt="Tip" /> for Admin users viewing the front-end of <a target="_blank" href="<?php echo esc_url( trailingslashit( get_bloginfo( 'url' ) ) ); ?>">your site</a></label>
+<?php }
+endif;
+if ( ! function_exists( 'progo_field_showfbtabs' ) ):
+/**
+ * outputs HTML for checkbox "Show Slogan" field on Site Settings page
+ * @since Business Pro 1.0
+ */
+function progo_field_showfbtabs() {
+	$options = get_option( 'progo_options' ); ?>
+<label for="progo_showfbtabs">
+<input type="checkbox" value="1" id="progo_showfbtabs" name="progo_options[fbtabs]"<?php
+	if ( (int) $options['fbtabs'] == 1 ) {
+		echo ' checked="checked"';
+	} ?> />
+Enable "Facebook Tabs" custom post type &amp; templates.</label> <span class="description">(some assembly required)</span>
+<?php }
+endif;
+if ( ! function_exists( 'progo_field_showppcposts' ) ):
+/**
+ * outputs HTML for checkbox "Show Slogan" field on Site Settings page
+ * @since Business Pro 1.0
+ */
+function progo_field_showppcposts() {
+	$options = get_option( 'progo_options' ); ?>
+<label for="progo_showppcposts">
+<input type="checkbox" value="1" id="progo_showppcposts" name="progo_options[ppcposts]"<?php
+	if ( (int) $options['ppcposts'] == 1 ) {
+		echo ' checked="checked"';
+	} ?> />
+Enable "PPC Posts" custom post type &amp; templates.</label> <span class="description">(some assembly required)</span>
 <?php }
 endif;
 if ( ! function_exists( 'progo_field_support' ) ):
@@ -2196,138 +2329,22 @@ endif;
   This code is dependant on this plugin (http://wordpress.org/extend/plugins/custom-post-template/) 
   It hooks our custom post type templates into the template selector in the admin for these types.
 */
-
-function my_cpt_post_types( $post_types ) {
+if ( ! function_exists( 'progo_cpt_post_types' ) ):
+function progo_cpt_post_types( $post_types ) {
 	$post_types[] = 'facebooktabs';
 	$post_types[] = 'ppc';
 	return $post_types;
 }
-add_filter( 'cpt_post_types', 'my_cpt_post_types' );
-
-// ADDING CUSTOM POST TYPE TEMPLATE SELECTOR -- End
-
-// Create Facebook Tabs Custom Post Type ----- Begin
-
-add_action('init', 'add_facebook_custom_type');
-
-function add_facebook_custom_type() 
-{
-  $FBlabels = array(
-    'name' => _x('Facebook Tabs', 'post type general name'),
-    'singular_name' => _x('Facebook Tabs', 'post type singular name'),
-    'add_new' => _x('Add New', 'Facebook Tabs'),
-    'add_new_item' => __('Add New Tab'),
-    'edit_item' => __('Edit Tab'),
-    'new_item' => __('New Tab'),
-    'view_item' => __('View Tab'),
-    'search_items' => __('Facebook'),
-    'not_found' =>  __('No Tab found'),
-    'not_found_in_trash' => __('No Tab found in Trash'), 
-    'parent_item_colon' => ''
-  );
-  $args = array(
-    'labels' => $FBlabels,
-    'public' => true,
-    'publicly_queryable' => true,
-    'show_ui' => true, 
-    'query_var' => true,
-    'rewrite' => true,
-    'capability_type' => 'post',
-    'hierarchical' => false,
-    'supports' => array('title','editor','custom-fields'),
-  ); 
-  register_post_type('facebooktabs',$args);
-}
-
-add_action( 'admin_head', 'wp_facebook_icons' );
-
-function wp_facebook_icons() {
-    ?>
-    <style type="text/css" media="screen">
-        #menu-posts-facebooktabs .wp-menu-image {
-            background: url(<?php echo get_bloginfo('template_url')?>/images/facebook_icon16.png) no-repeat 6px 7px !important;
-            opacity: 0.6;
-        }
-        #menu-posts-facebooktabs:hover .wp-menu-image, #menu-posts-facebooktabs.wp-has-current-submenu .wp-menu-image {
-            opacity: 1;
-        }
-        #icon-edit.icon32-posts-facebooktabs {background: url(<?php echo get_bloginfo('template_url')?>/images/facebook_icon.png) no-repeat center;}
-    </style>
-<?php }
-// Create Facebook Tabs Custom Post Type ----- End
+endif;
+add_filter( 'cpt_post_types', 'progo_cpt_post_types' );
 
 // Create PPC Custom Post Type ----- Begin
 
 
-add_action('init', 'add_ppc_custom_type');
-
-function add_ppc_custom_type() 
-{
-  $labels = array(
-    'name' => _x('PPC Posts', 'post type general name'),
-    'singular_name' => _x('PPC Posts', 'post type singular name'),
-    'add_new' => _x('Add New', 'PPC'),
-    'add_new_item' => __('Add New PPC'),
-    'edit_item' => __('Edit PPC'),
-    'new_item' => __('New PPC'),
-    'view_item' => __('View PPC'),
-    'search_items' => __('PPC'),
-    'not_found' =>  __('No PPC Posts found'),
-    'not_found_in_trash' => __('No PPC Posts found in Trash'), 
-    'parent_item_colon' => '',
-    'menu_name' => 'PPC Posts',
-    'description' => "Shortcodes: [keyword loc=1], [keyword loc=2], the 1st and 2nd words after ppc/."
-  );
-  $args = array(
-    'labels' => $labels,
-    'public' => true,
-    'publicly_queryable' => true,
-    'show_ui' => true, 
-    'query_var' => true,
-    'rewrite' => true,
-    'capability_type' => 'post',
-    'hierarchical' => false,
-    'supports' => array('title','editor','custom-fields', 'comments'),
-  ); 
-  register_post_type('ppc',$args);
-}
-
-
-//Add Metabox
-add_action ('add_meta_boxes', 'ppc_instructions');
-    
-function ppc_instructions(){
-    add_meta_box ('ppc_shortcodes', 'PPC Shortcodes', 'ppc_list_shortcodes', 'ppc', 'normal', 'high' );
-}
-
-function ppc_list_shortcodes(){    
-    echo "[keyword loc=1] = http://www.site.com/ppc/KEYWORD/ -- (default)";
-    echo "<br /><br /><br />";
-    echo "[keyword loc=2] = http://www.site.com/ppc/word/KEYWORD/";
-}
-
-
-add_action( 'admin_head', 'wp_DNDPPC_icons' );
- 
-function wp_DNDPPC_icons() {
-    ?>
-    <style type="text/css" media="screen">
-        #menu-posts-ppc .wp-menu-image {
-            background: url(<?php echo get_bloginfo('template_url')?>/images/dollar_16.png) no-repeat 6px 7px !important;
-            opacity: 0.6;
-        }
-        #menu-posts-ppc:hover .wp-menu-image, #menu-posts-ppc.wp-has-current-submenu .wp-menu-image {
-            opacity: 1;
-        }
-        #icon-edit.icon32-posts-ppc {background: url(<?php echo get_bloginfo('template_url')?>/images/dollar.png) no-repeat center;}
-    </style>
-<?php }
-// Create DND PPC Custom Post Type ----- End
-
 
 //DND PPC DKI Magic --- Begin
 
-add_shortcode ('keyword', 'dnd_ppc_kw');
+add_shortcode('keyword', 'dnd_ppc_kw');
 
 
 function dnd_ppc_kw ($location){
@@ -2395,7 +2412,7 @@ function populate_content(){
 	$the_slug = str_replace('/','',$uri[1]);
 	$args=array(
   	'name' => $the_slug,
-  	'post_type' => 'ppc',
+  	'post_type' => 'progo_ppc',
   	'post_status' => 'publish',
   	'showposts' => 1
   	);
