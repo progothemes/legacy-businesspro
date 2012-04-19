@@ -729,6 +729,15 @@ if ( ! function_exists( 'progo_businesspro_widgets' ) ):
  */
 function progo_businesspro_widgets() {
 	register_sidebar(array(
+		'name' => 'Blog',
+		'id' => 'blog',
+		'description' => 'Sidebar for the Blog area',
+		'before_widget' => '<div class="block %1$s %2$s">',
+		'after_widget' => '</div></div>',
+		'before_title' => '<h3 class="title"><span class="spacer">',
+		'after_title' => '</span></h3><div class="inside">'
+	));
+	register_sidebar(array(
 		'name' => 'Homepage Sidebar',
 		'id' => 'home',
 		'description' => 'Right column sidebar area on Homepage',
@@ -741,15 +750,6 @@ function progo_businesspro_widgets() {
 		'name' => 'Standard Pages',
 		'id' => 'main',
 		'description' => 'Standard right column sidebar area',
-		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
-		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
-	));
-	register_sidebar(array(
-		'name' => 'Blog',
-		'id' => 'blog',
-		'description' => 'Sidebar for the Blog area',
 		'before_widget' => '<div class="block %1$s %2$s">',
 		'after_widget' => '</div></div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
