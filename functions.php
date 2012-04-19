@@ -62,8 +62,8 @@ function progo_setup() {
 	add_filter( 'site_transient_update_themes', 'progo_update_check' );
 	add_filter( 'admin_post_thumbnail_html', 'progo_admin_post_thumbnail_html' );
 	add_filter( 'wp_mail_content_type', 'progo_mail_content_type' );
-	add_filter('custom_menu_order', 'progo_admin_menu_order');
-	add_filter('menu_order', 'progo_admin_menu_order');
+	add_filter( 'custom_menu_order', 'progo_admin_menu_order', 99 );
+	add_filter( 'menu_order', 'progo_admin_menu_order', 99 );
 	// force some metaboxes turned ON
 	add_filter('get_user_option_managenav-menuscolumnshidden', 'progo_metaboxhidden_defaults', 10, 3 );
 	
@@ -243,8 +243,12 @@ function progo_admin_menu_order($menu_ord) {
 		'index.php', // this represents the dashboard link
 		'separator1',
 		'themes.php', // which we changed to ProGo Theme menu area
+//		'admin.php?page=wpcf7', // failed
+		// to do : GRAVITY FORMS and TESTIMONIALS
 		'separator2',
 		'edit.php?post_type=page', // Pages
+		'edit.php?post_type=facebooktabs',
+		'edit.php?post_type=ppc',
 		'edit.php', // Posts
 		'upload.php', // Media
 		'edit-comments.php', // Comments
@@ -1682,7 +1686,6 @@ if (!function_exists('progo_field_businessaddy') ):
  */
 function progo_field_businessaddy() {
 $options = get_option( 'progo_options' ); ?>
-<a id="offInfo"></a>
 <input id="progo_businessaddy" name="progo_options[businessaddy]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessaddy'] ); ?>" />
 <span class="description">This address will appear in the Office Info widget.</span>
 <?php }
