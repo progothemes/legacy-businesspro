@@ -304,12 +304,14 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
         <?php
 		do_settings_sections( 'progo_theme' );
 		do_settings_sections( 'progo_info' );
+		do_settings_sections( 'progo_office' );
 		do_settings_sections( 'progo_hometop' );
+		do_settings_sections( 'progo_adv' );
 		?>
         <p class="submit"><input type="submit" value="Save Changes" class="button-primary" /></p>
 		<p><br /></p>
 		</form>
-        <h3>Additional Options</h3>
+        <h3>Additional ProGo Theme Options</h3>
         <table class="form-table">
         <?php
 		$addl = array(
@@ -522,20 +524,20 @@ function progo_admin_init() {
 	add_settings_field( 'progo_colorscheme', 'Color Scheme', 'progo_field_color', 'progo_theme', 'progo_theme' );
 	add_settings_field( 'progo_logo', 'Logo', 'progo_field_logo', 'progo_theme', 'progo_theme' );
 
-	add_settings_section( 'progo_info', 'Site Info', 'progo_section_text', 'progo_info' );
+	add_settings_section( 'progo_info', 'General Site Information', 'progo_section_text', 'progo_info' );
 	add_settings_field( 'progo_blogname', 'Site Name', 'progo_field_blogname', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_blogdescription', 'Slogan', 'progo_field_blogdesc', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_showdesc', 'Show/Hide Slogan', 'progo_field_showdesc', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_support', 'Customer Support', 'progo_field_support', 'progo_info', 'progo_info' );
 	add_settings_field( 'progo_copyright', 'Copyright Notice', 'progo_field_copyright', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_info', 'progo_info' );
+	
+	add_settings_section( 'progo_office', 'Office Information', 'progo_section_text', 'progo_office' );
 	//Business Info for Office Info Widget and Footer display.
-	add_settings_field( 'progo_businessaddy', 'Business Street Address', 'progo_field_businessaddy', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_businessCSZ', 'Business City, State, Zip', 'progo_field_businessCSZ', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_businessphone', 'Business Phone', 'progo_field_businessphone', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_businessemail', 'Business Email', 'progo_field_businessemail', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_businesshours', 'Business Hours', 'progo_field_businesshours', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_info', 'progo_info' );
+	add_settings_field( 'progo_businessaddy', 'Business Street Address', 'progo_field_businessaddy', 'progo_office', 'progo_office' );
+	add_settings_field( 'progo_businessCSZ', 'Business City, State, Zip', 'progo_field_businessCSZ', 'progo_office', 'progo_office' );
+	add_settings_field( 'progo_businessphone', 'Business Phone', 'progo_field_businessphone', 'progo_office', 'progo_office' );
+	add_settings_field( 'progo_businessemail', 'Business Email', 'progo_field_businessemail', 'progo_office', 'progo_office' );
+	add_settings_field( 'progo_businesshours', 'Business Hours', 'progo_field_businesshours', 'progo_office', 'progo_office' );
 	
 	add_settings_section( 'progo_homepage', 'Homepage Settings', 'progo_section_text', 'progo_hometop' );
 	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
@@ -543,8 +545,11 @@ function progo_admin_init() {
 	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_frontpage', 'Display', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
+
 	
-	
+	add_settings_section( 'progo_adv', 'Advanced Options', 'progo_section_text', 'progo_adv' );
+	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_adv', 'progo_adv' );
+	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_adv', 'progo_adv' );
 	
 	
 	// since there does not seem to be an actual THEME_ACTIVATION hook, we'll fake it here
@@ -784,7 +789,7 @@ function progo_businesspro_widgets() {
 		'after_title' => '</span></h3><div class="inside">'
 		));
 	
-	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm' );
+	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm', 'OfficeInfo' );
 	foreach ( $progo_widgets as $w ) {
 		require_once( 'widgets/widget-'. strtolower($w) .'.php' );
 		register_widget( 'ProGo_Widget_'. $w );
@@ -1678,8 +1683,8 @@ if (!function_exists('progo_field_businessaddy') ):
 function progo_field_businessaddy() {
 $options = get_option( 'progo_options' ); ?>
 <a id="offInfo"></a>
-<input id="progo_businessaddy" name="progo_options[businessaddy]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessaddy'] ); ?>"><br />
-<span class="description">This address will appear in the office info widget.</span>
+<input id="progo_businessaddy" name="progo_options[businessaddy]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessaddy'] ); ?>" />
+<span class="description">This address will appear in the Office Info widget.</span>
 <?php }
 endif;
 if (!function_exists('progo_field_businessCSZ') ):
@@ -1689,8 +1694,8 @@ if (!function_exists('progo_field_businessCSZ') ):
  */
 function progo_field_businessCSZ() {
 $options = get_option( 'progo_options' ); ?>
-<input id="progo_businessCSZ" name="progo_options[businessCSZ]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessCSZ'] ); ?>"><br />
-<span class="description">This address will appear in the office info widget under the street address above.</span>
+<input id="progo_businessCSZ" name="progo_options[businessCSZ]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessCSZ'] ); ?>" />
+<span class="description">This address will appear in the Office Info widget under the street address above.</span>
 <?php }
 endif;
 if (!function_exists('progo_field_businessphone') ):
@@ -1700,8 +1705,8 @@ if (!function_exists('progo_field_businessphone') ):
  */
 function progo_field_businessphone() {
 $options = get_option( 'progo_options' ); ?>
-<input id="progo_businessphone" name="progo_options[businessphone]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessphone'] ); ?>"><br />
-<span class="description">This phone will appear in the office info widget.</span>
+<input id="progo_businessphone" name="progo_options[businessphone]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessphone'] ); ?>" />
+<span class="description">This phone will appear in the Office Info widget.</span>
 <?php }
 endif;
 if (!function_exists('progo_field_businessemail') ):
@@ -1711,8 +1716,8 @@ if (!function_exists('progo_field_businessemail') ):
  */
 function progo_field_businessemail() {
 $options = get_option( 'progo_options' ); ?>
-<input id="progo_businessemail" name="progo_options[businessemail]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessemail'] ); ?>"><br />
-<span class="description">This email address will appear in the office info widget.</span>
+<input id="progo_businessemail" name="progo_options[businessemail]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessemail'] ); ?>" />
+<span class="description">This email address will appear in the Office Info widget.</span>
 <?php }
 endif;
 if (!function_exists('progo_field_businesshours') ):
@@ -1722,8 +1727,8 @@ if (!function_exists('progo_field_businesshours') ):
  */
 function progo_field_businesshours() {
 $options = get_option( 'progo_options' ); ?>
-<input id="progo_businesshours" name="progo_options[businesshours]" class="regular-text" type="text" value="<?php esc_html_e( $options['businesshours'] ); ?>"><br />
-<span class="description">These hours will appear in the office info widget.</span>
+<input id="progo_businesshours" name="progo_options[businesshours]" class="regular-text" type="text" value="<?php esc_html_e( $options['businesshours'] ); ?>" />
+<span class="description">These hours will appear in the Office Info widget.</span>
 <?php }
 endif;
 if ( ! function_exists( 'progo_field_footercolor' ) ):
@@ -2413,95 +2418,3 @@ function ppc_template() {
 }
 
 //DND PPC DKI Magic --- End
-
-//Office Info Widget --- Begin
-
-add_action( 'widgets_init', 'office_info_widgets' );
-
-function office_info_widgets() {
-	register_widget( 'Office_Info_Widget' );
-}
-
-class Office_Info_Widget extends WP_Widget {
-
-function Office_Info_Widget() {
-		/* Widget settings. */
-		$widget_ops = array( 'classname' => 'officeInfo', 'description' => 'A widget to easily display your offices information and directions.' );
-
-		/* Widget control settings. */
-		$control_ops = array( 'width' => 300, 'height' => 350, 'id_base' => 'office-info-widget' );
-
-		/* Create the widget. */
-		$this->WP_Widget( 'office-info-widget', 'Office Information', $widget_ops, $control_ops );
-	}
-	
-function widget( $args ) {
-		extract( $args );
-		$options = get_option( 'progo_options' );
-		
-		$title = "Office Info";
-		$busnessaddress = $options['businessaddy'];
-		$businessCSZ = $options['businessCSZ'];
-		$businessphone = $options['businessphone'];
-		$businessemail = $options['businessemail'];
-		$businesshours = $options['businesshours'];
-		
-
-		/* Before widget (defined by themes). */
-		echo $before_widget;
-
-	if ( $title )
-			echo $before_title . $title . $after_title;
-
-		/* Display Business Address from widget settings. */
-			
-		
-		if ( $busnessaddress != ""){
-			echo '<h4>Address:</h4>';
-			echo '<span>' . $busnessaddress . '</span><br />';
-		}
-		if ( $businessCSZ != ""){
-			
-			echo '<span>' . $businessCSZ . '</span><br />';
-		}
-		
-		
-		
-		if ( $businessphone != ""){
-		
-			echo '<br /><h4>Contact:</h4>';
-			echo '<span>' . $businessphone . '</span><br />';
-		}
-		
-		if ( $businessemail != ""){
-			
-			echo '<span>' . $businessemail . '</span><br />';
-		}
-		
-		
-		
-		if ( $businesshours != ""){
-			echo '<br /><h4>Hours of Operation:</h4>';
-			echo '<span>' . $businesshours . '</span><br />';
-		}
-		
-		if($busnessaddress != "" && $businessCSZ != ""){
-		echo '<br /><h4>Directions:</h4>';
-		echo '<div style="border:1px solid #ccc; width:260px; height:260px;"><iframe width="260px" height="260px" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://maps.google.com/maps?q=' .$busnessaddress . '+' . $businessCSZ . '&hl=en&output=embed"></iframe></div>';
-		}
-		
-		/* After widget (defined by themes). */
-		echo $after_widget;
-	}
-	
-	function form( $instance ) {
-		$options = get_option( 'progo_options' );
-		
-	?>
-	<div>Set Office Info options <a href="themes.php?page=progo_admin#offInfo">here</a></div>
-	<?php
-	
-	}
-	
-}
-//Office Info Widget --- End
