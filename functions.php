@@ -54,7 +54,7 @@ function progo_setup() {
 	add_action( 'save_post', 'progo_save_meta' );
 	add_action('wp_print_scripts', 'progo_add_scripts');
 	add_action('wp_print_styles', 'progo_add_styles');
-	add_action( 'wp_before_admin_bar_render', 'progo_admin_bar_render' );
+	add_action( 'admin_bar_menu', 'progo_admin_bar_menu', 88 );
 	
 	// add custom filters
 	add_filter( 'body_class', 'progo_bodyclasses' );
@@ -347,30 +347,31 @@ try{convertEntities(wpsc_adminL10n);}catch(e){};
 		} ?>
         </table><p><br /></p>
         <h3><a name="recommended"></a>Recommended Plugins</h3>
-                <?php if ( function_exists( 'alex_recommends_widget' ) ) {
-					alex_recommends_widget();
-				} else { ?>
-                    <p>The following plugins can help improve various aspects of your WordPress + ProGo Themes site:</p>
-                    <ul style="list-style:outside; padding: 0 1em">
-                    <?php
-					$pRec = array();
-					$pRec[] = array('name'=>'WordPress SEO by Yoast','stub'=>'wordpress-seo','desc'=>'Out-of-the-box SEO. Easily control your keywords, meta descriptions, and more');
-					$pRec[] = array('name'=>'ShareThis','stub'=>'share-this','desc'=>'Get more exposure for your site as visitors share it with their friends');
-					$pRec[] = array('name'=>'Ultimate Google Analytics','stub'=>'ultimate-google-analytics','desc'=>'Add Google Analytics to your site, with options to track external links, mailto\'s, and downloads');
-					$pRec[] = array('name'=>'NextGEN Gallery','stub'=>'nextgen-gallery','desc'=>'A fully integrated Image Gallery plugin with dozens of options and features');
-					$pRec[] = array('name'=>'Contact Form 7 to Database Extension','stub'=>'contact-form-7-to-database-extension','desc'=>'Saves submitted form data from Contact Form 7 to your database, for future reference');
-					$pRec[] = array('name'=>'WB DB Backup','stub'=>'wp-db-backup','desc'=>'On-demand backup of your WordPress database');
-					$pRec[] = array('name'=>'Duplicate Post','stub'=>'duplicate-post','desc'=>'Add functionality to Save Page As...');
-					
-					foreach( $pRec as $plug ) {
-						echo '<li>';
-						echo '<a title="Learn more &amp; install '. esc_attr( $plug['name'] ) .'" class="thickbox" href="'. get_bloginfo('url') .'/wp-admin/plugin-install.php?tab=plugin-information&amp;plugin='. $plug['stub'] .'&amp;TB_iframe=true&amp;width=640&amp;height=560">';
-						echo esc_html($plug['name']) .'</a> : '. esc_html($plug['desc']) .'</li>';
-					}
-					?>
-                    </ul>
-                    <?php } ?>
-                    <p><br /></p>
+		<?php if ( function_exists( 'alex_recommends_widget' ) ) {
+            alex_recommends_widget();
+        } else { ?>
+            <p>The following plugins can help improve various aspects of your WordPress + ProGo Themes site:</p>
+            <ul style="list-style:outside; padding: 0 1em">
+            <?php
+            $pRec = array();
+            $pRec[] = array('name'=>'WordPress SEO by Yoast','stub'=>'wordpress-seo','desc'=>'Out-of-the-box SEO. Easily control your keywords, meta descriptions, and more');
+            $pRec[] = array('name'=>'ShareThis','stub'=>'share-this','desc'=>'Get more exposure for your site as visitors share it with their friends');
+            $pRec[] = array('name'=>'Google Analytics for WordPress','stub'=>'google-analytics-for-wordpress','desc'=>'Add Google Analytics to your site, with options to track external links, mailto\'s, and downloads');
+            $pRec[] = array('name'=>'NextGEN Gallery','stub'=>'nextgen-gallery','desc'=>'A fully integrated Image Gallery plugin with dozens of options and features');
+            $pRec[] = array('name'=>'Contact Form 7 to Database Extension','stub'=>'contact-form-7-to-database-extension','desc'=>'Saves submitted form data from Contact Form 7 to your database, for future reference');
+            $pRec[] = array('name'=>'Duplicate Post','stub'=>'duplicate-post','desc'=>'Add functionality to Save Page As...');
+            $pRec[] = array('name'=>'WB DB Backup','stub'=>'wp-db-backup','desc'=>'On-demand backup of your WordPress database');
+            
+            foreach( $pRec as $plug ) {
+                echo '<li>';
+                echo '<a title="Learn more &amp; install '. esc_attr( $plug['name'] ) .'" class="thickbox" href="'. get_bloginfo('url') .'/wp-admin/plugin-install.php?tab=plugin-information&amp;plugin='. $plug['stub'] .'&amp;TB_iframe=true&amp;width=640&amp;height=560">';
+                echo esc_html($plug['name']) .'</a> : '. esc_html($plug['desc']) .'</li>';
+            }
+            ?>
+            <li><a href="http://www.gravityforms.com/" target="_blank">Gravity Forms</a> : when Contact Form 7 just isn't cutting it. Gravity Forms is a super robust Forms plugin, with Drag and Drop form creation, and so much more</li>
+            </ul>
+    <?php } ?>
+            <p><br /></p>
     <div class="clear"></div>
     </div>
 	<?php
@@ -2143,27 +2144,27 @@ function progo_admin_post_thumbnail_html($html) {
 }
 endif;
 /**
- * hooked by add_filter to 'wp_before_admin_bar_render'
+ * hooked by add_filter to 'wpseo_admin_bar_menu'
  * to tweak the new WP 3.1 ADMIN BAR
  * @since Business Pro 1.0
  */
-function progo_admin_bar_render() {
+function progo_admin_bar_menu() {
 	global $wp_admin_bar;
 	
 	$wp_admin_bar->remove_menu('widgets');
-	$wp_admin_bar->add_menu( array( 'id' => 'appearance', 'title' => __('Appearance'), 'href' => admin_url('themes.php?page=progo_admin') ) );
+	$wp_admin_bar->add_menu( array( 'id' => 'progo', 'title' => __('ProGo Theme'), 'href' => admin_url('themes.php?page=progo_admin'), ) );
 	// move Appearance > Widgets & Menus submenus to below our new ones
 	$wp_admin_bar->remove_menu('widgets');
 	$wp_admin_bar->remove_menu('menus');
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=progo_admin') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'homeslides', 'title' => __('Homepage Slides'), 'href' => admin_url('edit.php?post_type=progo_homeslide') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'background', 'title' => __('Background'), 'href' => admin_url('themes.php?page=custom-background') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'widgets', 'title' => __('Widgets'), 'href' => admin_url('widgets.php') ) );
-	$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'menus', 'title' => __('Menus'), 'href' => admin_url('nav-menus.php') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=progo_admin') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'homeslides', 'title' => __('Homepage Slides'), 'href' => admin_url('edit.php?post_type=progo_homeslide') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'background', 'title' => __('Background'), 'href' => admin_url('themes.php?page=custom-background') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'widgets', 'title' => __('Widgets'), 'href' => admin_url('widgets.php') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'menus', 'title' => __('Menus'), 'href' => admin_url('nav-menus.php') ) );
 	
 	$avail = progo_colorschemes();
 	if ( count($avail) > 0 ) {
-		$wp_admin_bar->add_menu( array( 'parent' => 'appearance', 'id' => 'progo_colorscheme', 'title' => 'Color Scheme', 'href' => admin_url('themes.php?page=progo_admin') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progo_colorscheme', 'title' => 'Color Scheme', 'href' => admin_url('themes.php?page=progo_admin') ) );
 	}
 	foreach($avail as $color) {
 		$wp_admin_bar->add_menu( array( 'parent' => 'progo_colorscheme', 'id' => 'progo_colorscheme'.esc_attr($color), 'title' => esc_attr($color), 'href' => admin_url('admin.php?progo_admin_action=color'. esc_attr($color) ) ) );
