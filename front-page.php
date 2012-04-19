@@ -59,15 +59,9 @@ foreach ( $slides as $s ) {
 		$bg .= ' custombg " style="background-image: url('. $thmsrc .')';
 	}
 	
-	/*
-	switch( $options['layout'] ) {
-		default:
-	*/
-	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside"><div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
+	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside">';
+	if ( $slidecontent['showtitle'] == 'Show' ) echo '<div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
 	echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div>'. ($pagetopW==12 ? '<div class="shadow"></div>' : '') .'</div>';
-	/*break;
-	}
-	*/
 }
 if ( $oneon == true && $count > 1 ) { ?>
 <div class="ar"><a href="#p" title="Previous Slide"></a><a href="#n" class="n" title="Next Slide"></a></div>

@@ -63,6 +63,7 @@ function progo_setup() {
 	add_filter( 'site_transient_update_themes', 'progo_update_check' );
 	add_filter( 'admin_post_thumbnail_html', 'progo_admin_post_thumbnail_html' );
 	add_filter( 'wp_mail_content_type', 'progo_mail_content_type' );
+	add_filter( 'embed_oembed_html', 'progo_oembed_fix', 10, 3 );
 	add_filter( 'custom_menu_order', 'progo_admin_menu_order', 99 );
 	add_filter( 'menu_order', 'progo_admin_menu_order', 99 );
 	// force some metaboxes turned ON
@@ -959,17 +960,26 @@ function progo_slidecontent_box() {
 	if ( ! isset( $content['textcolor'] ) ) {
 		$content['textcolor'] = 'Light';
 	}
+	if ( ! isset( $content['showtitle'] ) ) {
+		$content['showtitle'] = 'Show';
+	}
 	?>
     <div class="slidecontent" id="slidetypeTextContent">
     	<p><em>Title (above) will be used as the main text Headline for this Slide</em></p>
         <p><strong>Additional Copy (optional)</strong><br />
         <textarea name="progo_slidecontent[text]" rows="6" style="width: 100%"><?php echo esc_attr($slidetext); ?></textarea><br /><em>Line Breaks in the text above will be converted to "&lt;br /&gt;" on display</em></p>
     </div>
-    <table id="slideTextColor"><tr><th scope="row">Slide Text Color :</th><?php
+    <table id="slideTextColor"><tr><th scope="row" width="141" align="left">Slide Text Color :</th><?php
 	
-	$colors = array( 'Light', 'Dark');
-	foreach ( $colors as $c ) {
-		?><td style="padding: 0 41px"><label for="slideTextColor<?php esc_attr_e( $c ); ?>"><input type="radio" name="progo_slidecontent[textcolor]" id="slideTextColor<?php esc_attr_e( $c ); ?>" value="<?php esc_attr_e( $c ); ?>" <?php checked($content['textcolor'], $c) ?> /> <?php esc_attr_e( $c ); ?></label></td><?php
+	$opts = array( 'Light', 'Dark');
+	foreach ( $opts as $c ) {
+		?><td width="82"><label for="slideTextColor<?php esc_attr_e( $c ); ?>"><input type="radio" name="progo_slidecontent[textcolor]" id="slideTextColor<?php esc_attr_e( $c ); ?>" value="<?php esc_attr_e( $c ); ?>" <?php checked($content['textcolor'], $c) ?> /> <?php esc_attr_e( $c ); ?></label></td><?php
+	} ?></tr></table>
+    <table id="showhideTitle"><tr><th scope="row" width="141" align="left">Show/Hide Slide Title :</th><?php
+	
+	$opts = array( 'Show', 'Hide');
+	foreach ( $opts as $c ) {
+		?><td width="82"><label for="showhideTitle<?php esc_attr_e( $c ); ?>"><input type="radio" name="progo_slidecontent[showtitle]" id="showhideTitle<?php esc_attr_e( $c ); ?>" value="<?php esc_attr_e( $c ); ?>" <?php checked($content['showtitle'], $c) ?> /> <?php esc_attr_e( $c ); ?></label></td><?php
 	} ?></tr></table>
     <script type="text/javascript">
 /* <![CDATA[ */
@@ -1247,6 +1257,7 @@ function progo_save_meta( $post_id ){
 				if ( isset( $_POST['progo_slidecontent'] ) ) {
 					$slidecontent = $_POST['progo_slidecontent'];
 					$slidecontent['textcolor'] = $slidecontent['textcolor'] == 'Light' ? 'Light' : 'Dark';
+					$slidecontent['showtitle'] = $slidecontent['showtitle'] == 'Show' ? 'Show' : 'Hide';
 					
 					update_post_meta($post_id, "_progo_slidecontent", $slidecontent);
 					return $slidecontent;
@@ -2351,7 +2362,25 @@ function progo_mail_content_type( $content_type ) {
 	return 'text/html';
 }
 endif;
-
+if ( ! function_exists( 'progo_oembed_fix' ) ):
+function progo_oembed_fix($oembvideo, $url, $attr) {
+	if(strpos($url,'youtube.com')!== false) {
+		$patterns = array();
+		$replacements = array();
+		$patterns[] = '/<embed/';
+		$patterns[] = '/allowscriptaccess="always"/';
+		$patterns[] = '/feature=oembed/';
+		
+		$replacements[] = '<param name="wmode" value="opaque" /><embed';
+		$replacements[] = 'wmode="opaque" allowscriptaccess="always"';
+		$replacements[] = 'feature=oembed&amp;wmode=opaque';
+		
+		return preg_replace($patterns, $replacements, $oembvideo);
+	}
+	
+	return $oembvideo;
+}
+endif;
 if ( ! function_exists( 'progo_nomenu_cb' ) ):
 function progo_nomenu_cb() {
 	return '<ul></ul>';

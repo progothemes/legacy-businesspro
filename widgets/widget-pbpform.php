@@ -1,8 +1,8 @@
 <?php
 /**
- * ProGo Themes' Support Widget Class
+ * ProGo Themes' BusinessPro Form Widget Class
  *
- * This widget is for positioning/removing the "Customer Support" block
+ * This widget is for positioning/removing the BusinessPro Form block in sidebars
  *
  * @since 1.0.0
  *
