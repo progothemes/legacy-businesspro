@@ -821,45 +821,45 @@ function progo_businesspro_widgets() {
 		'id' => 'blog',
 		'description' => 'Sidebar for the Blog area',
 		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	register_sidebar(array(
 		'name' => 'Homepage Sidebar',
 		'id' => 'home',
 		'description' => 'Right column sidebar area on Homepage',
 		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	register_sidebar(array(
 		'name' => 'Standard Pages',
 		'id' => 'main',
 		'description' => 'Standard right column sidebar area',
 		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	register_sidebar(array(
 		'name' => 'Contact',
 		'id' => 'contact',
 		'description' => 'Optional Contact/About page sidebar',
 		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	register_sidebar(array(
 		'name' => 'Header',
 		'id' => 'header',
 		'description' => 'We can put a widget or two in the top right of the header',
 		'before_widget' => '<div class="hblock %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	register_sidebar(array(
 		'name' => 'Bottom Bar',
@@ -875,9 +875,9 @@ function progo_businesspro_widgets() {
 		'id' => 'ppc-template',
 		'description' => 'PPC Post Widgets Go Here',
 		'before_widget' => '<div class="block %1$s %2$s">',
-		'after_widget' => '</div></div>',
+		'after_widget' => '</div>',
 		'before_title' => '<h3 class="title"><span class="spacer">',
-		'after_title' => '</span></h3><div class="inside">'
+		'after_title' => '</span></h3>'
 	));
 	
 	$progo_widgets = array( 'FBLikeBox', 'Tweets', 'Share', 'Social', 'Support', 'PBPForm', 'OfficeInfo' );
