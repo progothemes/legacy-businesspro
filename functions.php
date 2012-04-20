@@ -2427,8 +2427,8 @@ endif;
 */
 if ( ! function_exists( 'progo_cpt_post_types' ) ):
 function progo_cpt_post_types( $post_types ) {
-	$post_types[] = 'facebooktabs';
-	$post_types[] = 'ppc';
+	$post_types[] = 'progo_facebooktabs';
+	$post_types[] = 'progo_ppc';
 	return $post_types;
 }
 endif;
