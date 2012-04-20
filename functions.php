@@ -768,7 +768,9 @@ function progo_businesspro_init() {
 		'publicly_queryable' => true,
 		'show_ui' => true, 
 		'query_var' => true,
-		'rewrite' => true,
+		'rewrite' => array(
+			'slug' => 'fb',
+		),
 		'capability_type' => 'post',
 		'hierarchical' => false,
 		'supports' => array( 'title', 'editor', 'custom-fields' ),
@@ -796,7 +798,9 @@ function progo_businesspro_init() {
 		'publicly_queryable' => true,
 		'show_ui' => true, 
 		'query_var' => true,
-		'rewrite' => true,
+		'rewrite' => array(
+			'slug' => 'ppc',
+		),
 		'capability_type' => 'post',
 		'hierarchical' => false,
 		'supports' => array( 'title', 'editor', 'custom-fields', 'comments' ),
