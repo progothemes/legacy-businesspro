@@ -21,19 +21,18 @@
 $fmenu = wp_nav_menu( array( 'container' => false, 'theme_location' => 'ftrlnx', 'echo' => 0, 'fallback_cb' => 'progo_nomenu_cb' ) );
 if( strpos( $fmenu, '</li>' ) > 0 ) {
 	$fmenu = str_replace('</li>','&nbsp;&nbsp;|&nbsp;&nbsp;</li>',substr($fmenu,0,strrpos($fmenu,'</li>'))) . "</li>\n</ul>";
-	echo '">'. $fmenu;
+	echo '">'. $fmenu .'<br />';
 } else {
-	echo ' nom">';	
+	echo ' nom">';
 }
+	
 $options = get_option('progo_options');
-$businessInfo = $options['businessaddy']. " ". $options['businessCSZ'] . " - " .  $options['businessphone'];
 
-if($businessInfo != ""){
-echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-echo $businessInfo;
+if( ($options['businessaddy'] != "") || ($options['businessCSZ'] != "") || ($options['businessphone'] != "") ) {
+	echo $options['businessaddy']. " ". $options['businessCSZ'];
+	if( ($options['businessaddy'] != "") || ($options['businessCSZ'] != "") ) echo " - ";
+	echo $options['businessphone'] .'<br />';
 }
-
-echo '<br />';
 
 if ( isset( $options['copyright'] ) ) {
 	echo wp_kses($options['copyright'],array());

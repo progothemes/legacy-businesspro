@@ -31,7 +31,7 @@ function progo_tooltip_init() {
 	// footer-specific tips
 	ptips = '';
 	ptips += progo_newtip( -20, -20, 'Customize which links appear here, via the "Footer Links" menu in Appearance > Menus', 'nav-menus.php' );
-	ptips += progo_newtip( -20, 6, 'Control this bottom line of text via Appearance "Copyright Notice" Theme Option', 'themes.php?page=progo_admin#progo_info' );
+	ptips += progo_newtip( -26, 18, 'Control this bottom line of text via Appearance "Copyright Notice" Theme Option', 'themes.php?page=progo_admin#progo_info' );
 	jQuery('#ftr .grid_8').append(ptips);
 }
 

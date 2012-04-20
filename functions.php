@@ -703,7 +703,8 @@ function progo_admin_init() {
 		
 		$slidecontent = array(
 			'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\"><strong>View Details</strong></a>",
-			'textcolor' => 'Light'
+			'textcolor' => 'Light',
+			'showtitle' => 'Show',
 		);
 		update_post_meta($slide1, "_progo_slidecontent", $slidecontent);
 		
@@ -857,9 +858,9 @@ function progo_businesspro_widgets() {
 		'after_title' => '</span></h3><div class="inside">'
 	));
 	register_sidebar(array(
-		'name' => 'Footer',
+		'name' => 'Bottom Bar',
 		'id' => 'fbar',
-		'description' => 'On the bottom of each page. If left blank, will display the Main Menu.',
+		'description' => 'Bar along the bottom of each page. If left blank, will display the Bottom Bar menu.',
 		'before_widget' => '<div class="fblock %1$s %2$s">',
 		'after_widget' => '</div>',
 		'before_title' => '<div class="title">',
@@ -1362,6 +1363,38 @@ function progo_options_defaults() {
 	// no SHARETHIS automatically all over the place?
 	update_option( 'st_add_to_content', 'no' );
 	update_option( 'st_add_to_page', 'no' );
+	
+	// how about setting widgets?
+	$ourwidgets = wp_get_sidebars_widgets();
+	foreach ( $ourwidgets as $a => $w ) {
+		switch( $a ) {
+			case 'blog':
+				if ( count($w) == 6 ) {
+					// default so many widgets, clean up plz
+					$newblogw = array();
+					foreach ( $w as $k => $v ) {
+						$lastd = strrpos( $v, '-' );
+						$wbase = substr( $v, 0, $lastd );
+						if ( !in_array($wbase, array( 'search', 'recent-comments', 'meta' ) ) ) {
+							$newblogw[] = $v;
+						}
+					}
+					$ourwidgets[$a] = $newblogw;
+				}
+				break;
+			case 'home':
+				if ( count($w) == 0 ) {
+					$newhomew = array(
+						'progo-office-info-2',
+						'progo-share-2',
+					);
+					$ourwidgets[$a] = $newhomew;
+				}
+				break;
+		}
+	}
+	
+	wp_set_sidebars_widgets($ourwidgets);
 }
 if ( ! function_exists( 'progo_validate_options' ) ):
 /**
