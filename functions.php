@@ -549,7 +549,7 @@ function progo_admin_init() {
 	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_headline', 'Form Headline', 'progo_field_headline', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_frontpage', 'Homepage Contet Displays', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
+	add_settings_field( 'progo_frontpage', 'Homepage Content Displays', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
 	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
 
 	
