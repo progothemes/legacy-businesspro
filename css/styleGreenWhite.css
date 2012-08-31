@@ -1,0 +1,54 @@
+#hdrap {
+	background-image: url(../images/colors/GreenWhite/hdr.png)
+}
+#logo {
+	color: #749232;
+}
+a#logo .g {
+	display: none;
+}
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/GreenWhite/navli.png)
+}
+/*
+ul#nav li.current-menu-item a.first,
+body.blog ul#nav li.blog a.first,
+ul#nav li.hover a.first,
+ul#nav li a.first:hover {
+	background-image: url(../images/colors/BrownBlue/navon.jpg);
+	color: #5C3C27;
+}
+*/
+.Layout4 .inside {
+	background: url(../images/colors/GreenWhite/slide.jpg) repeat 0 0;
+}
+#pagetop {
+	color: #333;
+}
+#pagetop .slide.Light {
+	color: #FFFFFF;
+}
+#pagetop.Layout3 .slide.Light {
+	color: #666666;
+}
+.pbpform .tar td {
+	background: url(../images/colors/GreenWhite/tar.jpg) no-repeat 50% 100%;
+	color: #333;
+}
+
+a.button, input.button, #main input.button {
+	background-color: #799636;
+	color: #FFFF66
+}
+#pagetop {
+	background: url(../images/colors/GreenWhite/pagetop.png) repeat 0 0;
+}
+.callout {
+	background-image: url(../images/colors/GreenWhite/call-to-action.jpg);
+}
+#main .callout a.button {
+	background-color: #000;
+	color: #fff;
+}
+
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeGreenWhite a { font-weight: bold }

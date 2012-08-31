@@ -1,0 +1,59 @@
+#hdrap {
+	background-image: url(../images/colors/Wood/hdr.png);
+}
+#logo,
+#hdr .hblock.support .inside
+.block h3.title,
+#pagetop .slide.Light,
+#pagetop h1.page-title {
+	color: #634100;
+}
+#pagetop.Layout2 .slide.Light {
+	color: #fff;
+}
+#slogan,
+#hdr .hblock.support h3 {
+	color: #999900;
+}
+a#logo .g {
+	display: none;
+}
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/Wood/navli.png)
+}
+ul#nav a.first {
+	color: #F4EEE2;
+}
+ul#nav li.current-menu-item a.first,
+body.blog ul#nav li.blog a.first,
+ul#nav li.hover a.first,
+ul#nav li a.first:hover {
+	background-image: url(../images/colors/Wood/navon.png);
+	color: #634100;
+}
+
+.Layout4 .inside {
+	background: url(../images/colors/Wood/slide.png) repeat 0 0;
+}
+.pbpform {
+	background: #F8F5EE url(../images/colors/Wood/pform.png) repeat-x 0 100%;
+}
+.pbpform .tar td {
+	background: url(../images/colors/Wood/tar.png) no-repeat 50% 100%;
+	color: #FFFFFF;
+}
+
+a.button, input.button, #main input.button {
+	background-color: #999900;
+}
+#pagetop {
+	background: url(../images/colors/Wood/pagetop.png) repeat 0 0;
+}
+#pagetop.sliding {
+	background: none
+}
+.callout {
+	background-image: url(../images/colors/Wood/call-to-action.jpg);
+}
+
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeWood a { font-weight: bold }

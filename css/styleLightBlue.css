@@ -1,17 +1,40 @@
-body { background: #fff url(../images/LightBlue/bg.png) repeat-x 0 0 }
+#hdrap {
+	background-image: url(../images/colors/LightBlue/hdr.png)
+}
 
-#hdr .hblock.support h3 { color: #00638b }
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/LightBlue/navli.png)
+}
 
-ul#nav { background: url(../images/LightBlue/nav.png) repeat-x 0 0 }
-ul#nav li { background-image:url(../images/LightBlue/navli.png) }
-ul#nav li.current-menu-item a.first, body.wpsc ul#nav li.wpsc a.first, body.blog ul#nav li.blog a.first { background-image: url(../images/LightBlue/navon.png); color: #fff }
+ul#nav li.current-menu-item a.first,
+body.blog ul#nav li.blog a.first,
+ul#nav li.hover a.first,
+ul#nav li a.first:hover {
+	background-image: url(../images/colors/LightBlue/navon.jpg);
+	color: #fff;
+}
 
-#pagetop, #pagetop.sliding { background: url(../images/LightBlue/pagetop.jpg) no-repeat 0 0 }
-.pbpform, .secondary .pbpform { background: #eee url(../images/LightBlue/hform.png) no-repeat 0 0 }
-.pbpform .tar, .secondary .pbpform .tar { color: #000; text-shadow: 2px 2px 2px #fff }
-.pbpform label { color: #000 }
-.pbpform input.submit { background-image: url(../images/LightBlue/submit.png) }
+.Layout4 .inside {
+	background-image: url(../images/colors/LightBlue/slide.jpg)
+}
 
-#fbar { background: #00638d url(../images/LightBlue/fbar.png) repeat-x 0 0 }
+.pbpform .tar td {
+	background: url(../images/colors/LightBlue/tar.jpg) no-repeat 50% 100%
+}
 
+a.button, input.button, #main input.button {
+	background-color: #006699;
+}
+#pagetop {
+	background-image: url(../images/colors/LightBlue/pagetop.jpg);
+}
+#pagetop h1.page-title {
+	color: #ffffff;
+}
+.callout {
+	background-image: url(../images/colors/LightBlue/call-to-action.jpg);
+}
+.block h3.title {
+	color: #006699;
+}
 #wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeLightBlue a { font-weight: bold }

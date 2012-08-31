@@ -19,23 +19,31 @@
 <?php wp_head(); ?>
 </head>
 
-<body <?php body_class(); ?>><div id="fx">
-<div id="wrap" class="container_12">
-	<div id="page" class="container_12">
+<body <?php body_class(); ?>>
+<div id="fx">
+    <div id="hdrap">
         <div id="hdr" class="container_12">
-        	<div class="grid_8">
+            <div class="grid_8">
             <?php progo_sitelogo();
             $options = get_option( 'progo_options' );
-			$showdesc = true;
-			if ( isset( $options['showdesc'] ) ) {
-				$showdesc = ( (int) $options['showdesc'] == 1 );
-			}
-            if ( $showdesc === true ) { ?>
-            <div id="slogan"><?php bloginfo( 'description' ); ?></div>
-            <?php } ?>
+            $showdesc = true;
+            if ( isset( $options['showdesc'] ) ) {
+                $showdesc = ( (int) $options['showdesc'] == 1 );
+            }
+            echo '<div id="slogan"'. ( ( $showdesc !== true ) ? ' style="display:none"' : '' ) .'>'. get_bloginfo( 'description' ) .'</div>';
+            ?>
             </div>
-            <?php get_sidebar('header');
-			$menuclass = 'menu';
-			if ( $options['menuwidth'] == 'auto' ) $menuclass .= ' autow';
-			wp_nav_menu( array( 'container' => 'false', 'theme_location' => 'mainmenu', 'menu_id' => 'nav', 'menu_class' => $menuclass, 'fallback_cb' => 'progo_nav_fallback' ) ); ?>
+            <?php
+            get_sidebar('header');
+            $menuclass = 'menu';
+            if ( $options['menuwidth'] == 'auto' ) $menuclass .= ' autow';
+            wp_nav_menu( array(
+                'container' => 'false',
+                'theme_location' => 'mainmenu',
+                'menu_id' => 'nav',
+                'menu_class' => $menuclass,
+                'fallback_cb' => 'progo_nav_fallback'
+            ) );
+            ?>
         </div>
+    </div><!-- #hdrwrap -->

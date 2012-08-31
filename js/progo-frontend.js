@@ -60,6 +60,13 @@ function progo_homecycle( lnk ) {
 			nex.css({'left':'-' + progo_sw});
 			dir = '+=' + progo_sw;
 		}
+		if ( onn.find('.youtube').size() > 0 ) {
+			// pause
+			var pid = onn.find('.youtube').attr('id');
+			var ply = document.getElementById(pid).contentWindow;
+			ply.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+		}
+		
 		onn.add(nex).animate({
 			left: dir
 		}, 600, function() {
@@ -84,7 +91,7 @@ function progo_scrollcheck() {
 jQuery(function($) {
 	var progo_ptop = $('#pagetop');
 	if(progo_ptop.hasClass('slides')) {
-		progo_sw = progo_ptop.hasClass('grid_8') ? '646px' : '952px';
+		progo_sw = '1000px'; //progo_ptop.hasClass('grid_8') ? '646px' : '952px';
 		progo_ptop.children('div.ar').children('a').click(function() { return progo_homecycle($(this)); });
 		progo_ptop.addClass('sliding');
 		$(window).bind('scroll.progo',progo_scrollcheck).trigger('scroll.progo');
@@ -96,4 +103,9 @@ jQuery(function($) {
 	}).parent().bind('mouseleave',function() {
 		$(this).removeClass('hover').children('ul').hide();
 	});
+	
+	// correct old pbpform btns
+	if ( $('.pbpform input.submit').size() > 0 ) {
+		$('.pbpform input.submit').addClass('button');
+	}
 });

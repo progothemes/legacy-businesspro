@@ -18,9 +18,9 @@ if ( ! function_exists( 'progo_setup' ) ):
 /**
  * Sets up theme defaults and registers support for various WordPress features.
  *
- * @uses register_nav_menus() To add support for navigation menus.
- * @uses add_custom_background() To add support for a custom background.
- * @uses add_theme_support( 'post-thumbnails' ) To add support for post thumbnails.
+ * @uses register_nav_menus() to add support for navigation menus.
+ * @uses add_theme_support( 'custom-background' ) to add support for a custom background.
+ * @uses add_theme_support( 'post-thumbnails' ) to add support for post thumbnails.
  *
  * @since Business Pro 1.0
  */
@@ -28,23 +28,35 @@ function progo_setup() {
 	// This theme styles the visual editor with editor-style.css to match the theme style
 	add_editor_style( 'css/editor-style.css' );
 	
+	// Load up our theme options page and related code.
+	require( get_template_directory() . '/inc/theme-options.php' );
+	
 	// This theme uses wp_nav_menu() in two locations
-	register_nav_menus( array(
+	$options = progo_get_theme_options();
+	$menus = array(
 		'mainmenu' => 'Main Menu',
 		'fbarlnx' => 'Footer Bar Links',
-		'ftrlnx' => 'Footer Links',
-		'ppcmenu' => 'PPC Menu',
-	) );
+		'ftrlnx' => 'Additional Footer Links',
+		'ppcmenu' => 'Optional PPC Page Menu'
+	);
+	register_nav_menus( $menus );
 	
 	// Add support for custom backgrounds
-	add_custom_background();
+	add_theme_support( 'custom-background', array(
+		'default-image' => progo_get_default_custom_bg(),
+		'wp-head-callback' => 'progo_custom_background_cb'
+	) );
+	
+	if ( ! function_exists( 'get_custom_header' ) ) {
+		// This is all for compatibility with versions of WordPress prior to 3.4.
+		add_custom_background();
+	}
 	
 	// Add support for post thumbnails
 	add_theme_support( 'post-thumbnails' );
 	add_image_size( 'large', 596, 397, true );
-	add_image_size( 'homeslide', 646, 382, true );
-	add_image_size( 'homeslide3', 305, 322, true );
-	add_image_size( 'homeslide4', 647, 322, true );
+	add_image_size( 'homeslide', 960, 445, true );
+	add_image_size( 'homeslide3', 480, 270, true );
 	
 	// Add custom actions
 	add_action( 'admin_init', 'progo_admin_init' );
@@ -53,9 +65,10 @@ function progo_setup() {
 	add_action( 'login_head', 'progo_custom_login_logo' );
 	add_action( 'login_headerurl', 'progo_custom_login_url' );
 	add_action( 'save_post', 'progo_save_meta' );
-	add_action('wp_print_scripts', 'progo_add_scripts');
-	add_action('wp_print_styles', 'progo_add_styles');
+	add_action( 'wp_print_scripts', 'progo_add_scripts' );
+	add_action( 'wp_print_styles', 'progo_add_styles' );
 	add_action( 'admin_bar_menu', 'progo_admin_bar_menu', 88 );
+	add_action( 'progo_poweredby', 'progo_powered_by' );
 	
 	// add custom filters
 	add_filter( 'body_class', 'progo_bodyclasses' );
@@ -89,7 +102,7 @@ if ( ! function_exists( 'progo_sitelogo' ) ):
  * @since Business Pro 1.0
  */
 function progo_sitelogo() {
-	$options = get_option( 'progo_options' );
+	$options = progo_get_theme_options();
 	$progo_logo = $options['logo'];
 	$upload_dir = wp_upload_dir();
 	$dir = trailingslashit($upload_dir['baseurl']);
@@ -193,6 +206,41 @@ function progo_comments($comment, $args, $depth) {
 	<?php
 }
 endif;
+if ( ! function_exists( 'progo_powered_by' ) ):
+function progo_powered_by() {
+	print 'Powered by <a href="http://www.wordpress.org" target="_blank">WordPress</a>. Designed by <a href="http://www.progo.com/" title="WordPress Themes" target="_blank"><img src="'. get_bloginfo('template_url') .'/images/logo_admin.png" alt="WordPress Themes by ProGo" /></a>';
+}
+endif;
+if ( ! function_exists( 'progo_oembed_fix' ) ):
+function progo_oembed_fix($oembvideo, $url, $attr) {
+	global $post;
+	if ( $post->post_type == 'progo_homeslide' ) {
+		$maxwidth = 480;
+		$heightat = strpos( $oembvideo , 'height="' );
+		if ( $heightat !== false ) {
+			$heightat += 8;
+			$nextq = strpos( $oembvideo, '"', $heightat );
+			$oheight = substr( $oembvideo, $heightat, $nextq - $heightat );
+			
+			$widthat = strpos( $oembvideo, 'width="' ) + 7;
+			$nextq = strpos( $oembvideo, '"', $widthat );
+			$owidth = substr( $oembvideo, $widthat, $nextq - $widthat );
+			//$oembvideo = '<div>'. $owidth .' x '. $oheight .'</div>';
+			 
+			$newhei = round($oheight * ( $maxwidth / $owidth ));
+			$playclass = 'slideplayer';
+			if ( strpos( $oembvideo, 'youtu' ) !== false ) {
+				$playclass .= ' youtube';
+			}
+			
+			$oembvideo = str_replace( 'width="'. $owidth, 'id="slideplayer'. $post->ID .'" class="'. $playclass .'" width="'. $maxwidth, str_replace( 'height="'. $oheight, 'height="'. $newhei, $oembvideo ) );
+		}
+	}
+	return $oembvideo;
+}
+endif;
+add_filter('embed_oembed_html', 'progo_oembed_fix', 10, 3);
+
 /********* Back-End Functions *********/
 if ( ! function_exists( 'progo_admin_menu_cleanup' ) ):
 /**
@@ -209,11 +257,28 @@ function progo_admin_menu_cleanup() {
 	$sub1[0] = 'Edit Theme Files';
 	$submenu['tools.php'][] = $sub1;
 	// add Theme Options and Homepage Slides pages under APPEARANCE
-	add_theme_page( 'Theme Options', 'Theme Options', 'edit_theme_options', 'progo_admin', 'progo_admin_page' );
+	add_theme_page( 'Theme Options', 'Theme Options', 'edit_theme_options', 'theme_options', 'progo_theme_options_render_page' );
 	rsort($submenu['themes.php']);
 	
 	$menu[60][0] = 'ProGo Theme';
 	$menu[60][4] = 'menu-top menu-icon-progo';
+	
+	
+	$options = progo_get_theme_options();
+	if ( absint($options['fbtabs']) != 1 ) {
+		foreach ( $menu as $k => $m ) {
+			if ( $m[2] == 'edit.php?post_type=progo_facebooktabs' ) {
+				unset($menu[$k]);
+			}
+		}
+	}
+	if ( absint($options['ppcposts']) != 1 ) {
+		foreach ( $menu as $k => $m ) {
+			if ( $m[2] == 'edit.php?post_type=progo_ppc' ) {
+				unset($menu[$k]);
+			}
+		}
+	}
 }
 endif;
 if ( ! function_exists( 'progo_metaboxhidden_defaults' ) ):
@@ -245,12 +310,13 @@ function progo_admin_menu_order($menu_ord) {
 		'index.php', // this represents the dashboard link
 		'separator1',
 		'themes.php', // which we changed to ProGo Theme menu area
+		'edit.php?post_type=progo_facebooktabs',
+		'edit.php?post_type=progo_ppc',
 //		'admin.php?page=wpcf7', // failed
 		// to do : GRAVITY FORMS and TESTIMONIALS
 		'separator2',
 		'edit.php?post_type=page', // Pages
-		'edit.php?post_type=progo_facebooktabs',
-		'edit.php?post_type=progo_ppc',
+		
 		'edit.php', // Posts
 		'upload.php', // Media
 		'edit-comments.php', // Comments
@@ -273,126 +339,6 @@ function progo_admin_menu_finder($menu, $slug) {
 	return $id;
 }
 endif;
-if ( ! function_exists( 'progo_admin_page' ) ):
-/**
- * ProGo Themes' Business Pro Admin Page function
- * switch statement creates Pages for Installation, Shipping, Payment, Products, Appearance
- * from admin_menu_cleanup()
- 
- * @since Business Pro 1.0
- */
-function progo_admin_page() {
-	//must check that the user has the required capability 
-	if ( current_user_can('edit_theme_options') == false) {
-		wp_die( __('You do not have sufficient permissions to access this page.') );
-	} ?>
-<script type="text/javascript">/* <![CDATA[ */
-var wpsc_adminL10n = {
-	unsaved_changes_detected: "Unsaved changes have been detected. Click OK to lose these changes and continue.",
-	dragndrop_set: "false"
-};
-try{convertEntities(wpsc_adminL10n);}catch(e){};
-/* ]]> */
-</script>
-    <?php
-	$thispage = $_GET['page'];
-	switch($thispage) {
-		case "progo_admin":
-	?>
-	<div class="wrap">
-    <div class="icon32" id="icon-themes"><br /></div>
-    <h2>ProGo Business Pro Theme Options</h2>
-	<form action="options.php" method="post" enctype="multipart/form-data"><?php
-		settings_fields( 'progo_options' );
-		do_settings_sections( 'progo_api' );
-		?>
-        <p class="submit"><input type="submit" value="Save Changes" class="button-primary" /></p>
-        <?php
-		do_settings_sections( 'progo_theme' );
-		do_settings_sections( 'progo_info' );
-		do_settings_sections( 'progo_office' );
-		do_settings_sections( 'progo_hometop' );
-		do_settings_sections( 'progo_adv' );
-		?>
-        <p class="submit"><input type="submit" value="Save Changes" class="button-primary" /></p>
-		<p><br /></p>
-		</form>
-        <h3>Additional ProGo Theme Options</h3>
-        <table class="form-table">
-        <?php
-		$addl = array(
-			'Homepage Slides' => array(
-				'url' => 'edit.php?post_type=progo_homeslide',
-				'btn' => 'Manage Homepage Slides',
-				'desc' => 'Edit existing slides, change text, upload images, and add more slides.'
-			),
-			'Background' => array(
-				'url' => 'themes.php?page=custom-background',
-				'btn' => 'Customize Your Background',
-				'desc' => 'Change the underlying color, or upload your own custom background image.'
-			),
-			'Widgets' => array(
-				'url' => 'widgets.php',
-				'btn' => 'Manage Widgets',
-				'desc' => 'Customize what appears in the right column on various areas of your site.'
-			),
-			'Menus' => array(
-				'url' => 'nav-menus.php',
-				'btn' => 'Manage Menu Links',
-				'desc' => 'Control the links in the Header &amp; Footer area of your site.'
-			),
-			'Contact Forms' => array(
-				'url' => 'admin.php?contactform=1&page=wpcf7',
-				'btn' => 'Manage Contact Forms',
-				'desc' => 'Edit Contact Form 7 Forms that appear on your site, like on the Homepage.'
-			)
-		);
-		if ( is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ) === false ) {
-			unset($addl['Contact Forms']);
-		}
-		foreach ( $addl as $k => $v ) {
-			echo '<tr><th scope="row">'. wp_kses($k,array()) .'</th><td><a href="'. esc_url($v['url']) .'" class="button" target="_blank">'. wp_kses($v['btn'],array()) .' &raquo;</a> <span class="description">'. wp_kses($v['desc'],array()) .'</span></td></tr>';
-		} ?>
-        </table><p><br /></p>
-        <h3><a name="recommended"></a>Recommended Plugins</h3>
-		<?php if ( function_exists( 'alex_recommends_widget' ) ) {
-            alex_recommends_widget();
-        } else { ?>
-            <p>The following plugins can help improve various aspects of your WordPress + ProGo Themes site:</p>
-            <ul style="list-style:outside; padding: 0 1em">
-            <?php
-            $pRec = array();
-            $pRec[] = array('name'=>'WordPress SEO by Yoast','stub'=>'wordpress-seo','desc'=>'Out-of-the-box SEO. Easily control your keywords, meta descriptions, and more');
-            $pRec[] = array('name'=>'ShareThis','stub'=>'share-this','desc'=>'Get more exposure for your site as visitors share it with their friends');
-            $pRec[] = array('name'=>'Google Analytics for WordPress','stub'=>'google-analytics-for-wordpress','desc'=>'Add Google Analytics to your site, with options to track external links, mailto\'s, and downloads');
-            $pRec[] = array('name'=>'NextGEN Gallery','stub'=>'nextgen-gallery','desc'=>'A fully integrated Image Gallery plugin with dozens of options and features');
-            $pRec[] = array('name'=>'Contact Form 7 to Database Extension','stub'=>'contact-form-7-to-database-extension','desc'=>'Saves submitted form data from Contact Form 7 to your database, for future reference');
-            $pRec[] = array('name'=>'Duplicate Post','stub'=>'duplicate-post','desc'=>'Add functionality to Save Page As...');
-            $pRec[] = array('name'=>'WB DB Backup','stub'=>'wp-db-backup','desc'=>'On-demand backup of your WordPress database');
-            
-            foreach( $pRec as $plug ) {
-                echo '<li>';
-                echo '<a title="Learn more &amp; install '. esc_attr( $plug['name'] ) .'" class="thickbox" href="'. get_bloginfo('url') .'/wp-admin/plugin-install.php?tab=plugin-information&amp;plugin='. $plug['stub'] .'&amp;TB_iframe=true&amp;width=640&amp;height=560">';
-                echo esc_html($plug['name']) .'</a> : '. esc_html($plug['desc']) .'</li>';
-            }
-            ?>
-            <li><a href="http://www.gravityforms.com/" target="_blank">Gravity Forms</a> : when Contact Form 7 just isn't cutting it. Gravity Forms is a super robust Forms plugin, with Drag and Drop form creation, and so much more</li>
-            </ul>
-    <?php } ?>
-            <p><br /></p>
-    <div class="clear"></div>
-    </div>
-	<?php
-			break;
-		default: ?>
-	<div class="wrap">
-    <div class="icon32" id="icon-themes"><br /></div><h2>Huh?</h2>
-    </div>
-    <?php
-			break;
-	}
-}
-endif;
 if ( ! function_exists( 'progo_custom_login_logo' ) ):
 /**
  * hooked to 'login_head' by add_action in progo_setup()
@@ -404,8 +350,7 @@ function progo_custom_login_logo() {
 		echo "<!-- login screen here... overwrite logo with custom logo -->\n"; 
 	} else { ?>
 <style type="text/css">
-#login { margin-top: 6em; }
-h1 a { background: url(<?php bloginfo( 'template_url' ); ?>/images/logo_progo.png) no-repeat top center; height: 80px; }
+.login h1 a { background: url(<?php bloginfo( 'template_url' ); ?>/images/logo_progo.png) no-repeat top center; height: 80px; }
 </style>
 <?php }
 }
@@ -432,8 +377,8 @@ if ( ! function_exists( 'progo_admin_page_styles' ) ):
  */
 function progo_admin_page_styles() {
 	global $pagenow;
-	if ( $pagenow == 'themes.php' && isset( $_GET['page'] ) ) {
-		if ( 'progo_admin' == $_GET['page'] ) {
+	if ( in_array($pagenow, array( 'themes.php', 'admin.php' ) ) && isset( $_GET['page'] ) ) {
+		if ( 'theme_options' == $_GET['page'] ) {
 				wp_enqueue_style( 'global' );
 				wp_enqueue_style( 'wp-admin' );
 				wp_enqueue_style( 'thickbox' );
@@ -451,9 +396,9 @@ if ( ! function_exists( 'progo_admin_page_scripts' ) ):
  */
 function progo_admin_page_scripts() {
 	global $pagenow;
-	if ( $pagenow == 'themes.php' && isset( $_GET['page'] ) ) {
+	if ( in_array($pagenow, array( 'themes.php', 'admin.php' ) ) && isset( $_GET['page'] ) ) {
 		switch ( $_GET['page'] ) {
-			case 'progo_admin':
+			case 'theme_options':
         		wp_enqueue_script( 'thickbox' );
 				break;
         }
@@ -470,24 +415,18 @@ if ( ! function_exists( 'progo_admin_init' ) ):
 function progo_admin_init() {
 	global $pagenow;
 	if ( isset( $_REQUEST['progo_admin_action'] ) ) {
-		switch( $_REQUEST['progo_admin_action'] ) {
+		$act = $_REQUEST['progo_admin_action'];
+		if ( substr( $act, 0, 5 ) == 'color' ) {
+			$color = substr( $act, 5 );
+			$colors = progo_colorschemes();
+			if ( in_array( $color, $colors ) ) {
+				progo_colorscheme_switch( $color );
+			}
+		}
+		
+		switch( $act ) {
 			case 'reset_logo':
 				progo_reset_logo();
-				break;
-			case 'colorGreyscale':
-				progo_colorscheme_switch( 'Greyscale' );
-				break;
-			case 'colorDarkGreen':
-				progo_colorscheme_switch( 'DarkGreen' );
-				break;
-			case 'colorBlackOrange':
-				progo_colorscheme_switch( 'BlackOrange' );
-				break;
-			case 'colorLightBlue':
-				progo_colorscheme_switch( 'LightBlue' );
-				break;
-			case 'colorGreenBrown':
-				progo_colorscheme_switch( 'GreenBrown' );
 				break;
 			case 'permalink_recommended':
 				progo_permalink_check( 'recommended' );
@@ -509,57 +448,13 @@ function progo_admin_init() {
 	
 	if ( $pagenow == 'admin.php' && isset( $_GET['page'] ) ) {
 		if ( $_GET['page'] == 'progo_admin' ) {
-			wp_redirect( admin_url( 'themes.php?page=progo_admin' ) );
+			wp_redirect( admin_url( 'themes.php?page=theme_options' ) );
 		}
 	}
 	
 	// ACTION hooks
 	add_action( 'admin_print_styles', 'progo_admin_page_styles' );
 	add_action( 'admin_print_scripts', 'progo_admin_page_scripts' );
-	
-	// Installation (api key) settings
-	// register_setting( 'progo_api_options', 'progo_api_options', 'progo_validate_options' );
-	
-	// Appearance settings
-	register_setting( 'progo_options', 'progo_options', 'progo_validate_options' );
-	
-	add_settings_section( 'progo_api', 'ProGo Themes API Key', 'progo_section_text', 'progo_api' );
-	add_settings_field( 'progo_api_key', 'API Key', 'progo_field_apikey', 'progo_api', 'progo_api' );
-	
-	add_settings_section( 'progo_theme', 'Theme Customization', 'progo_section_text', 'progo_theme' );
-	add_settings_field( 'progo_colorscheme', 'Color Scheme', 'progo_field_color', 'progo_theme', 'progo_theme' );
-	add_settings_field( 'progo_logo', 'Logo', 'progo_field_logo', 'progo_theme', 'progo_theme' );
-
-	add_settings_section( 'progo_info', 'General Site Information', 'progo_section_text', 'progo_info' );
-	add_settings_field( 'progo_blogname', 'Site Name', 'progo_field_blogname', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_blogdescription', 'Slogan', 'progo_field_blogdesc', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_showdesc', 'Show/Hide Slogan', 'progo_field_showdesc', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_support', 'Customer Support', 'progo_field_support', 'progo_info', 'progo_info' );
-	add_settings_field( 'progo_copyright', 'Copyright Notice', 'progo_field_copyright', 'progo_info', 'progo_info' );
-	
-	add_settings_section( 'progo_office', 'Office Information', 'progo_section_text', 'progo_office' );
-	//Business Info for Office Info Widget and Footer display.
-	add_settings_field( 'progo_businessaddy', 'Business Street Address', 'progo_field_businessaddy', 'progo_office', 'progo_office' );
-	add_settings_field( 'progo_businessCSZ', 'Business City, State, Zip', 'progo_field_businessCSZ', 'progo_office', 'progo_office' );
-	add_settings_field( 'progo_businessphone', 'Business Phone', 'progo_field_businessphone', 'progo_office', 'progo_office' );
-	add_settings_field( 'progo_businessemail', 'Business Email', 'progo_field_businessemail', 'progo_office', 'progo_office' );
-	add_settings_field( 'progo_businesshours', 'Business Hours', 'progo_field_businesshours', 'progo_office', 'progo_office' );
-	
-	add_settings_section( 'progo_homepage', 'Homepage Settings', 'progo_section_text', 'progo_hometop' );
-	add_settings_field( 'progo_layout', 'Page Layout', 'progo_field_layout', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_headline', 'Form Headline', 'progo_field_headline', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_homeform', 'Form Code', 'progo_field_form', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_frontpage', 'Homepage Content Displays', 'progo_field_frontpage', 'progo_hometop', 'progo_homepage' );
-	add_settings_field( 'progo_homeseconds', 'Slide Rotation Speed', 'progo_field_homeseconds', 'progo_hometop', 'progo_homepage' );
-
-	
-	add_settings_section( 'progo_adv', 'Advanced Options', 'progo_section_text', 'progo_adv' );
-	add_settings_field( 'progo_field_menuwidth', 'Main Menu Item Width', 'progo_field_menuwidth', 'progo_adv', 'progo_adv' );
-	add_settings_field( 'progo_footercolor', 'Footer Text Color', 'progo_field_footercolor', 'progo_adv', 'progo_adv' );
-	add_settings_field( 'progo_field_showtips', 'Show/Hide ProGo Tips', 'progo_field_showtips', 'progo_adv', 'progo_adv' );
-	add_settings_field( 'progo_field_showfbtabs', 'Facebook Tabs', 'progo_field_showfbtabs', 'progo_adv', 'progo_adv' );
-	add_settings_field( 'progo_field_showppcposts', 'PPC Posts', 'progo_field_showppcposts', 'progo_adv', 'progo_adv' );
-	
 	
 	// since there does not seem to be an actual THEME_ACTIVATION hook, we'll fake it here
 	if ( get_option( 'progo_businesspro_installed' ) != true ) {
@@ -570,10 +465,10 @@ function progo_admin_init() {
 		
 		// create new menus in the Menu system
 		$new_menus = array(
-			'mainmenu' => 'Main Menu',
-			'fbarlnx' => 'Bottom Bar Links',
-			'ftrlnx' => 'Footer Links',
-			'ppcmenu' => 'PPC Primary Menu',
+			'mainmenu' => '1 Main Menu',
+			'fbarlnx' => '2 Footer Bar Links',
+			'ftrlnx' => '3 Additional Footer Links',
+			'ppcmenu' => 'Optional PPC Primary Menu',
 		);
 		$aok = 1;
 		foreach ( $new_menus as $k => $m ) {
@@ -594,13 +489,13 @@ function progo_admin_init() {
 		$new_pages = array(
 			'home' => array(
 				'title' => __( 'Home', 'progo' ),
-				'content' => "<h3>This is your Homepage</h3>$lipsum",
+				'content' => "<h2>This is your Homepage</h2>\n$lipsum\n\n[smbcallout headline=\"Don't Wait - Request an Appointment|Today With a Profesional\" lnk=\"#top\" call=\"GET STARTED\"]",
 				'id' => '',
 				'menus' => array( 'mainmenu', 'ppcmenu' )
 			),
 			'about' => array(
 				'title' => __( 'About', 'progo' ),
-				'content' => "<h3>This Page could have info about your site/store</h3>$lipsum",
+				'content' => "<h2>This Page could have info about your site/store</h2>\n$lipsum",
 				'id' => '',
 				'menus' => array( 'mainmenu', 'fbarlnx', 'ppcmenu' )
 			),
@@ -612,19 +507,19 @@ function progo_admin_init() {
 			),
 			'terms' => array(
 				'title' => __( 'Terms & Conditions', 'progo' ),
-				'content' => "<h3>List your Terms and Conditions here</h3>$lipsum",
+				'content' => "<h2>List your Terms and Conditions here</h2>\n$lipsum",
 				'id' => '',
 				'menus' => array( 'ftrlnx' )
 			),
 			'privacy' => array(
 				'title' => __( 'Privacy Policy', 'progo' ),
-				'content' => "<h3>Put your Privacy Policy here</h3>$lipsum",
+				'content' => "<h2>Put your Privacy Policy here</h2>\n$lipsum",
 				'id' => '',
 				'menus' => array( 'ftrlnx' )
 			),
 			'customer-service' => array(
 				'title' => __( 'Customer Service', 'progo' ),
-				'content' => "<h3>This Page could have Customer Service info on it</h3>$lipsum",
+				'content' => "<h2>This Page could have Customer Service info on it</h2>\n$lipsum",
 				'id' => '',
 				'menus' => array( 'ftrlnx' )
 			)
@@ -690,31 +585,227 @@ function progo_admin_init() {
 		}
 		// and lets also add our first HOMEPAGE SLIDE ?
 		$slide1 = wp_insert_post( array(
-			'post_title' 	=>	'BusinessPro Comes With Proven Features to Increase Conversions',
+			'post_title' 	=>	'Get Your Customers What|They Need Most!',
 			'post_type' 	=>	'progo_homeslide',
 			'post_name'		=>	'slide1',
 			'comment_status'=>	'closed',
 			'ping_status' 	=>	'closed',
-			'post_content' 	=>	'',
+			'post_content' 	=>	"Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ips\n\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\" class=\"button\">CALL TO ACTION</a>",
 			'post_status' 	=>	'publish',
 			'post_author' 	=>	1,
 			'menu_order'	=>	1
 		));
 		
-		$slidecontent = array(
-			'text' => "Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt.\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\"><strong>View Details</strong></a>",
-			'textcolor' => 'Light',
-			'showtitle' => 'Show',
-		);
-		update_post_meta($slide1, "_progo_slidecontent", $slidecontent);
-		
 		// set our default SITE options
 		progo_options_defaults();
 		
 		// and send to WELCOME page
-		wp_redirect( get_option( 'siteurl' ) . '/wp-admin/themes.php?page=progo_admin' );
+		wp_redirect( get_option( 'siteurl' ) . '/wp-admin/themes.php?page=theme_options' );
 	}
 }
+endif;
+if ( ! function_exists( 'progo_admin_head_fix' ) ):
+function progo_admin_head_fix(){
+global $post;
+
+echo' <style type="text/css">#postdiv.postarea, #postdivrich.postarea { margin:0; } #post-status-info { line-height:1.4em; font-size:13px; } #custom_editor .inside { margin:2px 6px 6px 6px; } #ed_toolbar { display:none; } #postdiv #ed_toolbar, #postdivrich #ed_toolbar { display:block; }
+</style>';
+
+	if ( get_post_type($post) == 'progo_facebooktabs') {
+?>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+	
+	<script type='text/javascript'>//<![CDATA[ 
+jQuery(document).ready(function() {
+	show_hide_meta_box();
+    jQuery("input[name$='FB_Tab_meta_template']").click(function() { show_hide_meta_box();	});	
+});
+function show_hide_meta_box() {
+	var test;
+	 jQuery("input[name$='FB_Tab_meta_template']").each(function(){
+		if($(this).is(':checked'))
+			test = $(this).val();
+	 });
+	 test == 2 ? jQuery('#fbIImage').show() : jQuery('#fbIImage').hide();
+	test == 1? jQuery('#custom_menu_meta_box ').show() : jQuery('#custom_menu_meta_box ').hide();
+	if(test == 3 || test == 6){
+		jQuery('#custom_sub_head_meta_box').show();
+		jQuery('#custom_pre_head_meta_box').hide();
+	}else{
+		jQuery('#custom_sub_head_meta_box').hide();
+		jQuery('#custom_pre_head_meta_box').show();
+	}	
+	if(test == 4 || test == 5 || test == 6) jQuery('#fbVideo').show(); else jQuery('#fbVideo').hide(); 
+}
+//]]>  
+
+</script>
+
+<?php
+	}
+	
+	if ( get_post_type($post) == 'progo_ppc') {
+?>
+<script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
+	
+	<script type='text/javascript'>//<![CDATA[ 
+jQuery(document).ready(function() {
+	show_hide_meta_box();
+    jQuery("input[name$='PPC_meta_template']").click(function() { show_hide_meta_box();	});	
+});
+function show_hide_meta_box() {
+	var test;
+	 jQuery("input[name$='PPC_meta_template']").each(function(){
+		if($(this).is(':checked'))
+			test = $(this).val();
+	 });
+	 	if(test == 1){
+		jQuery('#progo_ppc_form_content').show();
+		
+	}else{
+		jQuery('#progo_ppc_form_content').hide();
+		
+	}
+}
+//]]>  
+
+</script>
+
+
+<?php
+	}
+}
+endif;
+add_action('admin_head', 'progo_admin_head_fix');
+
+if ( ! function_exists( 'progo_admin_footer_fix' ) ):
+function progo_admin_footer_fix(){
+global $post;
+	if ( get_post_type($post) == 'progo_facebooktabs') {
+?>
+
+	<script type="text/javascript">
+		jQuery('#postdiv, #postdivrich').prependTo('#custom_editor .inside');
+	</script>
+	
+
+<?php
+	}
+	
+	if ( get_post_type($post) == 'progo_ppc') {
+?>
+
+	<script type="text/javascript">
+		jQuery('#postdiv, #postdivrich').prependTo('#custom_editor .inside');
+	</script>
+	
+
+<?php
+	}
+}
+endif;
+add_action('admin_footer','progo_admin_footer_fix');
+
+if ( ! function_exists( 'FB_Tab_meta_headline' ) ):
+	function FB_Tab_meta_headline($post){    
+    $FB_Tab_meta_headline = get_post_meta($post->ID, '_FB_Tab_meta_headline', true);
+   ?>
+   <input id="FB_Tab_meta_headline" type="text" size="75" name="FB_Tab_meta_headline" value="<?php echo esc_attr($FB_Tab_meta_headline); ?>" />
+		
+    <?php		
+    }
+    endif;
+    
+	
+	function FB_Tab_iframe_code($post){
+		$postID = $post->ID;
+	?> 
+	<strong>1)</strong> <span class="description">Setup Facebook Fan Page:<br />
+	<div style="background-color:#666; color:#fff;">Install App on Fan Page: <a href="https://apps.facebook.com/static_html_plus/?fb_page_id=248250431889836" target="_blank" style="background-color:#fff;">Install Static HTML Application</a>
+	<br />
+	<br />Create Facebook Fan Page Tutorial: <a href="http://www.opace.co.uk/blog/how-to-install-a-static-html-iframe-tab" target="_blank" style="background-color:#fff;">View Tutorial</a>
+	</span></div>
+  <br />
+  <strong>2)</strong> <span class="description">Copy and Paste this Iframe code into your Facebook Fan Page Static HTML content area:</span> <div style="background-color:#666; color:#fff;"><xmp><iframe width="851px" height="100%" scrolling="no" src="<?php echo get_permalink( $postID ); ?>">
+</iframe></xmp></div>
+
+<br />
+<strong>3)</strong> <span class="description">Copy and Paste this code into your Facebook Tab content window above to add a second LIKE ME button at the bottom of your offer:</span><div style="background-color:#666; color:#fff;"><xmp><div class="fb-like" data-href="ADD YOUR FACEBOOK FAN PAGE URL HERE" data-send="true" 
+data-width="450" data-show-faces="true"></div></xmp></div>
+		
+    <?php
+	
+	}
+	
+		
+if ( ! function_exists( 'FB_Tab_meta_form' ) ):
+	function FB_Tab_meta_form($post){    
+    $FB_Tab_meta_form = get_post_meta($post->ID, '_FB_Tab_meta_form', true);
+   ?> 
+    Form Shortcode: <input id="FB_Tab_meta_form" type="text" size="75" name="FB_Tab_meta_form" value="<?php echo esc_attr($FB_Tab_meta_form); ?>" />
+		
+    <?php		
+    }
+    endif;
+    
+    
+    if ( ! function_exists( 'FB_Tab_meta_video' ) ):
+	function FB_Tab_meta_video($post){
+    $FB_Tab_meta_video = get_post_meta($post->ID, '_FB_Tab_meta_video', true);
+    $FB_Tab_meta_thumb = get_post_meta($post->ID, '_FB_Tab_meta_thumb', true);
+    $FB_Tab_meta_template = get_post_meta($post->ID, '_FB_Tab_meta_template', true);
+   
+   ?>
+  	<div id="myTemplateGroup">
+    <div id="FB_Tab_meta_template" class="desc" >
+      Video URL: <input id="FB_Tab_meta_video" type="text" size="75" name="FB_Tab_meta_video" value="<?php echo esc_attr($FB_Tab_meta_video); ?>" />
+	<br />
+	<hr />
+	<br />
+	Thumbnail URL: <input id="FB_Tab_meta_thumb" type="text" size="75" name="FB_Tab_meta_thumb" value="<?php echo esc_attr($FB_Tab_meta_thumb); ?>" /> 	
+    </div>
+	</div>
+	<?php 
+    }
+    endif;
+    
+     if ( ! function_exists( 'FB_Tab_meta_template' ) ):
+/**
+ * outputs HTML for "Facebook Tab Cust Post types" option on FB Tab Settings post
+ * @since Business Pro 1.0
+ */
+    function FB_Tab_meta_template($post){    
+    $FB_Tab_meta_template = get_post_meta($post->ID, '_FB_Tab_meta_template', true);
+  
+
+	$layouton = $FB_Tab_meta_template;
+	if ( $layouton < 1 || $layouton > 6 ) {
+		$layouton = 1;
+	}
+	$descriptions = array(
+		1 => 'Non Fan Public Content (Template 1)',
+		2 => 'Video, Contact Form and Content (Template 2)',
+		3 => 'Non Fan Public Content (Template 3)',
+		4 => 'Fans Only Content (Template 4)',
+		5 => 'Custom first Content (Template 5)',
+		6 => 'Custom second Content (Template 6)'
+	);
+//	echo '<pre style="display:none">'. print_r($options,true) .'</pre>';
+	?>
+    <table>
+    <tr valign="top">
+<?php
+	for ( $i=1; $i<7; $i++ ) {
+		$chk = $layouton==$i ? ' checked="checked"' : '';
+		$last = "";
+		if($i == 3 || $i == 6) $last = "last_temp_img";
+		echo '<td class="template_radio_but"><input type="radio" name="FB_Tab_meta_template" id="fblayout'. $i .'" value="'. $i .'"'. $chk .' /></td><td class="template_img '.$last.'"><label for="fblayout'. $i .'"><img src="'. get_bloginfo('template_url') .'/images/FBTabTemplateImages/'. $i .'.jpg" /><br /><strong>Layout '. $i .'</strong></label><br /><span class="description">'. $descriptions[$i] .'</span></td>';
+		if($i == 3) echo "</tr><tr>";
+		//<option value="'. $color .'"'. (($options['colorscheme']==$color) ? ' selected="selected"' : '') .'>'.esc_html($color).'</option>';
+	}
+	?></tr></table>
+	<?php
+	}
 endif;
 if ( ! function_exists( 'progo_businesspro_init' ) ):
 /**
@@ -743,12 +834,10 @@ function progo_businesspro_init() {
 			'exclude_from_search' => true,
 			'show_in_menu' => 'themes.php',
 			'hierarchical' => true,
-			'supports' => array( 'title', 'thumbnail', 'revisions', 'page-attributes' ),
+			'supports' => array( 'title', 'editor', 'thumbnail', 'revisions', 'page-attributes' ),
 		)
 	);
 
-	$options = get_option( 'progo_options' );
-	if ( (int) $options['fbtabs'] == 1 ) {
 	// Facebook Tabs
 	register_post_type( 'progo_facebooktabs', array(
 		'labels' => array(
@@ -775,8 +864,7 @@ function progo_businesspro_init() {
 		'hierarchical' => false,
 		'supports' => array( 'title', 'editor', 'custom-fields' ),
 	));
-	}
-	if ( (int) $options['ppcposts'] == 1 ) {
+	
 	// PPC POSTS
 	register_post_type( 'progo_ppc', array(
 		'labels' =>  array(
@@ -805,10 +893,52 @@ function progo_businesspro_init() {
 		'hierarchical' => false,
 		'supports' => array( 'title', 'editor', 'custom-fields', 'comments' ),
 	));
-	}
 }
 add_action( 'init', 'progo_businesspro_init' );
 endif;
+if ( ! function_exists( 'progo_custom_updated_messages' ) ):
+function progo_custom_updated_messages( $messages ) {
+  global $post, $post_ID;
+
+ $messages['progo_homeslide'] = array(
+    0 => '', // Unused. Messages start at index 1.
+    1 => sprintf( __('Slide updated. <a href="%s">View Home Page</a>'), get_bloginfo( 'url' ) ),
+    2 => __('Custom field updated.'),
+    3 => __('Custom field deleted.'),
+    4 => __('Slide updated.'),
+    /* translators: %s: date and time of the revision */
+    5 => isset($_GET['revision']) ? sprintf( __('Slide restored to revision from %s'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false,
+    6 => sprintf( __('Slide published. <a href="%s">View Home Page</a>'), get_bloginfo( 'url' ) ),
+    7 => __('Hot Tub saved.'),
+    8 => sprintf( __('Slide submitted.') ),
+    9 => sprintf( __('Slide scheduled for: <strong>%1$s</strong>'),
+      // translators: Publish box date format, see http://php.net/date
+      date_i18n( __( 'M j, Y @ G:i' ), strtotime( $post->post_date ) ) ),
+    10 => sprintf( __('Slide draft updated.') ),
+  );
+  return $messages;
+}
+endif;
+add_filter( 'post_updated_messages', 'progo_custom_updated_messages' );
+
+if ( ! function_exists( 'FB_Template' ) ):
+
+function FB_Template($single_template) {
+	global $post;
+	
+	if ($post->post_type == 'progo_facebooktabs') {
+	
+		$fbt = absint(get_post_meta($post->ID, '_FB_Tab_meta_template', true));
+		if ( $fbt < 2 || $fbt > 6 ) {
+			$fbt = 1;
+		}
+		$single_template = dirname( __FILE__ ) . '/facebook-tab-page'. $fbt .'.php';
+	}
+	return $single_template;
+}
+
+endif;
+add_filter( "single_template", "FB_Template" ) ;
 if ( ! function_exists( 'progo_businesspro_widgets' ) ):
 /**
  * registers a sidebar area for the WIDGETS page
@@ -887,6 +1017,9 @@ function progo_businesspro_widgets() {
 	}
 }
 endif;
+
+	
+function blank(){}
 if ( ! function_exists( 'progo_metabox_cleanup' ) ):
 /**
  * fires after wpsc_meta_boxes hook, so we can overwrite a lil bit
@@ -897,6 +1030,12 @@ function progo_metabox_cleanup() {
 	global $post_type;
 	global $post;
 	
+
+	foreach (array('page','post','progo_facebooktabs','progo_ppc') as $type)
+	{
+		add_meta_box('custom_editor', 'Content', 'blank', $type, 'normal', 'high');
+	}
+	
 	switch($post_type) {
 		case 'page':
 			add_meta_box( 'progo_sidebar_box', 'Sidebar', 'progo_sidebar_box', 'page', 'side', 'low' );
@@ -904,7 +1043,6 @@ function progo_metabox_cleanup() {
 		case 'progo_homeslide':
 			$wp_meta_boxes['progo_homeslide']['side']['low']['postimagediv']['title'] = 'Slide Background Image';
 			
-			add_meta_box( 'progo_slidecontent_box', 'Slide Content', 'progo_slidecontent_box', 'progo_homeslide', 'normal', 'high' );
 			// no need for SEO metaboxes on Homeslides
 			if(isset($wp_meta_boxes['progo_homeslide']['normal']['high']['wpseo_meta'])) unset($wp_meta_boxes['progo_homeslide']['normal']['high']['wpseo_meta']);
 			break;
@@ -912,7 +1050,22 @@ function progo_metabox_cleanup() {
 			if(isset($wp_meta_boxes['progo_testimonials']['normal']['high']['wpseo_meta'])) unset($wp_meta_boxes['progo_testimonials']['normal']['high']['wpseo_meta']);
 			break;
 		case 'progo_ppc':
-			add_meta_box ('progo_ppc_shortcodes', 'PPC Shortcodes', 'progo_ppc_list_shortcodes', 'progo_ppc', 'normal', 'high' );
+			add_meta_box ('progo_ppc_templates', 'Select A Template', 'progo_ppc_templates', 'progo_ppc', 'normal', 'high' );
+			add_meta_box ('progo_ppc_form_title', 'Form Title', 'progo_ppc_form_title', 'progo_ppc', 'normal', 'high' );
+			add_meta_box ('progo_ppc_form_shortcode', 'Form Shortcode', 'progo_ppc_form_shortcode', 'progo_ppc', 'normal', 'high' );
+			add_meta_box ('progo_ppc_form_content', 'Below Form Content', 'progo_ppc_form_content', 'progo_ppc', 'normal', 'high' );
+			add_meta_box ('progo_ppc_shortcodes', 'PPC Overview', 'progo_ppc_list_shortcodes', 'progo_ppc', 'normal', 'high' );
+			break;
+		case 'progo_facebooktabs':
+			$temp = get_post_meta($post->ID, '_FB_Tab_meta_template', true);
+			add_meta_box ('fbTemplate', 'Select a Template', 'FB_Tab_meta_template', 'progo_facebooktabs', 'normal', 'high' );
+			add_meta_box('custom_pre_head_meta_box', 'Preheadline', 'add_fb_pre_headline', 'progo_facebooktabs', 'normal', 'high');
+			add_meta_box('custom_sub_head_meta_box', 'Subheadline', 'add_fb_sub_headline', 'progo_facebooktabs', 'normal', 'high');
+			add_meta_box ('fbIImage', 'Featured Image', 'FB_featured_image', 'progo_facebooktabs', 'normal', 'high' );
+			add_meta_box ('fbHeadline', 'Headline', 'FB_Tab_meta_headline', 'progo_facebooktabs', 'normal', 'high' );
+			add_meta_box ('fbForm', 'Form Shortcode', 'FB_Tab_meta_form', 'progo_facebooktabs', 'normal', 'high' );
+			add_meta_box ('fbVideo', 'Video Settings', 'FB_Tab_meta_video', 'progo_facebooktabs', 'normal', 'high' );
+			add_meta_box ('fbIFrame', 'Facebook Fan Page Resources', 'FB_Tab_iframe_code', 'progo_facebooktabs', 'normal', 'high' );
 			break;
 	}
 }
@@ -929,8 +1082,8 @@ if ( ! function_exists( 'progo_sidebar_box' ) ):
  */
 function progo_sidebar_box() {
 	global $post;
-	$custom = get_post_meta($post->ID,'_progo_sidebar');
-	$sidebar = $custom[0];
+	$sidebar = get_post_meta($post->ID,'_progo_sidebar', true);
+	if ( $sidebar == '' ) $sidebar = 'main';
 	
 	$ids = array('main', 'home', 'blog', 'contact');
 	$titles = array('Standard sidebar', 'Homepage', 'Blog', 'Contact');
@@ -1004,11 +1157,111 @@ if ( ! function_exists( 'progo_ppc_list_shortcodes' ) ):
  */
 function progo_ppc_list_shortcodes() {
 	?>
-    <p>[keyword loc=1] = http://www.site.com/ppc/KEYWORD/ -- (default)<br /><br /><br />
+	<p>
+    <strong>Instructions / Overview</strong><br />
+    <a href="<?php echo get_stylesheet_directory_uri(); ?>/instructions/PPC-Overview.pdf" target="_blank">PPC Overview</a></p>
+    <p>
+    <strong>Shortcodes</strong><br />
+    [keyword loc=1] = http://www.site.com/ppc/KEYWORD/ -- (default)<br />
     [keyword loc=2] = http://www.site.com/ppc/word/KEYWORD/</p>
     <?php
 }
 endif;
+
+if ( ! function_exists( 'progo_ppc_templates' ) ):
+/**
+ * custom metabox for PPC Posts, allowing the selection of a template to use.
+ * @since Business Pro 1.2.6
+ */
+function progo_ppc_templates($post) {
+	  $PPC_meta_template = get_post_meta($post->ID, '_PPC_meta_template', true);
+  
+
+	$layouton = $PPC_meta_template;
+	if ( $layouton < 1 || $layouton > 4 ) {
+		$layouton = 2;
+	}
+	$descriptions = array(
+		1 => 'Large text area on top of page,<br /> Contact form in middle of page, Second text area under form',
+		2 => 'Lots of room for Text on the Left, Form on the Right',
+		3 => 'Lots of room for Text, Featured Image on the Right, Form below',
+	);
+//	echo '<pre style="display:none">'. print_r($options,true) .'</pre>';
+	?>
+    <table>
+    <tr valign="top">
+<?php
+	for ( $i=1; $i<3; $i++ ) {
+		$chk = $layouton==$i ? ' checked="checked"' : '';
+		echo '<td><input type="radio" name="PPC_meta_template" id="PPClayout'. $i .'" value="'. $i .'"'. $chk .' /></td><td><label for="PPClayout'. $i .'"><img src="'. get_bloginfo('template_url') .'/images/PPCTemplateImages/'. $i .'.jpg" /><br /><strong>Layout '. $i .'</strong></label><br /><span class="description">'. $descriptions[$i] .'</span></td>';
+		//<option value="'. $color .'"'. (($options['colorscheme']==$color) ? ' selected="selected"' : '') .'>'.esc_html($color).'</option>';
+	}
+	?></tr></table>
+	<?php
+	} 
+	
+endif;
+
+if ( ! function_exists( 'progo_ppc_form_title' ) ):
+/**
+ * custom metabox for PPC Posts, Form Title
+ * @since Business Pro 1.2.6
+ */
+function progo_ppc_form_title($post) {
+	 $ppc_form_title = get_post_meta($post->ID, '_ppc_form_title', true);
+   ?> 
+    Form Title: <input id="ppc_form_title" type="text" size="75" name="ppc_form_title" value="<?php echo esc_attr($ppc_form_title); ?>" />
+		
+    <?php		
+}
+endif; 
+
+if ( ! function_exists( 'progo_ppc_form_shortcode' ) ):
+/**
+ * custom metabox for PPC Posts, Form Shortcode
+ * @since Business Pro 1.2.6
+ */
+function progo_ppc_form_shortcode($post) {
+	 $ppc_form_shortcode = get_post_meta($post->ID, '_ppc_form_shortcode', true);
+   ?> 
+    Form Shortcode: <input id="ppc_form_shortcode" type="text" size="75" name="ppc_form_shortcode" value="<?php echo esc_attr($ppc_form_shortcode); ?>" />
+		
+    <?php	
+}
+endif;
+
+
+if ( ! function_exists( 'progo_ppc_form_content' ) ):
+/**
+ * custom metabox for PPC Posts, Below Form Content
+ * @since Business Pro 1.2.6
+ */
+function progo_ppc_form_content($post) {
+
+	$settings =   array(
+    'wpautop' => true, // use wpautop?
+    'media_buttons' => true, // show insert/upload button(s)
+    'textarea_name' => 'ppcformcontent', // set the textarea name to something different, square brackets [] can be used here
+    'textarea_rows' => get_option('default_post_edit_rows', 10), // rows="..."
+    'tabindex' => '',
+    'editor_css' => '', // intended for extra styles for both visual and HTML editors buttons, needs to include the <style> tags, can use "scoped".
+    'editor_class' => '', // add extra class(es) to the editor textarea
+    'teeny' => false, // output the minimal editor config used in Press This
+    'dfw' => false, // replace the default fullscreen with DFW (supported on the front-end in WordPress 3.4)
+    'tinymce' => true, // load TinyMCE, can be used to pass settings directly to TinyMCE using an array()
+    'quicktags' => true // load Quicktags, can be used to pass settings directly to Quicktags using an array()
+	);
+	
+	$ppc_form_content =  wpautop(get_post_meta($post->ID, '_ppcformcontent', true));
+	wp_editor( $ppc_form_content, 'ppcformcontent', $settings);
+   ?> 
+ 
+		    <?php	
+}
+endif;
+
+
+
 
 /********* core ProGo Themes' Business Pro functions *********/
 
@@ -1023,8 +1276,8 @@ function progo_add_scripts() {
 		wp_enqueue_script( 'progo', get_bloginfo('template_url') .'/js/progo-frontend.js', array('jquery'), '1.0' );
 		do_action('progo_frontend_scripts');
 		
-		 if ( current_user_can('edit_theme_options') ) {
-			$options = get_option( 'progo_options' );
+		if ( current_user_can('edit_theme_options') ) {
+			$options = progo_get_theme_options();
 			if ( (int) $options['showtips'] == 1 ) {
 				wp_enqueue_script( 'progo-tooltips', get_bloginfo('template_url') .'/js/progo-tooltips.js', array('jquery'), '1.0', true );
 				echo '<script type="text/javascript">var progo_adminurl = "'. admin_url('') .'";</script>';
@@ -1040,15 +1293,6 @@ function progo_add_scripts() {
 }
 endif;
 
-if ( ! function_exists( 'progo_colorschemes' ) ):
-/**
- * @return array of Color Schemes
- * @since Business Pro 1.0
- */
-function progo_colorschemes() {
-	return array( 'Greyscale', 'LightBlue', 'DarkGreen', 'BlackOrange', 'GreenBrown' );
-}
-endif;
 if ( ! function_exists( 'progo_add_styles' ) ):
 /**
  * hooked to 'wp_print_styles' by add_action in progo_setup()
@@ -1057,7 +1301,7 @@ if ( ! function_exists( 'progo_add_styles' ) ):
  */
 function progo_add_styles() {
 	if ( ! is_admin() ) {
-		$options = get_option('progo_options');
+		$options = progo_get_theme_options();
 		$color = $options['colorscheme'];
 		$avail = progo_colorschemes();
 		if ( in_array( $color, $avail ) ) {
@@ -1066,16 +1310,16 @@ function progo_add_styles() {
 			wp_enqueue_style( $scheme );
 		}
 		if ( $options['footercolor'] != '' ) {
-			add_action('wp_head', 'progo_custombg_color', 1000 );
+			add_action('wp_head', 'progo_custom_footer_color', 1000 );
 		}
 	}
 	do_action('progo_frontend_styles');
 }
 endif;
-if ( ! function_exists( 'progo_custombg_color' ) ):
-function progo_custombg_color() {
-	$options = get_option('progo_options');
-	echo '<style type="text/css">#ftr, #ftr a { color: #'. esc_attr($options['footercolor']) .' }</style>';
+if ( ! function_exists( 'progo_custom_footer_color' ) ):
+function progo_custom_footer_color() {
+	$options = progo_get_theme_options();
+	echo '<style type="text/css" id="custom_footer_color">#ftr, #ftr a { color: '. esc_attr($options['footercolor']) .' }</style>';
 }
 endif;
 if ( ! function_exists( 'progo_reset_logo' ) ):
@@ -1087,12 +1331,12 @@ function progo_reset_logo(){
 	check_admin_referer( 'progo_reset_logo' );
 	
 	// reset logo settings
-	$options = get_option('progo_options');
+	$options = progo_get_theme_options();
 	$options['logo'] = '';
 	update_option( 'progo_options', $options );
 	update_option( 'progo_settings_just_saved', 1 );
 	
-	wp_redirect( get_option('siteurl') .'/wp-admin/themes.php?page=progo_admin' );
+	wp_redirect( get_option('siteurl') .'/wp-admin/themes.php?page=theme_options' );
 	exit();
 }
 endif;
@@ -1121,7 +1365,7 @@ function progo_menus_set(){
 	// menus are set - proceed to next step
 	update_option( 'progo_businesspro_onstep', 7);
 	
-	wp_redirect( admin_url("themes.php?page=progo_admin") );
+	wp_redirect( admin_url("themes.php?page=theme_options") );
 	exit();
 }
 endif;
@@ -1157,7 +1401,7 @@ function progo_firstform(){
 		.'[text phone id:phone class:text]' . "\n\n"
 		.'<label for="email">Email<span title="Required">*</span></label>' . "\n"
 		.'[email* email id:email class:text akismet:author_email]' . "\n\n"
-		.'[submit class:submit "Submit Today!"]';
+		.'[submit class:button "Submit Today!"]';
 	
 	$subject = get_option( 'blogname' ) .' : Contact Form';
 	$sender = '[name] <[email]>';
@@ -1190,7 +1434,7 @@ function progo_firstform(){
 	update_post_meta( $hformID, 'additional_settings', '' );
 	update_option( 'progo_businesspro_onstep', 5);
 	
-	$opt = get_option( 'progo_options' );
+	$opt = progo_get_theme_options();
 	$opt['form'] = '[contact-form-7 id="'. $hformID .'"]';
 	update_option( 'progo_options', $opt );
 	
@@ -1242,36 +1486,96 @@ function progo_save_meta( $post_id ){
 		return $post_id;
 	}
 	// check permissions
-	switch( $_POST['post_type'] ) {
-		case 'page':
-			if ( current_user_can( 'edit_page', $post_id ) ) {
-				// OK, we're authenticated: we need to find and save the data
-				if ( isset( $_POST['_progo_sidebar'] ) ) {
-					$sidebar = $_POST['_progo_sidebar'];
-					
-					if ( in_array ( $sidebar, array('main', 'home', 'blog', 'contact') ) ) {
-						update_post_meta($post_id, "_progo_sidebar", $sidebar);
-						return $sidebar;
+	if ( isset( $_POST['post_type'] ) ) {
+		switch( $_POST['post_type'] ) {
+			case 'page':
+				if ( current_user_can( 'edit_page', $post_id ) ) {
+					// OK, we're authenticated: we need to find and save the data
+					if ( isset( $_POST['_progo_sidebar'] ) ) {
+						$sidebar = $_POST['_progo_sidebar'];
+						
+						if ( in_array ( $sidebar, array('main', 'home', 'blog', 'contact') ) ) {
+							update_post_meta($post_id, "_progo_sidebar", $sidebar);
+							return $sidebar;
+						}
 					}
 				}
-			}
-			break;
-		case 'progo_homeslide':
-			if ( current_user_can( 'edit_page', $post_id ) ) {
-				// OK, we're authenticated: we need to find and save the data
-				if ( isset( $_POST['progo_slidecontent'] ) ) {
-					$slidecontent = $_POST['progo_slidecontent'];
-					$slidecontent['textcolor'] = $slidecontent['textcolor'] == 'Light' ? 'Light' : 'Dark';
-					$slidecontent['showtitle'] = $slidecontent['showtitle'] == 'Show' ? 'Show' : 'Hide';
-					
-					update_post_meta($post_id, "_progo_slidecontent", $slidecontent);
-					return $slidecontent;
-					
+				break;
+			case 'progo_homeslide':
+				if ( current_user_can( 'edit_page', $post_id ) ) {
+					// OK, we're authenticated: we need to find and save the data
+					/*
+					if ( isset( $_POST['progo_slidecontent'] ) ) {
+						$slidecontent = $_POST['progo_slidecontent'];
+						$slidecontent['textcolor'] = $slidecontent['textcolor'] == 'Light' ? 'Light' : 'Dark';
+						$slidecontent['showtitle'] = $slidecontent['showtitle'] == 'Show' ? 'Show' : 'Hide';
+						
+						update_post_meta($post_id, "_progo_slidecontent", $slidecontent);
+						return $slidecontent;
+						
+					}
+					*/
 				}
-			}
-			break;
+				break;
+				
+			case 'progo_facebooktabs':	
+				if(isset($_POST['FB_Tab_meta_form'])){
+					//save metadata
+					update_post_meta($post_id, '_FB_Tab_meta_form', ($_POST['FB_Tab_meta_form']));
+				}
+				if(isset($_POST['FB_Tab_meta_template'])){
+					//save metadata
+					update_post_meta($post_id, '_FB_Tab_meta_template', ($_POST['FB_Tab_meta_template']));
+				}
+				
+				if(isset($_POST['FB_Tab_meta_video'])){
+					//save metadata
+					update_post_meta($post_id, '_FB_Tab_meta_video', ($_POST['FB_Tab_meta_video']));
+				}
+				if(isset($_POST['FB_Tab_meta_thumb'])){
+					//save metadata
+					update_post_meta($post_id, '_FB_Tab_meta_thumb', ($_POST['FB_Tab_meta_thumb']));
+				}
+				if(isset($_POST['FB_Tab_meta_headline'])){
+					//save metadata
+					update_post_meta($post_id, '_FB_Tab_meta_headline', ($_POST['FB_Tab_meta_headline']));
+				}
+				$bullets = array(
+					1 => isset($_POST['fb-bullet-1']) ? $_POST['fb-bullet-1'] : '',
+					2 => isset($_POST['fb-bullet-2']) ? $_POST['fb-bullet-2'] : '',
+					3 => isset($_POST['fb-bullet-3']) ? $_POST['fb-bullet-3'] : '',
+					4 => isset($_POST['fb-bullet-4']) ? $_POST['fb-bullet-4'] : '',
+					'image' => isset($_POST['fb-bullet-image']) ? $_POST['fb-bullet-image'] : ''
+				);
+				update_post_meta($post_id, '_FB_BULLET', $bullets);
+				$upd = isset($_POST['fb_pre_headline']) ? $_POST['fb_pre_headline'] : '';
+				update_post_meta($post_id, '_FB_PRE_HEADLINE', $upd);
+				$upd = isset($_POST['fb_sub_headline']) ? $_POST['fb_sub_headline'] : '';
+				update_post_meta($post_id, '_FB_SUB_HEADLINE', $upd);
+				$upd = isset($_POST['fb_feture_img']) ? $_POST['fb_feture_img'] : '';
+				update_post_meta($post_id, '_FB_FEATURE_IMG', $upd);
+				
+				break;
+			case 'progo_ppc':
+				if(isset($_POST['PPC_meta_template'])){
+					//save metadata
+					update_post_meta($post_id, '_PPC_meta_template', ($_POST['PPC_meta_template']));
+				}
+				if(isset($_POST['ppc_form_title'])){
+					//save metadata
+					update_post_meta($post_id, '_ppc_form_title', ($_POST['ppc_form_title']));
+				}
+				if(isset($_POST['ppc_form_shortcode'])){
+					//save metadata
+					update_post_meta($post_id, '_ppc_form_shortcode', ($_POST['ppc_form_shortcode']));
+				}
+				if(isset($_POST['ppcformcontent'])){
+					//save metadata
+					update_post_meta($post_id, '_ppcformcontent', ($_POST['ppcformcontent']));
+				}
+				break;
+		}
 	}
-	
 	return $post_id;
 }
 endif;
@@ -1290,7 +1594,7 @@ function progo_colorscheme_switch( $color ) {
 	}
 	
 	if ( $okgo == true ) {
-		$opt = get_option( 'progo_options' );
+		$opt = progo_get_theme_options();
 		$opt[colorscheme] = $color;
 		
 		// check to update footer text & link color too
@@ -1315,37 +1619,9 @@ endif;
  */
 function progo_options_defaults() {
 	// Define default option settings
-	$tmp = get_option( 'progo_options' );
+	$tmp = progo_get_theme_options();
     if ( ! is_array( $tmp ) ) {
-		$def = array(
-			// THEME CUSTOMIZATION
-			"colorscheme" => "Greyscale",
-			"logo" => "",
-			// GENERAL SITE INFORMATION
-			"blogname" => get_option( 'blogname' ),
-			"blogdescription" => get_option( 'blogdescription' ),
-			"showdesc" => 1,
-			"support" => "(858) 555-1234",
-			"copyright" => "© Copyright ". date('Y') .", All Rights Reserved",
-			// OFFICE INFORMATION
-			"businessaddy" => "",
-			"businessCSZ" => "",
-			"businessphone" => "",
-			"businessemail" => "",
-			"businesshours" => "",
-			// HOMEPAGE SETTINGS
-			"layout" => 1,
-			"headline" => "Get Your Customers\nWhat They Need Most!",
-			"form" => "",
-			"frontpage" => get_option( 'show_on_front' ),
-			"homeseconds" => 6,
-			// ADVANCED OPTIONS
-			"menuwidth" => "fixed",
-			"footercolor" => "",
-			"showtips" => 1,
-			"fbtabs" => 0,
-			"ppcposts" => 0,
-		);
+		$def = progo_get_default_theme_options();
 		update_option( 'progo_options', $def );
 	}
 	$tmp = get_option( 'progo_slides' );
@@ -1400,664 +1676,9 @@ function progo_options_defaults() {
 	
 	wp_set_sidebars_widgets($ourwidgets);
 }
-if ( ! function_exists( 'progo_validate_options' ) ):
-/**
- * ProGo Site Settings Options validation function
- * from register_setting( 'progo_options', 'progo_options', 'progo_validate_options' );
- * in progo_admin_init()
- * also handles uploading of custom Site Logo
- * @param $input options to validate
- * @return $input after validation has taken place
- * @since Business Pro 1.0
- */
-function progo_validate_options( $input ) {
-	if( isset($input['apikey']) ) {
-		$input['apikey'] = wp_kses( $input['apikey'], array() );
-		// store API KEY in its own option
-		if ( $input['apikey'] != get_option( 'progo_businesspro_apikey' ) ) {
-			update_option( 'progo_businesspro_apikey', substr( $input['apikey'], 0, 39 ) );
-		}
-	}
-	
-	// do validation here...
-	$arr = array( 'blogname', 'blogdescription', 'colorscheme', 'support', 'copyright', 'footercolor', 'headline' );
-	foreach ( $arr as $opt ) {
-		$input[$opt] = wp_kses( $input[$opt], array() );
-	}
-	
-	// opt[colorscheme] must be one of the allowed colors
-	$colors = progo_colorschemes();
-	if ( ! in_array( $input['colorscheme'], $colors ) ) {
-		$input['colorscheme'] = 'Greyscale';
-	}
-	
-	$color = preg_replace('/[^0-9a-fA-F]/', '', $input['footercolor']);
-	if ( strlen($color) == 6 || strlen($color) == 3 ) {
-		$input['footercolor'] = $color;
-	} else {
-		$input['footercolor'] = '';
-		if ( in_array( $input['colorscheme'], array( 'BlackOrange', 'DarkGreen', 'GreenBrown' ) ) ) {
-			$opt['footercolor'] = 'fff';
-		}
-	}
-	
-	$choices = array(
-		'posts',
-		'page',
-	);
-	if ( ! in_array( $input['frontpage'], $choices ) ) {
-		$input['frontpage'] = get_option('show_on_front');
-	}
-	switch ( $input['frontpage'] ) {
-		case 'posts':
-			update_option( 'show_on_front', 'posts' );
-			break;
-		case 'page':
-			update_option( 'show_on_front', 'page' );
-			update_option( 'page_on_front', get_option('progo_homepage_id') );
-			break;
-	}
-	$choices = array(
-		'fixed',
-		'auto',
-	);
-	if ( ! in_array( $input['menuwidth'], $choices ) ) {
-		$input['frontpage'] = 'fixed';
-	}
-	// opt[showdesc] can only be 1 or 0
-	$bincheck = array( 'showdesc', 'showtips', 'fbtabs', 'ppcposts' );
-	foreach( $bincheck as $f ) {
-		if ( (int) $input[$f] != 1 ) {
-			$input[$f] = 0;
-		}
-	}
-	
-	// opt[layout] can only be an int  1 <= int <= 4
-	$intcheck = absint( $input['layout'] );
-	if ( $intcheck < 1 || $intcheck > 4 ) {
-		$intcheck = 1;
-	}
-	$input['layout'] = absint( $intcheck );
-	
-	// save blogname & blogdescription to other options as well
-	$arr = array( 'blogname', 'blogdescription' );
-	foreach ( $arr as $opt ) {
-		if ( $input[$opt] != get_option( $opt ) ) {
-			update_option( $opt, $input[$opt] );
-		}
-	}
-	
-	// check SUPPORT field & set option['support_email'] flag if we have an email
-	$input['support_email'] = is_email( $input['support'] );
-	
-		// upload error?
-		$error = '';
-	// upload the file - BASED OFF WP USERPHOTO PLUGIN
-	if ( isset($_FILES['progo_options']) && @$_FILES['progo_options']['name']['logotemp'] ) {
-		if ( $_FILES['progo_options']['error']['logotemp'] ) {
-			switch ( $_FILES['progo_options']['error']['logotemp'] ) {
-				case UPLOAD_ERR_INI_SIZE:
-				case UPLOAD_ERR_FORM_SIZE:
-					$error = "The uploaded file exceeds the max upload size.";
-					break;
-				case UPLOAD_ERR_PARTIAL:
-					$error = "The uploaded file was only partially uploaded.";
-					break;
-				case UPLOAD_ERR_NO_FILE:
-					$error = "No file was uploaded.";
-					break;
-				case UPLOAD_ERR_NO_TMP_DIR:
-					$error = "Missing a temporary folder.";
-					break;
-				case UPLOAD_ERR_CANT_WRITE:
-					$error = "Failed to write file to disk.";
-					break;
-				case UPLOAD_ERR_EXTENSION:
-					$error = "File upload stopped by extension.";
-					break;
-				default:
-					$error = "File upload failed due to unknown error.";
-			}
-		} elseif ( ! $_FILES['progo_options']['size']['logotemp'] ) {
-			$error = "The file &ldquo;". $_FILES['progo_options']['name']['logotemp'] ."&rdquo; was not uploaded. Did you provide the correct filename?";
-		} elseif ( ! in_array( $_FILES['progo_options']['type']['logotemp'], array( "image/jpeg", "image/pjpeg", "image/gif", "image/png", "image/x-png" ) ) ) {
-			$error = "The uploaded file type &ldquo;". $_FILES['progo_options']['type']['logotemp'] ."&rdquo; is not allowed.";
-		}
-		$tmppath = $_FILES['progo_options']['tmp_name']['logotemp'];
-		
-		$imageinfo = null;
-		if ( ! $error ) {			
-			$imageinfo = getimagesize($tmppath);
-			if ( ( ! $imageinfo ) || ( ! $imageinfo[0] ) || ( ! $imageinfo[1] ) ) {
-				$error = __("Unable to get image dimensions.", 'user-photo');
-			} else if ( $imageinfo[0] > 598 || $imageinfo[1] > 75 ) {
-				/*
-				if(userphoto_resize_image($tmppath, null, $userphoto_maximum_dimension, $error)) {
-					$imageinfo = getimagesize($tmppath);
-				}
-				*/
-				$filename = $tmppath;
-				$newFilename = $filename;
-				$jpeg_compression = 86;
-				#if(empty($userphoto_jpeg_compression))
-				#	$userphoto_jpeg_compression = USERPHOTO_DEFAULT_JPEG_COMPRESSION;
-				
-				$info = @getimagesize($filename);
-				if ( ( ! $info ) || ( ! $info[0] ) || ( ! $info[1] ) ) {
-					$error = __("Unable to get image dimensions.", 'user-photo');
-				}
-				//From WordPress image.php line 22
-				else if (
-					! function_exists( 'imagegif' ) && $info[2] == IMAGETYPE_GIF
-					||
-					! function_exists( 'imagejpeg' ) && $info[2] == IMAGETYPE_JPEG
-					||
-					! function_exists( 'imagepng' ) && $info[2] == IMAGETYPE_PNG
-				) {
-					$error = __( 'Filetype not supported.', 'user-photo' );
-				}
-				else {
-					// create the initial copy from the original file
-					if ( $info[2] == IMAGETYPE_GIF ) {
-						$image = imagecreatefromgif( $filename );
-					}
-					elseif ( $info[2] == IMAGETYPE_JPEG ) {
-						$image = imagecreatefromjpeg( $filename );
-					}
-					elseif ( $info[2] == IMAGETYPE_PNG ) {
-						$image = imagecreatefrompng( $filename );
-					}
-					if ( ! isset( $image ) ) {
-						$error = __("Unrecognized image format.", 'user-photo');
-						return false;
-					}
-					if ( function_exists( 'imageantialias' ))
-						imageantialias( $image, TRUE );
-			
-					// make sure logo is within max 598 x 75 dimensions
-					
-					// figure out the longest side
-					if ( ( $info[0] / $info[1] ) > 8 ) { // resize width to fit 
-						$image_width = $info[0];
-						$image_height = $info[1];
-						$image_new_width = 598;
-			
-						$image_ratio = $image_width / $image_new_width;
-						$image_new_height = round( $image_height / $image_ratio );
-					} else { // resize height to fit
-						$image_width = $info[0];
-						$image_height = $info[1];
-						$image_new_height = 75;
-			
-						$image_ratio = $image_height / $image_new_height;
-						$image_new_width = round( $image_width / $image_ratio );
-					}
-			
-					$imageresized = imagecreatetruecolor( $image_new_width, $image_new_height);
-					@ imagecopyresampled( $imageresized, $image, 0, 0, 0, 0, $image_new_width, $image_new_height, $info[0], $info[1] );
-			
-					// move the thumbnail to its final destination
-					if ( $info[2] == IMAGETYPE_GIF ) {
-						if ( ! imagegif( $imageresized, $newFilename ) ) {
-							$error = __( "Logo path invalid" );
-						}
-					}
-					elseif ( $info[2] == IMAGETYPE_JPEG ) {
-						if ( ! imagejpeg( $imageresized, $newFilename, $jpeg_compression ) ) {
-							$error = __( "Logo path invalid" );
-						}
-					}
-					elseif ( $info[2] == IMAGETYPE_PNG ) {
-						@ imageantialias($imageresized,true);
-						@ imagealphablending($imageresized, false);
-						@ imagesavealpha($imageresized,true);
-						$transparent = imagecolorallocatealpha($imageresized, 255, 255, 255, 0);
-						for($x=0;$x<$image_new_width;$x++) {
-							for($y=0;$y<$image_new_height;$y++) {
-							@ imagesetpixel( $imageresized, $x, $y, $transparent );
-							}
-						}
-						@ imagecopyresampled( $imageresized, $image, 0, 0, 0, 0, $image_new_width, $image_new_height, $info[0], $info[1] );
-
-						if ( ! imagepng( $imageresized, $newFilename ) ) {
-							$error = __( "Logo path invalid" );
-						}
-					}
-				}
-				if(empty($error)) {
-					$imageinfo = getimagesize($tmppath);
-				}
-			}
-		}
-		
-		if ( ! $error ) {
-			$upload_dir = wp_upload_dir();
-			$dir = trailingslashit( $upload_dir['basedir'] );
-			$imagepath = $dir . $_FILES['progo_options']['name']['logotemp'];
-			
-			if ( ! move_uploaded_file( $tmppath, $imagepath ) ) {
-				$error = "Unable to place the user photo at: ". $imagepath;
-			}
-			else {
-				chmod($imagepath, 0666);
-				
-				$input['logo'] = $_FILES['progo_options']['name']['logotemp'];
-	
-				/*
-				if($oldFile && $oldFile != $newFile)
-					@unlink($dir . '/' . $oldFile);
-				*/
-			}
-		}
-	}
-	update_option('progo_settings_just_saved',1);
-	
-	return $input;
-}
-endif;
 
 /********* more helper functions *********/
 
-if ( ! function_exists( 'progo_field_color' ) ):
-/**
- * outputs HTML for "Color Scheme" option on Site Settings page
- * @uses progo_colorschemes() for list of available Color Schemes
- * @since Business Pro 1.0
- */
-function progo_field_color() {
-	$options = get_option( 'progo_options' );
-	$opts = progo_colorschemes();
-	// in case a child theme overwrites the Available Colors progo_colorschemes() function
-	if( count($opts) > 0 ) {
-	?>
-<select id="progo_colorscheme" name="progo_options[colorscheme]" style="float: left; margin-right: 20px; width: 128px;" onchange="updateScreenshot()">
-<?php
-	foreach ( $opts as $color ) {
-		echo '<option value="'. $color .'"'. (($options['colorscheme']==$color) ? ' selected="selected"' : '') .'>'.esc_html($color).'</option>';
-	}
-?></select><script type="text/javascript">
-function updateScreenshot() {
-	var color = jQuery('#progo_colorscheme').val();
-	jQuery('#progo_color_thm').attr('src','<?php bloginfo('template_url'); ?>/images/'+ color +'/screenshot-thm.jpg');
-}
-
-jQuery(function($) {
-	$('#progo_colorscheme').after('<img id="progo_color_thm" style="border:1px solid #DFDFDF; width: 150px" />').parent().attr('valign','top');
-	updateScreenshot();
-});
-</script>
-<?php } else {
-		echo 'COLOR SCHEMES OPTION HAS BEEN OVERWRITTEN';
-	}
-}
-endif;
-if ( ! function_exists( 'progo_field_logo' ) ):
-/**
- * outputs HTML for custom "Logo" on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_logo() {
-	$options = get_option('progo_options');
-	if ( $options['logo'] != '' ) {
-		$upload_dir = wp_upload_dir();
-		$dir = trailingslashit( $upload_dir['baseurl'] );
-		$imagepath = $dir . $options['logo'];
-		echo '<img src="'. esc_attr( $imagepath ) .'" /> [<a href="'. wp_nonce_url("admin.php?progo_admin_action=reset_logo", 'progo_reset_logo') .'">Delete Logo</a>]<br /><span class="description">Replace Logo</span><br />';
-	} ?>
-<input type="hidden" id="progo_logo" name="progo_options[logo]" value="<?php echo esc_attr( $options['logo'] ); ?>" />
-<input type="file" id="progo_logotemp" name="progo_options[logotemp]" />
-<span class="description">Upload your logo here.<br />
-Maximum dimensions: 598px Width x 75px Height. Larger images will be automatically scaled down to fit size.<br />
-Maximum upload file size: <?php echo ini_get( "upload_max_filesize" ); ?>. Allowable formats: gif/jpg/png. Transparent png's / gif's are recommended.</span>
-<?php
-#needswork
-}
-endif;
-if ( ! function_exists( 'progo_field_layout' ) ):
-/**
- * outputs HTML for "Pay Layout" option on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_layout() {
-	$options = get_option( 'progo_options' );
-	$layouton = absint($options['layout']);
-	if ( $layouton < 1 || $layouton > 4 ) {
-		$layouton = 1;
-	}
-	$descriptions = array(
-		1 => 'Lots of room for Text on the Left, Form on the Right',
-		2 => 'Background Image with Text on the Left, Form on the Right',
-		3 => 'Lots of room for Text, Featured Image on the Right, Form below',
-		4 => 'Large Image on the Left, Text on the Right, Form below'
-	);
-//	echo '<pre style="display:none">'. print_r($options,true) .'</pre>';
-	?>
-    <table>
-    <tr valign="top">
-<?php
-	for ( $i=1; $i<5; $i++ ) {
-		$chk = $layouton==$i ? ' checked="checked"' : '';
-		echo '<td><input type="radio" name="progo_options[layout]" id="progolayout'. $i .'" value="'. $i .'"'. $chk .' /></td><td><label for="progolayout'. $i .'"><img src="'. get_bloginfo('template_url') .'/images/homeslideOptions/'. $i .'.jpg" /><br /><strong>Layout '. $i .'</strong></label><br /><span class="description">'. $descriptions[$i] .'</span></td>';
-		//<option value="'. $color .'"'. (($options['colorscheme']==$color) ? ' selected="selected"' : '') .'>'.esc_html($color).'</option>';
-	}
-	?></tr></table>
-	<?php
-}
-endif;
-/**
- * outputs HTML for "API Key" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_apikey() {
-	$opt = get_option( 'progo_businesspro_apikey', true );
-	echo '<input id="apikey" name="progo_options[apikey]" class="regular-text" type="text" value="'. esc_html( $opt ) .'" maxlength="39" />';
-	$apiauth = get_option( 'progo_businesspro_apiauth', true );
-	switch($apiauth) {
-		case 100:
-			echo ' <img src="'. get_bloginfo('template_url') .'/images/check.png" alt="aok" class="kcheck" />';
-			break;
-		default:
-			echo ' <img src="'. get_bloginfo('template_url') .'/images/x.gif" alt="X" class="kcheck" title="'. $apiauth .'" />';
-			break;
-	}
-	echo '<br /><span class="description">You API Key was sent via email when you purchased the Business Pro theme from ProGo Themes.</span><br /><br />ProGo Themes are Easy and Quick to Set Up using our Step-by-Step Process.<br /><a href="http://www.progo.com/resources/QuickStartGuide-Business Pro.pdf" target="_blank">Download the ProGo Business Pro Theme Quick Start Guide (PDF)</a>';
-}
-if ( ! function_exists( 'progo_field_blogname' ) ):
-/**
- * outputs HTML for "Site Name" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_blogname() {
-	$opt = get_option( 'blogname' );
-	echo '<input id="blogname" name="progo_options[blogname]" class="regular-text" type="text" value="'. esc_html( $opt ) .'" />';
-}
-endif;
-if ( ! function_exists( 'progo_field_blogdesc' ) ):
-/**
- * outputs HTML for "Slogan" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_blogdesc() {
-	$opt = get_option( 'blogdescription' ); ?>
-<input id="blogdescription" name="progo_options[blogdescription]" class="regular-text" type="text" value="<?php esc_html_e( $opt ); ?>" />
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_showdesc' ) ):
-/**
- * outputs HTML for checkbox "Show/Hide Tips" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_showdesc() {
-	$options = get_option( 'progo_options' ); ?>
-<fieldset><legend class="screen-reader-text"><span>Show Slogan</span></legend><label for="progo_showdesc">
-<input type="checkbox" value="1" id="progo_showdesc" name="progo_options[showdesc]"<?php
-	if ( (int) $options['showdesc'] == 1 ) {
-		echo ' checked="checked"';
-	} ?> />
-Show the Site Slogan next to the Logo at the top of <a target="_blank" href="<?php echo esc_url( trailingslashit( get_bloginfo( 'url' ) ) ); ?>">your site</a></label>
-</fieldset>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_showtips' ) ):
-/**
- * outputs HTML for checkbox "Show Slogan" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_showtips() {
-	$options = get_option( 'progo_options' ); ?>
-<label for="progo_showtips">
-<input type="checkbox" value="1" id="progo_showtips" name="progo_options[showtips]"<?php
-	if ( (int) $options['showtips'] == 1 ) {
-		echo ' checked="checked"';
-	} ?> />
-Show ProGo Tips <img src="<?php bloginfo('template_url'); ?>/images/tip.png" alt="Tip" /> for Admin users viewing the front-end of <a target="_blank" href="<?php echo esc_url( trailingslashit( get_bloginfo( 'url' ) ) ); ?>">your site</a></label>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_showfbtabs' ) ):
-/**
- * outputs HTML for checkbox "Show Slogan" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_showfbtabs() {
-	$options = get_option( 'progo_options' ); ?>
-<label for="progo_showfbtabs">
-<input type="checkbox" value="1" id="progo_showfbtabs" name="progo_options[fbtabs]"<?php
-	if ( (int) $options['fbtabs'] == 1 ) {
-		echo ' checked="checked"';
-	} ?> />
-Enable "Facebook Tabs" custom post type &amp; templates.</label> <span class="description">(some assembly required)</span>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_showppcposts' ) ):
-/**
- * outputs HTML for checkbox "Show Slogan" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_showppcposts() {
-	$options = get_option( 'progo_options' ); ?>
-<label for="progo_showppcposts">
-<input type="checkbox" value="1" id="progo_showppcposts" name="progo_options[ppcposts]"<?php
-	if ( (int) $options['ppcposts'] == 1 ) {
-		echo ' checked="checked"';
-	} ?> />
-Enable "PPC Posts" custom post type &amp; templates.</label> <span class="description">(some assembly required)</span>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_support' ) ):
-/**
- * outputs HTML for "Customer Support" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_support() {
-	$options = get_option( 'progo_options' );
-	?>
-<input id="progo_support" name="progo_options[support]" value="<?php esc_html_e( $options['support'] ); ?>" class="regular-text" type="text" />
-<span class="description">Enter either a Phone # (like <em>222-333-4444</em>) or email address</span>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_copyright' ) ):
-/**
- * outputs HTML for "Copyright Notice" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_copyright() {
-	$options = get_option( 'progo_options' );
-	?>
-<input id="progo_copyright" name="progo_options[copyright]" value="<?php esc_html_e( $options['copyright'] ); ?>" class="regular-text" type="text" />
-<span class="description">Copyright notice that appears on the right side of your site's footer.</span>
-<?php }
-endif;
-if (!function_exists('progo_field_businessaddy') ):
-/**
- * outputs HTML for "Business Address" field on Site Settings page
- * @since SmallBusiness 1.0
- */
-function progo_field_businessaddy() {
-$options = get_option( 'progo_options' ); ?>
-<input id="progo_businessaddy" name="progo_options[businessaddy]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessaddy'] ); ?>" />
-<span class="description">This address will appear in the Office Info widget.</span>
-<?php }
-endif;
-if (!function_exists('progo_field_businessCSZ') ):
-/**
- * outputs HTML for "Business City, State, Zip" field on Site Settings page
- * @since SmallBusiness 1.0
- */
-function progo_field_businessCSZ() {
-$options = get_option( 'progo_options' ); ?>
-<input id="progo_businessCSZ" name="progo_options[businessCSZ]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessCSZ'] ); ?>" />
-<span class="description">This address will appear in the Office Info widget under the street address above.</span>
-<?php }
-endif;
-if (!function_exists('progo_field_businessphone') ):
-/**
- * outputs HTML for "Business Phone" field on Site Settings page
- * @since SmallBusiness 1.0
- */
-function progo_field_businessphone() {
-$options = get_option( 'progo_options' ); ?>
-<input id="progo_businessphone" name="progo_options[businessphone]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessphone'] ); ?>" />
-<span class="description">This phone will appear in the Office Info widget.</span>
-<?php }
-endif;
-if (!function_exists('progo_field_businessemail') ):
-/**
- * outputs HTML for "Business Email" field on Site Settings page
- * @since SmallBusiness 1.0
- */
-function progo_field_businessemail() {
-$options = get_option( 'progo_options' ); ?>
-<input id="progo_businessemail" name="progo_options[businessemail]" class="regular-text" type="text" value="<?php esc_html_e( $options['businessemail'] ); ?>" />
-<span class="description">This email address will appear in the Office Info widget.</span>
-<?php }
-endif;
-if (!function_exists('progo_field_businesshours') ):
-/**
- * outputs HTML for "Business Hours" field on Site Settings page
- * @since SmallBusiness 1.0
- */
-function progo_field_businesshours() {
-$options = get_option( 'progo_options' ); ?>
-<input id="progo_businesshours" name="progo_options[businesshours]" class="regular-text" type="text" value="<?php esc_html_e( $options['businesshours'] ); ?>" />
-<span class="description">These hours will appear in the Office Info widget.</span>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_footercolor' ) ):
-/**
- * outputs HTML for "Footer Text Color" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_footercolor() {
-	$options = get_option( 'progo_options' );
-	?>
-<fieldset><legend class="screen-reader-text"><span><?php _e( 'Background Color' ); ?></span></legend>
-<?php $show_clear = ( $options['footercolor'] != '' ) ? '' : ' style="display:none"'; ?>
-<input type="text" name="progo_options[footercolor]" id="background-color" value="#<?php echo esc_attr( $options['footercolor'] ) ?>" />
-<a class="hide-if-no-js" href="#" id="pickcolor"><?php _e('Select a Color'); ?></a> <span <?php echo $show_clear; ?>class="hide-if-no-js" id="clearcolor"> (<a href="#"><?php _e( 'Clear' ); ?></a>)</span>
-<div id="colorPickerDiv" style="z-index: 100; background:#eee; border:1px solid #ccc; position:absolute; display:none;"></div>
-</fieldset>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_headline' ) ):
-/**
- * outputs HTML for "Customer Support" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_headline() {
-	$options = get_option( 'progo_options' );
-	?><table><tr valign="top"><td style="padding-left: 0"><textarea id="progo_headline" name="progo_options[headline]" rows="3" cols="20"><?php esc_attr_e( $options['headline'] ); ?></textarea></td>
-    <td><span class="description">Headline for the homepage Form</span></td></tr></table>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_form' ) ):
-/**
- * outputs HTML for "Customer Support" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_form() {
-	$options = get_option( 'progo_options' );
-	?>
-<textarea id="progo_homeform" name="progo_options[form]" rows="3" cols="100%"><?php esc_attr_e( $options['form'] ); ?></textarea>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_frontpage' ) ):
-/**
- * outputs HTML for Homepage "Displays" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_frontpage() {
-	// Latest Blog Posts, (Featured Products), Static Content
-	$choices = array(
-		'posts' => 'Latest Blog Posts',
-		'page' => 'Static Content'
-	);
-	$msgs = array(
-		'posts' => '<a href="edit.php" target="_blank">Edit Posts Here</a>',
-		'page' => '<a href="post.php?post='. get_option('progo_homepage_id') .'&action=edit" target="_blank">Edit Homepage Content Here</a>'
-	);
-	$msg = '';
-	
-//	$msg .= '<pre>'. print_r(get_option('show_on_front'),true)  .'</pre>'. print_r(get_option('page_on_front'),true) .'</pre>'. print_r(get_option('page_for_posts'),true) .'</pre>';
-	
-	$options = get_option( 'progo_options' );
-	// check just in case show_on_front changed since this was last updated?
-	// $options['frontpage'] = get_option('show_on_front');
-	
-	?><p><select id="progo_frontpage" name="progo_options[frontpage]" onchange="progo_frontpage_msg();"><?php
-    foreach ( $choices as $k => $c ) {
-		echo '<option value="'. $k .'"';
-		if( $k == $options['frontpage'] ) {
-			echo ' selected="selected"';
-		}
-		echo '>'. esc_attr($c) .'</option>';
-	}
-    ?></select><span class="description"><?php echo ( $msg != '' ? $msg : $msgs[$options['frontpage']] ); ?></span></p>
-<script type="text/javascript">
-function progo_frontpage_msg() {
-	var msg = '';
-	var sel = jQuery('#progo_frontpage');
-	switch( sel.val() ) { <?php
-	foreach ( $msgs as $k => $v ) {
-		echo "case '$k':\n";
-			echo "msg = '$v';\n";
-			echo "break;";
-	} ?>
-	}
-	sel.next().html(msg);
-}
-</script>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_menuwidth' ) ):
-/**
- * outputs HTML for Adv Option "Main Menu Width" field on Site Settings page
- * @since Business Pro 1.2.6
- */
-function progo_field_menuwidth() {
-	// Latest Blog Posts, (Featured Products), Static Content
-	$choices = array(
-		'fixed' => 'Fixed Width',
-		'auto' => 'Auto'
-	);
-	
-	$options = get_option( 'progo_options' );
-	// check just in case show_on_front changed since this was last updated?
-	// $options['frontpage'] = get_option('show_on_front');
-	
-	?><select id="progo_menuwidth" name="progo_options[menuwidth]"><?php
-    foreach ( $choices as $k => $c ) {
-		echo '<option value="'. $k .'"';
-		if( $k == $options['menuwidth'] ) {
-			echo ' selected="selected"';
-		}
-		echo '>'. esc_attr($c) .'</option>';
-	}
-    ?></select><span class="description">Would you like the top links in the Main Menu on your site to be Fixed Width or Auto Width?</span>
-<?php }
-endif;
-if ( ! function_exists( 'progo_field_homeseconds' ) ):
-/**
- * outputs HTML for Homepage "Cycle Seconds" field on Site Settings page
- * @since Business Pro 1.0
- */
-function progo_field_homeseconds() {
-	$options = get_option( 'progo_options' );
-	// check just in case show_on_front changed since this was last updated?
-	// $options['frontpage'] = get_option('show_on_front');
-	?><p><input id="progo_homeseconds" name="progo_options[homeseconds]" type="text" size="2" value="<?php echo absint($options['homeseconds']); ?>"><span class="description"> sec. per slide. Enter "0" to disable auto-rotation.</span></p>
-<?php }
-endif;
-if ( ! function_exists( 'progo_section_text' ) ):
-/**
- * (dummy) function called by 
- * add_settings_section( [id] , [title], 'progo_section_text', 'progo_site_settings' );
- * echos anchor link for that section
- * @since Business Pro 1.0
- */
-function progo_section_text( $args ) {
-	echo '<a name="'. $args['id'] .'"></a>';
-}
-endif;
 if ( ! function_exists( 'progo_bodyclasses' ) ):
 /**
  * adds some additional classes to the <body> based on what page we're on
@@ -2071,7 +1692,7 @@ function progo_bodyclasses($classes) {
 			break;
 	}
 	if ( is_front_page() ) {
-		$options = get_option( 'progo_options' );
+		$options = progo_get_theme_options();
 	}
 	// add another class to body if we have a custom bg image
 	if ( get_background_image() != '' ) {
@@ -2168,13 +1789,13 @@ function progo_admin_notices() {
 		<p><?php
         switch($apiauth) {
 			case 'new':	// key has not been entered yet
-				echo '<a href="themes.php?page=progo_admin" title="Site Settings">Please enter your ProGo Themes API Key to Activate your theme.</a>';
+				echo '<a href="themes.php?page=theme_options" title="Site Settings">Please enter your ProGo Themes API Key to Activate your theme.</a>';
 				break;
 			case '999': // invalid key?
-				echo 'Your ProGo Themes API Key appears to be invalid. <a href="themes.php?page=progo_admin" title="Site Settings">Please double check it.</a>';
+				echo 'Your ProGo Themes API Key appears to be invalid. <a href="themes.php?page=theme_options" title="Site Settings">Please double check it.</a>';
 				break;
 			case '300': // wrong site URL?
-				echo '<a href="themes.php?page=progo_admin" title="Site Settings">The ProGo Themes API Key you entered</a> is already bound to another URL.';
+				echo '<a href="themes.php?page=theme_options" title="Site Settings">The ProGo Themes API Key you entered</a> is already bound to another URL.';
 				break;
 		}
 		?></p>
@@ -2196,8 +1817,12 @@ function progo_admin_notices() {
 		$onstep = progo_businesspro_completeness( $onstep );
 		update_option( 'progo_businesspro_onstep', $onstep);
 		// couldnt check step 2 before but now we have get_plugins() function
-		if ( ($onstep == 2) && ( $_REQUEST['action'] == 'install-plugin' ) ) {
-				return;
+		if ( $onstep == 2 ) {
+			if ( isset( $_REQUEST['action'] ) ) {
+				if ( $_REQUEST['action'] == 'install-plugin' ) {
+					return;
+				}
+			}
 		}
 		// quick check if the ACTIVATE link was just clicked...
 		if ( ( $onstep == 3 ) && is_plugin_active( 'contact-form-7/wp-contact-form-7.php' ) ) {
@@ -2233,7 +1858,7 @@ function progo_admin_notices() {
 				break;
 			case 6: // Permalinks
 				$pct = 80;
-				$nst = 'Your <em>Permalinks</em> settings are still set to the Default option. <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_recommended", 'progo_permalink_check') .'">Use the ProGo-Recommended "Day and name" setting</a>, <a href="'. admin_url("options-permalink.php") .'">Choose another non-Default option for yourself</a>, or <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_default", 'progo_permalink_check') .'">keep the Default setting and move to the next step</a>.';
+				$nst = 'Your <em>Permalinks</em> settings are still set to the Default option. <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_recommended", 'progo_permalink_check') .'">Use the ProGo-Recommended "Day and name" setting</a>, <a href="'. admin_url("options-permalink.php") .'">Choose another non-Default option for yourself</a>, or <a href="'. wp_nonce_url("admin.php?progo_admin_action=permalink_default", 'progo_permalink_check') .'">keep the Default setting and proceed to the next step</a>.';
 				break;
 			case 7: // Main Menu
 				$pct = 90;
@@ -2248,7 +1873,7 @@ function progo_admin_notices() {
  * hooked to 'site_transient_update_themes' by add_filter in progo_setup()
  * checks ProGo-specific URL to see if our theme is up to date!
  * @param array of checked Themes
- * @uses get_allowed_themes() To retrieve list of all installed themes.
+ * @uses wp_get_themes() To retrieve list of all installed themes.
  * @uses wp_remote_post() To check remote URL for updates.
  * @return checked data array
  * @since Business Pro 1.0
@@ -2258,7 +1883,7 @@ function progo_update_check($data) {
 		return $data;
 	}
 	
-	$themes = get_allowed_themes();
+	$themes = wp_get_themes( array( 'allowed' => true ) );
 	
 	if ( isset( $data->checked ) == false ) {
 		$checked = array();
@@ -2266,7 +1891,7 @@ function progo_update_check($data) {
 		foreach ( $themes as $thm ) {
 			// we don't care to check CHILD themes
 			if( $thm['Parent Theme'] == '') {
-				$checked[$thm[Template]] = $thm[Version];
+				$checked[$thm['Template']] = $thm['Version'];
 			}
 		}
 		$data->checked = $checked;
@@ -2277,7 +1902,7 @@ function progo_update_check($data) {
 	
 	$request = array(
 		'slug' => "businesspro",
-		'version' => $data->checked[businesspro],
+		'version' => $data->checked['businesspro'],
 		'siteurl' => get_bloginfo('url')
 	);
 	
@@ -2306,15 +1931,15 @@ function progo_update_check($data) {
 		// wp_die('response:<br /><pre>'. print_r($response,true) .'</pre><br /><br />apikey: '. $apikey );
 		// only save AUTHCODE if APIKEY is not blank.
 		if ( $apikey != '' ) {
-			update_option( 'progo_businesspro_apiauth', $response[authcode] );
+			update_option( 'progo_businesspro_apiauth', $response['authcode'] );
 		} else {
 			update_option( 'progo_businesspro_apiauth', 'new' );
 		}
-		if ( version_compare($data->checked[businesspro], $response[new_version], '<') ) {
-			$data->response[businesspro] = array(
-				'new_version' => $response[new_version],
-				'url' => $response[url],
-				'package' => $response[package]
+		if ( version_compare($data->checked['businesspro'], $response['new_version'], '<') ) {
+			$data->response['businesspro'] = array(
+				'new_version' => $response['new_version'],
+				'url' => $response['url'],
+				'package' => $response['package']
 			);
 		}
 	}
@@ -2335,7 +1960,7 @@ function progo_to_twentyten() {
 		$msg = 'This ProGo Themes site is currently not Activated.';
 		
 		if(current_user_can('edit_pages')) {
-			$msg .= '<br /><br /><a href="'. trailingslashit(get_bloginfo('url')) .'wp-admin/themes.php?page=progo_admin">Click here to update your API Key</a>';
+			$msg .= '<br /><br /><a href="'. trailingslashit(get_bloginfo('url')) .'wp-admin/themes.php?page=theme_options">Click here to update your API Key</a>';
 		}
 		wp_die($msg);
 	}
@@ -2349,16 +1974,10 @@ function progo_admin_post_thumbnail_html($html) {
 	global $post_type;
 	global $post;
 	if( $post_type=='progo_homeslide' ) {
-		$options = get_option( 'progo_options' );
+		$options = progo_get_theme_options();
 		switch( $options['layout'] ) {
-			case 3:
-				$size = '305px W x 322px H';
-				break;
-			case 4:
-				$size = '647px W x 322px H';
-				break;
 			default:
-				$size = '646px W x 382px H';
+				$size = '960px W x 445px H';
 				break;
 		}
 		$html = str_replace(__('Set featured image').'</a>',__('Upload/Select a Background Image') .'</a> '. __('Recommended Size') .': '. $size, $html );
@@ -2375,11 +1994,11 @@ function progo_admin_bar_menu() {
 	global $wp_admin_bar;
 	
 	$wp_admin_bar->remove_menu('widgets');
-	$wp_admin_bar->add_menu( array( 'id' => 'progo', 'title' => __('ProGo Theme'), 'href' => admin_url('themes.php?page=progo_admin'), ) );
+	$wp_admin_bar->add_menu( array( 'id' => 'progo', 'title' => __('ProGo Theme'), 'href' => admin_url('themes.php?page=theme_options'), ) );
 	// move Appearance > Widgets & Menus submenus to below our new ones
 	$wp_admin_bar->remove_menu('widgets');
 	$wp_admin_bar->remove_menu('menus');
-	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=progo_admin') ) );
+	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progothemeoptions', 'title' => __('Theme Options'), 'href' => admin_url('themes.php?page=theme_options') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'homeslides', 'title' => __('Homepage Slides'), 'href' => admin_url('edit.php?post_type=progo_homeslide') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'background', 'title' => __('Background'), 'href' => admin_url('themes.php?page=custom-background') ) );
 	$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'widgets', 'title' => __('Widgets'), 'href' => admin_url('widgets.php') ) );
@@ -2387,7 +2006,7 @@ function progo_admin_bar_menu() {
 	
 	$avail = progo_colorschemes();
 	if ( count($avail) > 0 ) {
-		$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progo_colorscheme', 'title' => 'Color Scheme', 'href' => admin_url('themes.php?page=progo_admin') ) );
+		$wp_admin_bar->add_menu( array( 'parent' => 'progo', 'id' => 'progo_colorscheme', 'title' => 'Color Scheme', 'href' => admin_url('themes.php?page=theme_options') ) );
 	}
 	foreach($avail as $color) {
 		$wp_admin_bar->add_menu( array( 'parent' => 'progo_colorscheme', 'id' => 'progo_colorscheme'.esc_attr($color), 'title' => esc_attr($color), 'href' => admin_url('admin.php?progo_admin_action=color'. esc_attr($color) ) ) );
@@ -2424,31 +2043,27 @@ function progo_nomenu_cb() {
 }
 endif;
 
-/*
-  ADDING CUSTOM POST TYPE TEMPLATE SELECTOR -- Begin
-  This code is dependant on this plugin (http://wordpress.org/extend/plugins/custom-post-template/) 
-  It hooks our custom post type templates into the template selector in the admin for these types.
-*/
-if ( ! function_exists( 'progo_cpt_post_types' ) ):
-function progo_cpt_post_types( $post_types ) {
-	$post_types[] = 'progo_facebooktabs';
-	$post_types[] = 'progo_ppc';
-	return $post_types;
-}
-endif;
-add_filter( 'cpt_post_types', 'progo_cpt_post_types' );
 
 //DND PPC DKI Magic --- Begin
-add_shortcode('keyword', 'progo_ppc_kw');
+
 if ( !function_exists( 'progo_ppc_kw' ) ):
 function progo_ppc_kw ($location){
 	$uri = progo_get_kw_uri();
-	
-	$kwy1 = str_replace('/','',$uri[1]);
+	$index = array_search("ppc/",$uri);
+	$out_index1 = (1 + $index);
+	$out_index2 = (2 + $index);
+	if ( isset($uri[1]) ) {
+	$kwy1 = str_replace('/','',$uri[$out_index1]);
 	$kwy1 = str_replace('-',' ',$kwy1);
-	$kwy2 = str_replace('/','',$uri[2]);
+	} else {
+		$kwy1 = '';
+	}
+	if ( isset($uri[2]) ) {
+	$kwy2 = str_replace('/','',$uri[$out_index2]);
 	$kwy2 = str_replace('-',' ',$kwy2);
-
+	} else {
+		$kwy2 = '';
+	}
 	switch($location['loc']){
 		case '2':
 			$keyword = $kwy2;
@@ -2458,10 +2073,12 @@ function progo_ppc_kw ($location){
 			break;
 	}
 	
-	return $keyword . " " . $request_uri;
+	return $keyword;
 }
+add_shortcode('keyword', 'progo_ppc_kw');
 endif;
 if ( !function_exists( 'progo_get_kw_uri' ) ):
+/* from URL like /ppc/test-page/ , returns array('ppc/','test-page/') */
 function progo_get_kw_uri() {
         $request_uri = $_SERVER['REQUEST_URI'];
         // for consistency, check to see if trailing slash exists in URI request
@@ -2477,22 +2094,36 @@ endif;
 if ( !function_exists( 'progo_ppc_title' ) ):
 function progo_ppc_title (){
 	$uri = progo_get_kw_uri();
+	$index = array_search("ppc/",$uri);
+	$out_index1 = (1 + $index);
+	$out_index2 = (2 + $index);
 	
-	$kwy1 = str_replace('/','',$uri[1]);
+	if ( isset($uri[1]) ) {
+	$kwy1 = str_replace('/','',$uri[$out_index1]);
 	$kwy1 = str_replace('-',' ',$kwy1);
-	$kwy2 = str_replace('/','',$uri[2]);
+	} else {
+		$kwy1 = '';
+	}
+	if ( isset($uri[2]) ) {
+	$kwy2 = str_replace('/','',$uri[$out_index2]);
 	$kwy2 = str_replace('-',' ',$kwy2);
+	} else {
+		$kwy2 = '';
+	}
+	//$title_out = $kwy1 . ( ($kwy2 != "") ? ' | '. $kwy2 : '' );
 	
-	$title_out = $kwy1 . ( ($kwy2 != "") ? ' | '. $kwy2 : '' );
+	$title_out = ( ($kwy2 != "") ?  $kwy2 : $kwy1 );
 	
-	echo $title_out;
+	echo ucwords($title_out);
 }
 endif;
 if ( !function_exists( 'progo_populate_ppc_content' ) ):
 function progo_populate_ppc_content(){
+	global $post;
 	$uri = progo_get_kw_uri();
-	
-	$the_slug = str_replace('/','',$uri[1]);
+	$index = array_search("ppc/",$uri);
+	$out_index1 = (1 + $index);
+	$the_slug = str_replace('/','',$uri[$out_index1]);
 	$args=array(
 		'name' => $the_slug,
 		'post_type' => 'progo_ppc',
@@ -2501,23 +2132,234 @@ function progo_populate_ppc_content(){
 	);
 	
 	$lastposts = get_posts( $args );
+	
+	/*
 	foreach($lastposts as $post) {
 		setup_postdata($post); 
 		return the_content(); 
 	}
+	echo $the_slug;
+	echo $uri[2];
+	
+	*/
+	
+	if ( count($lastposts) > 0 ) {
+		$post = $lastposts[0];
+		setup_postdata($post); 
+		return the_content();
+		  
+	} else {
+		echo 'ktjljklj;lj';
+	}
 }
 endif;
+
+if ( !function_exists( 'progo_ppc_get_id' ) ):
+function progo_ppc_get_id(){
+	$uri = progo_get_kw_uri();
+	$index = array_search("ppc/",$uri);
+	$out_index1 = (1 + $index);
+	$the_slug = str_replace('/','',$uri[$out_index1]);
+	$args=array(
+		'name' => $the_slug,
+		'post_type' => 'progo_ppc',
+		'post_status' => 'publish',
+		'showposts' => 1
+	);
+	
+	$lastposts = get_posts( $args );
+	$post_id = 0;
+	foreach($lastposts as $post) {
+		setup_postdata($post); 
+		$post_id = $post->ID;
+	}
+	return $post_id;
+}
+endif;
+
 add_filter( 'template_redirect', 'progo_ppc_template' );
 remove_filter('template_redirect','redirect_canonical');
+
 if ( !function_exists( 'progo_ppc_template' ) ):
 function progo_ppc_template() {
+	global $post; 
 	$uri = progo_get_kw_uri();
-	if ($uri[0]=='ppc/') {
-		//add_filter('wp_title', 'ppc_template_title', 20);
+	$index = array_search("ppc/",$uri);
+	
+	if ( $index === false ) {
+		return;
+	}
+	
+	$theSlug = str_replace("/", "", $uri[($index+1)]);
+	
+	if ($uri[$index]=='ppc/') {
+		
+	
+	$args=array(
+  	'name' => $theSlug,
+  	'post_type' => 'progo_ppc',
+  	'post_status' => 'publish',
+  	'showposts' => 1,
+  	'ignore_sticky_posts'=> 1
+	);
+	
+$my_posts = get_posts($args);
+
+if( $my_posts ) {
+$postID = $my_posts[0]->ID;
+$PPC_meta_template = get_post_meta($postID, '_PPC_meta_template', true);
+}
+
+
+		switch ($PPC_meta_template) {
+		case 2:
+  			$single_template = dirname( __FILE__ ) . '/PPC-page2.php';
+  		break;
+		/*
+		case 3:
+  		$single_template = dirname( __FILE__ ) . '/PPC-page2.php';
+ 		break;
+ 		case 4:
+  		$single_template = dirname( __FILE__ ) . '/PPC-page4.php';
+ 		break;
+		*/
+       default:
+       $single_template = dirname( __FILE__ ) . '/PPC-page.php';
+		}
+
 		status_header(200);
-		include(STYLESHEETPATH . '/PPC-page.php');
+		include($single_template);
 		die();
 	}
 }
 endif;
+
+
+add_action( 'add_meta_boxes', 'fb_bullet' );
+
+
+
+function fb_bullet() {
+	global $post;
+    add_meta_box(
+        'custom_menu_meta_box',
+        'Bullets', 
+        'add_fb_bullet',
+        'progo_facebooktabs',
+		'normal',
+		'default'
+    );
+	
+}
+
+
+
+function add_fb_bullet( $post ) {
+	$FB_Tab_meta_template = get_post_meta($post->ID, '_FB_Tab_meta_template', true);
+	
+	$fb_bullets = get_post_meta($post->ID, '_FB_BULLET', true);
+	if ( $fb_bullets == '' ) {
+		$fb_bullets = array(
+			1 => '',
+			2 => '',
+			3 => '',
+			4 => '',
+			'image' => ''
+		);
+	}
+	?>
+	<table id="bullets" >
+		<tr>
+			<td>Bullet №1</td>
+			<td><input type="text" name="fb-bullet-1" size="70" value="<?php echo $fb_bullets[1] ?>" /></td>
+		</tr>
+		<tr>
+			<td>Bullet №2</td>
+			<td><input type="text" name="fb-bullet-2" size="70" value="<?php echo $fb_bullets[2] ?>" /></td>
+		</tr>
+		<tr>
+			<td>Bullet №3</td>
+			<td><input type="text" name="fb-bullet-3" size="70" value="<?php echo $fb_bullets[3] ?>" /></td>
+		</tr>
+		<tr>
+			<td>Bullet №4</td>
+			<td><input type="text" name="fb-bullet-4" size="70" value="<?php echo $fb_bullets[4] ?>" /></td>
+		</tr>
+		<tr>
+			<td>Bullets Image</td>
+			<td><input type="text" name="fb-bullet-image" size="50" value="<?php echo $fb_bullets['image'] ?>" /></td>
+		</tr>
+	</table>
+	<?php
+	
+}
+
+
+function add_fb_pre_headline( $post ) {
+	$fb_pre_headline = get_post_meta($post->ID, '_FB_PRE_HEADLINE', true);
+	?>
+	<input type="text" name="fb_pre_headline" value="<?php echo $fb_pre_headline; ?>" size="75" />
+	<?php
+	
+}
+function add_fb_sub_headline( $post ){
+	$fb_sub_headline = get_post_meta($post->ID, '_FB_SUB_HEADLINE', true);
+	?>
+	<input type="text" name="fb_sub_headline"  value="<?php echo $fb_sub_headline; ?>" size="75" />
+	<?php
+}
+
+function FB_featured_image( $post ){
+ $fb_feature_img = get_post_meta($post->ID, '_FB_FEATURE_IMG', true);
+	?>
+	<input type="text" name="fb_feture_img"  value="<?php echo $fb_feature_img; ?>" size="75" />
+	<?php
+}
+
+
+function save_fb_pre_headline( $post_id ) {
+  if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) 
+      return;
+
+  if ( 'page' == $_POST['post_type'] ) 
+  {
+    if ( !current_user_can( 'edit_page', $post_id ) )
+        return;
+  }
+  else
+  {
+    if ( !current_user_can( 'edit_post', $post_id ) )
+        return;
+  }
+	
+}
+
+
+
 //DND PPC DKI Magic --- End
+
+add_shortcode('smbcallout', 'progo_smbcallout');
+function progo_smbcallout( $atts, $content = null ) {
+	extract( shortcode_atts( array(
+		'headline' => 'The Headline from your Call to Action shortcode appeared to be missing!',
+		'lnk' => '#',
+		'call' => false,
+		'class' => 'button',
+	), $atts ) );
+	$oot = '<div class="callout grid_8"><h2>'. str_replace('|', '<br />', esc_attr( $headline ) ) .'</h2>';
+	if ( $call != false ) {
+		$oot .= '<a href="'. esc_url($lnk) .'" class="'. esc_attr($class) .'">'. esc_attr($call) .'</a>';
+	}
+	$oot .= '</div>';
+	return $oot;
+}
+
+add_shortcode('smb2col', 'progo_smb2cols');
+function progo_smb2cols( $atts, $content = null ) {
+	$content = str_replace( '<p></p>', '', force_balance_tags( $content ) );
+	
+	$oot = '<div class="grid_8 alpha omega"><div class="grid_4 alpha">';
+	$oot .= str_replace('<p>[smbcol]</p>', '</div><div class="grid_4 alpha omega">', $content);
+	$oot .= '</div></div>';
+	return $oot;
+}

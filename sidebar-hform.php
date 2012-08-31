@@ -1,6 +1,6 @@
 <?php
 /**
- * Homepage Form stored in another Sidebar.
+ * DEPRECATED : Homepage Form stored in another Sidebar.
  *
  * @package ProGo
  * @subpackage Business Pro

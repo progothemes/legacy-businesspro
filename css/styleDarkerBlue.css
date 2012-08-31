@@ -1,0 +1,37 @@
+#hdrap {
+	background-image: url(../images/colors/DarkerBlue/hdr.png)
+}
+#logo,
+#slogan,
+#hdr .hblock.support .inside {
+	color: #FFFFFF;
+}
+a#logo .g {
+	display: none;
+}
+#hdr .hblock.support h3 {
+	color: #CBDF3F;
+}
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/DarkerBlue/navli.png)
+}
+#pagetop.Layout4 .inside {
+	background: #fff url(../images/colors/DarkerBlue/slide.jpg) repeat-x 0 0;
+	color: #333;
+}
+.pbpform .tar td {
+	background: url(../images/colors/DarkerBlue/tar.jpg) no-repeat 50% 100%
+}
+#pagetop {
+	background-image: url(../images/colors/DarkerBlue/pagetop.jpg);
+}
+#pagetop h1.page-title {
+	color: #4A4A4A;
+}
+a.button, input.button, #main input.button {
+	background-color: #172B38;
+}
+.callout {
+	background-image: url(../images/colors/DarkerBlue/call-to-action.jpg);
+}
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeDarkerBlue a { font-weight: bold }

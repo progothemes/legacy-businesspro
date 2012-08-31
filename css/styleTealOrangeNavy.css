@@ -1,0 +1,48 @@
+#hdrap {
+	background-image: url(../images/colors/TealOrangeNavy/hdr.png)
+}
+#logo,
+#hdr .hblock.support h3,
+#hdr .hblock.support .inside {
+	color: #FFFFFF;
+}
+a#logo .g {
+	display: none;
+}
+#slogan {
+	color: #213639;
+}
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/TealOrangeNavy/navli.png)
+}
+ul#nav a.first,
+.pbpform label {
+	color: #DA8A00
+}
+ul#nav li.current-menu-item a.first,
+body.blog ul#nav li.blog a.first,
+ul#nav li.hover a.first,
+ul#nav li a.first:hover {
+	background: none;
+	color: #1E91A3;
+}
+#pagetop {
+	color: #FFFFFF;
+	background: url(../images/colors/GreenWhite/pagetop.png) repeat 0 0;
+}
+.pbpform,
+.Layout4 .inside {
+	background: #213639;
+}
+.pbpform .tar td {
+	background: url(../images/colors/TealOrangeNavy/tar.png) no-repeat 50% 100%;
+	color: #FFFFFF;
+}
+a.button, input.button, #main input.button {
+	background-color: #DA8A00;
+}
+.callout {
+	background-image: url(../images/colors/TealOrangeNavy/call-to-action.jpg);
+}
+
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeTealOrangeNavy a { font-weight: bold }

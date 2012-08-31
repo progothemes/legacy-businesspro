@@ -1,6 +1,8 @@
 /*
- * as Greyscale is the default, the colors/bg images are set in the main style.css...
+ * as LightGreys is the default, the colors/bg images are set in the main style.css...
  * so here, we just need to...
  */
+
+.pbpform .tar td { background: #464646 url(../images/colors/Greyscale/tar-dark.png) no-repeat 50% 100% }
 
 #wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeGreyscale a { font-weight: bold }

@@ -50,9 +50,11 @@ class ProGo_Widget_Social extends WP_Widget {
 		$title = apply_filters( 'widget_title', empty($instance['title']) ? __('Follow Us') : $instance['title'], $instance, $this->id_base);
 		$facebook = strip_tags($instance['facebook']);
 		$twitter = strip_tags($instance['twitter']);
+		$gplus = strip_tags($instance['gplus']);
+		$pinterest = strip_tags($instance['pinterest']);
+		$linkedin = strip_tags($instance['linkedin']);
 		$youtube = strip_tags($instance['youtube']);
 		$vimeo = strip_tags($instance['vimeo']);
-		$linkedin = strip_tags($instance['linkedin']);
 		$rss = $instance['rss'] == 'yes' ? 'yes' : 'no';
 		
 		echo $before_widget;
@@ -61,37 +63,51 @@ class ProGo_Widget_Social extends WP_Widget {
 		$items = array();
 		if ( $facebook != '' ) {
 			$items[] = array(
-				'url' => $facebook,
+				'url' => esc_url($facebook),
 				'class' => 'fb',
 				'text' => 'Join us on Facebook'
 			);
 		}
 		if ( $twitter != '' ) {
 			$items[] = array(
-				'url' => "http://twitter.com/$twitter",
+				'url' => "http://twitter.com/". esc_attr($twitter),
 				'class' => 'tw',
 				'text' => 'Follow us on Twitter'
 			);
 		}
+		if ( $gplus != '' ) {
+			$items[] = array(
+				'url' => "http://plus.google.com/". esc_attr($gplus),
+				'class' => 'gp',
+				'text' => 'Find us on Google+'
+			);
+		}
+		if ( $pinterest != '' ) {
+			$items[] = array(
+				'url' => "http://pinterest.com/". esc_attr($pinterest),
+				'class' => 'pn',
+				'text' => 'Follow us on Pinterest'
+			);
+		}
+		if ( $linkedin != '' ) {
+			$items[] = array(
+				'url' => esc_url($linkedin),
+				'class' => 'in',
+				'text' => 'Join us on LinkedIn'
+			);
+		}
 		if ( $youtube != '' ) {
 			$items[] = array(
-				'url' => $youtube,
+				'url' => esc_url($youtube),
 				'class' => 'yt',
 				'text' => 'Watch us on YouTube'
 			);
 		}
 		if ( $vimeo != '' ) {
 			$items[] = array(
-				'url' => $vimeo,
+				'url' => esc_url($vimeo),
 				'class' => 'vm',
 				'text' => 'Watch us on Vimeo'
-			);
-		}
-		if ( $linkedin != '' ) {
-			$items[] = array(
-				'url' => $linkedin,
-				'class' => 'in',
-				'text' => 'Join us on LinkedIn'
 			);
 		}
 		if ( $rss == 'yes' ) {
@@ -119,10 +135,12 @@ class ProGo_Widget_Social extends WP_Widget {
 	function update( $new_instance, $old_instance ) {
 		$instance = $old_instance;
 		
-		$new_instance = wp_parse_args( (array) $new_instance, array( 'title' => '', 'facebook' => '', 'twitter' => '', 'youtube' => '', 'vimeo' => '', 'linkedin' => '', 'rss' => 'no') );
+		$new_instance = wp_parse_args( (array) $new_instance, array( 'title' => '', 'facebook' => '', 'twitter' => '', 'gplus' => '', 'pinterest' => '', 'youtube' => '', 'vimeo' => '', 'linkedin' => '', 'rss' => 'no') );
 		$instance['title'] = strip_tags($new_instance['title']);
 		$instance['facebook'] = strip_tags($new_instance['facebook']);
 		$instance['twitter'] = strip_tags($new_instance['twitter']);
+		$instance['gplus'] = strip_tags($new_instance['gplus']);
+		$instance['pinterest'] = strip_tags($new_instance['pinterest']);
 		$instance['youtube'] = strip_tags($new_instance['youtube']);
 		$instance['vimeo'] = strip_tags($new_instance['vimeo']);
 		$instance['linkedin'] = strip_tags($new_instance['linkedin']);
@@ -136,10 +154,12 @@ class ProGo_Widget_Social extends WP_Widget {
 	 * @since 1.0
 	 */
 	function form( $instance ) {
-		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'facebook' => '', 'twitter' => '', 'youtube' => '', 'vimeo' => '', 'linkedin' => '', 'rss' => 'yes') );
+		$instance = wp_parse_args( (array) $instance, array( 'title' => '', 'facebook' => '', 'twitter' => '', 'gplus' => '', 'pinterest' => '', 'youtube' => '', 'vimeo' => '', 'linkedin' => '', 'rss' => 'yes') );
 		$title = strip_tags($instance['title']);
 		$fb = strip_tags($instance['facebook']);
 		$tw = strip_tags($instance['twitter']);
+		$gp = strip_tags($instance['gplus']);
+		$pn = strip_tags($instance['pinterest']);
 		$yt = strip_tags($instance['youtube']);
 		$vm = strip_tags($instance['vimeo']);
 		$in = strip_tags($instance['linkedin']);
@@ -147,6 +167,8 @@ class ProGo_Widget_Social extends WP_Widget {
 		<p><label for="<?php echo $this->get_field_id('title'); ?>"><?php _e('Title:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('title'); ?>" name="<?php echo $this->get_field_name('title'); ?>" type="text" value="<?php echo esc_attr($title); ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id('facebook'); ?>"><?php _e('Facebook URL:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('facebook'); ?>" name="<?php echo $this->get_field_name('facebook'); ?>" type="text" value="<?php echo esc_attr($fb); ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id('twitter'); ?>"><?php _e('Twitter @name:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('twitter'); ?>" name="<?php echo $this->get_field_name('twitter'); ?>" type="text" value="<?php echo esc_attr($tw); ?>" /></p>
+		<p><label for="<?php echo $this->get_field_id('gplus'); ?>"><?php _e('Google+ #:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('gplus'); ?>" name="<?php echo $this->get_field_name('gplus'); ?>" type="text" value="<?php echo esc_attr($gp); ?>" /></p>
+		<p><label for="<?php echo $this->get_field_id('pinterest'); ?>"><?php _e('Pinterest name:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('pinterest'); ?>" name="<?php echo $this->get_field_name('pinterest'); ?>" type="text" value="<?php echo esc_attr($pn); ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id('youtube'); ?>"><?php _e('YouTube Channel URL:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('youtube'); ?>" name="<?php echo $this->get_field_name('youtube'); ?>" type="text" value="<?php echo esc_attr($yt); ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id('vimeo'); ?>"><?php _e('Vimeo URL:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('vimeo'); ?>" name="<?php echo $this->get_field_name('vimeo'); ?>" type="text" value="<?php echo esc_attr($vm); ?>" /></p>
 		<p><label for="<?php echo $this->get_field_id('linkedin'); ?>"><?php _e('LinkedIn URL:'); ?></label> <input class="widefat" id="<?php echo $this->get_field_id('linkedin'); ?>" name="<?php echo $this->get_field_name('linkedin'); ?>" type="text" value="<?php echo esc_attr($in); ?>" /></p>

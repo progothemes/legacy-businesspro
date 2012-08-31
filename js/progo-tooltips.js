@@ -4,20 +4,22 @@ function progo_newtip( x, y, message, url ) {
 
 function progo_tooltip_init() {
 	var ptips = '';
-	// tooltips for every page / header area
-	ptips += progo_newtip( -41, 20, 'Customize your Background via Appearance > Background', 'themes.php?page=custom-background' );
+	// tooltips for header area
+	ptips += progo_newtip( -48, 147, 'Customize your Background via Appearance > Background', 'themes.php?page=custom-background' );
 	ptips += progo_newtip( -11, 82, 'Customize your Menu via Appearance > Menu', 'nav-menus.php' );
-	ptips += progo_newtip( 15, 12, 'Customize your Logo via Appearance > Theme Options', 'themes.php?page=progo_admin#progo_theme' );
-	ptips += progo_newtip( 833, 17, 'Customize your Customer Support area via Appearance > Theme Options', 'themes.php?page=progo_admin#progo_info' );
+	ptips += progo_newtip( 15, 12, 'Customize your Logo via Appearance > Theme Options', 'themes.php?page=theme_options#progo_theme' );
+	ptips += progo_newtip( 833, 17, 'Customize your Customer Support area via Appearance > Theme Options', 'themes.php?page=theme_options#progo_info' );
+	ptips += progo_newtip( 770, 109, 'Choose a Color Scheme via Appearance > Theme Options, or in the Admin Bar > ProGo Theme > Color Scheme', 'themes.php?page=theme_options#progo_theme' );
 	
 	if ( jQuery('body').hasClass('home') ) {
 		ptips += progo_newtip( -11, 129, 'Edit your Homepage Slides via Appearance > Homepage Slides', 'edit.php?post_type=progo_homeslide' );
+		ptips += progo_newtip( 630, 141, 'Choose different Layout Options for your Homepage Slide area via Appearance > Theme Options', 'themes.php?page=theme_options#progo_homepage' );
 	}
 	// for SLOGAN, we want to know how long the LOGO is
 	var pos = jQuery('#slogan').position();
-	ptips += progo_newtip( pos.left, 28, 'Customize your Slogan via Appearance > Theme Options', 'themes.php?page=progo_admin#progo_info' );
+	ptips += progo_newtip( pos.left, 28, 'Customize your Slogan via Appearance > Theme Options', 'themes.php?page=theme_options#progo_info' );
 	
-	jQuery('#page').append(ptips);
+	jQuery('#hdr').append(ptips);
 	
 	// sidebar-specific tips
 	ptips = '';
@@ -31,7 +33,7 @@ function progo_tooltip_init() {
 	// footer-specific tips
 	ptips = '';
 	ptips += progo_newtip( -20, -20, 'Customize which links appear here, via the "Footer Links" menu in Appearance > Menus', 'nav-menus.php' );
-	ptips += progo_newtip( -26, 18, 'Control this bottom line of text via Appearance "Copyright Notice" Theme Option', 'themes.php?page=progo_admin#progo_info' );
+	ptips += progo_newtip( -26, 5, 'Control this bottom line of text via Appearance "Copyright Notice" Theme Option', 'themes.php?page=theme_options#progo_info' );
 	jQuery('#ftr .grid_8').append(ptips);
 }
 

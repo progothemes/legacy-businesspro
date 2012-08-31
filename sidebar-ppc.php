@@ -16,7 +16,7 @@
  * some default sidebar stuff just in case.
  */
 if ( ! dynamic_sidebar( 'ppc-template' ) ) :
-// do SHOPPING CART widget ?
+// do some default something?
 ?>
  <?php endif; // end primary widget area ?>
 </div>

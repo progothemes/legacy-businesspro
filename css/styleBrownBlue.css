@@ -1,0 +1,56 @@
+#hdrap {
+	background-image: url(../images/colors/BrownBlue/hdr.png)
+}
+#logo,
+#slogan {
+	color: #FFFFFF;
+}
+a#logo .g {
+	display: none;
+}
+#hdr .hblock.support h3 {
+	color: #C3D8DE;
+}
+#hdr .hblock.support .inside {
+	color: #EDDCD2;
+}
+ul#nav, ul#nav li {
+	background-image: url(../images/colors/BrownBlue/navli.png)
+}
+
+ul#nav li.current-menu-item a.first,
+body.blog ul#nav li.blog a.first,
+ul#nav li.hover a.first,
+ul#nav li a.first:hover {
+	background-image: url(../images/colors/BrownBlue/navon.jpg);
+	color: #5C3C27;
+}
+
+.Layout4 .inside {
+	background: url(../images/colors/BrownBlue/slide.jpg) repeat 0 0;
+}
+#pagetop .slide.Light {
+	color: #666666;
+}
+#pagetop.Layout2 .slide.Light {
+	color: #FFFFFF;
+}
+.pbpform .tar td {
+	background: url(../images/colors/BrownBlue/tar.jpg) no-repeat 50% 100%
+}
+
+a.button, input.button, #main input.button {
+	background-color: #3F7485;
+}
+#pagetop {
+	background-image: url(../images/colors/BrownBlue/pagetop.jpg);
+}
+.callout {
+	background-image: url(../images/colors/BrownBlue/call-to-action.jpg);
+}
+.block h3.title,
+.pbpform .tar td,
+#pagetop h1.page-title {
+	color: #3F7485;
+}
+#wpadminbar .quicklinks #wp-admin-bar-progo_colorschemeBrownBlue a { font-weight: bold }

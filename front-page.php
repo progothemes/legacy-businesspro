@@ -4,7 +4,6 @@
  * @subpackage Business Pro
  * @since Business Pro 1.0
  */
-
 get_header();
 global $wp_query, $post;
 $options = get_option( 'progo_options' );
@@ -12,6 +11,8 @@ if ( isset( $options['layout'] ) == false ) {
 	$options = array();
 	$options['layout'] = 1;
 }
+$pagetopW = 12;
+/*
 switch( $options['layout'] ) {
 	case 1:
 	case 2:
@@ -22,47 +23,53 @@ switch( $options['layout'] ) {
 		$pagetopW = 12;
 		break;
 }
+*/
 ?>
-<div id="container" class="container_12">
+	<div id="bg">
+    <div id="homeslides" class="container_12">
 <div id="pagetop" class="slides grid_<?php echo $pagetopW .' Layout'. $options['layout']; ?>">
 <?php
 $original_query = $wp_query;
 $slides = get_posts('post_type=progo_homeslide&post_status=publish&posts_per_page=-1&orderby=menu_order&order=ASC');
 $count = count($slides);
 $oneon = false;
+$ogpost = $post;
 foreach ( $slides as $s ) {
+	$post = $s;
 	$on = '';
 	if ( $oneon == false ) {
 		$oneon = true;
 		$on = ' on';
 	}
 	
-	$slidecustom = get_post_meta($s->ID,'_progo_slidecontent');
-	$slidecontent = (array) $slidecustom[0];
-	$bg = ' '. $slidecontent['textcolor'];
+	$bg = ' Light';
+	$imgsize = 'homeslide';
+	$thmsrc = get_bloginfo( 'template_url' ) .'/images/slides/businesspeoples';
+	if( $options['layout'] == 3 ) {
+		$imgsize .= '3';
+		$thmsrc .= '-480';
+	}
+	$thmsrc .= '.jpg';
 	if ( get_post_thumbnail_id( $s->ID ) ) {
-		switch( $options['layout'] ) {
-			case 3:
-				$imgsize = 'homeslide3';
-				break;
-			case 4:
-				$imgsize = 'homeslide4';
-				break;
-			default:
-				$imgsize = 'homeslide';
-				break;
-		}
-		
 		$thm = get_the_post_thumbnail($s->ID, $imgsize);
 		$thmsrc = strpos($thm, 'src="') + 5;
 		$thmsrc = substr($thm, $thmsrc, strpos($thm,'"',$thmsrc+1)-$thmsrc);
+	}
+		
+	if ( $options['layout'] == 3 ) {
+		$bg .= ' custombg "><img src="'. $thmsrc;
+	} else {
 		$bg .= ' custombg " style="background-image: url('. $thmsrc .')';
 	}
 	
 	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside">';
-	if ( $slidecontent['showtitle'] == 'Show' ) echo '<div class="page-title">'. wp_kses($s->post_title,array()) .'</div>';
-	echo '<div class="content productcol">'. apply_filters('the_content',$slidecontent['text']) .'</div></div>'. ($pagetopW==12 ? '<div class="shadow"></div>' : '') .'</div>';
+	echo '<div class="page-title">'. str_replace('|', '<br />', wp_kses($s->post_title,array())) .'</div>';
+	if ( $options['layout'] != 2 ) {
+		echo '<div class="content productcol">'. apply_filters('the_content',$s->post_content) .'</div>';
+	}
+	echo '</div>'. ($pagetopW==12 ? '<div class="shadow"></div>' : '') .'</div>';
 }
+$post = $ogpost;
 if ( $oneon == true && $count > 1 ) { ?>
 <div class="ar"><a href="#p" title="Previous Slide"></a><a href="#n" class="n" title="Next Slide"></a></div>
 <script type="text/javascript">
@@ -79,8 +86,20 @@ if ( $options['layout'] < 3 ) {
 	get_sidebar('pbpform');
 }
 ?>
+</div><!-- /homeslides -->
+</div><!-- /bg -->
+    <div id="container" class="container_12">
+        <div id="pagewrap">
 <div id="main" class="grid_8">
 <?php
+
+if ( current_user_can('edit_theme_options') ) {
+	$options = get_option( 'progo_options' );
+	if ( (int) $options['showtips'] == 1 ) {
+		echo '<a style="position: relative" class="ptip" href="'. admin_url('themes.php?page=theme_options#progo_homepage') .'"><span>Choose to have your Home page display Latest Blog Posts or Static Content via Appearance > Theme Options</span></a>';
+	}
+}
+
 rewind_posts();
 $onfront = get_option( 'show_on_front' );
 if ( isset( $options['frontpage'] ) ) {
@@ -114,5 +133,6 @@ if($options['frontpage'] == 'posts') {
 	get_sidebar();
 } ?>
 </div>
+</div><!-- #pagewrap -->
 </div><!-- #container -->
 <?php get_footer(); ?>

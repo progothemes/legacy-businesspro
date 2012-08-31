@@ -1,0 +1,174 @@
+/*
+Theme Name: Small Business Pro
+Template: Facebook Tabs
+Theme URI: http://www.progo.com/businesspro/
+Description: WordPress Theme for creating powerful websites for Businesses, focused on lead generation, created by ProGo Themes.
+Author: ProGo Themes
+Author URI: http://www.progo.com
+Version: 1.2.6
+Tags: two-columns, right-sidebar, fixed-width, custom-background, custom-menu, theme-options
+*/
+
+
+.fb-head {
+
+	width:100%;
+	height: 100px;
+	background-color:#666;
+	color:#fff;
+	margin-bottom:25px;
+	
+}
+.clear{ clear: both; }
+body.fb{
+	width: 851px;
+	margin: 0 auto;
+	background-color: #fff;
+}
+.fb-general{ margin-top: 20px; }
+.fb-headline{margin:5px 5px; color: #6582a0;}
+.fb-old-headline{ text-align: center; }
+.fb-old-headline h2{ padding: 15px 0px 15px 0px; color: #3b5998; }
+.fb-bullets{
+	position: relative;
+	top: 25px;
+	padding-left:5px;
+}
+.fb-arrow {
+
+	padding-left:25px;
+
+
+}
+.fb-bullets ul li{ padding-left:35px; padding-bottom: 7px; color: #3b5998; list-style: none; 
+	background: url(../images/red-check-mark.png) no-repeat center left;  }
+.fb-left{
+	float: left;
+	width: 450px;
+	margin-left:5px;
+}
+.fb-right{
+	float: right;
+	width: 395px;
+}
+.fb-content{ clear: both; margin:5px 5px; width:800px; color: #6582a0; }
+.fb-form-t1 span.your-message textarea{ 
+	width: 290px;
+	height: 100px;
+}
+.fb-form_button2{
+	width: 290px;
+	height: 50px;
+}
+div.cont-right{ text-align: right; }
+.fb-templ3-text{ 
+	text-align: center;
+	padding: 15px 0px 10px 0px;
+}
+.fb-templ3-text input[type="text"]{ display: initial; }
+.page_3 .fb-form-t3 .wpcf7-text,
+.page_6 .fb-form-t3 .wpcf7-text{
+	width: 650px;
+}
+.page_1 .fb-form-t3 .wpcf7-text,
+.page_2 .fb-form-t3 .wpcf7-text,
+.page_4 .fb-form-t3 .wpcf7-text,
+.page_5 .fb-form-t3 .wpcf7-text{
+	width: 258px;
+}
+.page_3 .cstm_but{
+	display: block;
+	float: right;
+	margin-right: 164px;
+	}
+.page_6 #container_wrapper{ margin: 0 auto; }
+#fbTemplate .inside{ overflow: auto; }
+.page_6 .fb_cstm_t6{
+	text-align: left;
+	width: 715px;
+	margin-left:250px;
+}
+.cstm_buttons .cstm_but{
+	width: 265px;
+	height: 65px;
+	cursor: pointer;
+	background: url(../images/cstm_but.png) no-repeat center center transparent;
+}
+.cstm_buttons .cstm_but:hover{ background: url(../images/cstm_but_hover.png) no-repeat center center transparent; }
+.temp4_arrow{
+	position: relative;
+	top: -35px;
+}
+
+/* Gravity Forms */
+.fb-form {
+	
+	width:256px;
+
+}
+
+
+.gform_body{
+
+	padding-left: 65px;
+	
+
+}
+
+.gfield_label {
+
+	font-weight: bold;
+	color: #3b5998; 
+}
+
+.gform_body li {
+
+	list-style-type: none !important;
+}
+
+/* Contact Forms 7 */
+
+.fb-general .cstm_but {
+
+		margin-right:290px;
+
+}
+
+
+.fb-form1 {
+
+	margin-left:35px;
+
+
+}
+
+.fb-form2 {
+
+	margin-left:35px;
+
+
+}
+
+.fb-form4 {
+
+	margin-left:35px;
+
+}
+
+.fb-form5 {
+
+	margin-left:35px;
+
+}
+
+.fb-form6 .wpcf7 {
+
+	
+}
+
+.fb-form6 input[type="text"] {
+
+	margin-left:20px;
+	
+	
+}
