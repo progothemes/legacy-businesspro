@@ -13,13 +13,13 @@ if ( is_array($options) == false ) {
 }
 ?>
 <div class="pbpform"><a name="pbpform"></a>
-<table class="tar" width="100%"><tr><td><?php
+<table class="tar" width="100%"><tr><td><span><?php
 if ( isset( $options['headline'] ) ) {
 	echo str_replace( '|', '<br />', wp_kses( $options['headline'], array() ) );
 } else {
 	_e('Get Your Customers<br />What They Need Most!');
 }
-?></td></tr></table>
+?></span></td></tr></table>
 <?php
 $showformtip = true;
 if ( isset( $options['form'] ) ) {

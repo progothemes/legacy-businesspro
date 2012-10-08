@@ -4,7 +4,7 @@ Theme URI: http://www.progo.com/businesspro/
 Description: WordPress Theme for creating powerful websites for Businesses, focused on lead generation.
 Author: ProGo Themes
 Author URI: http://www.progo.com
-Version: 1.3.1
+Version: 1.3.2
 Tags: two-columns, right-sidebar, fixed-width, custom-background, custom-menu, theme-options
 */
 
@@ -524,11 +524,14 @@ ul#nav ul a:hover {
 	text-align: center;
 	width: 100%;
 	height: 95px;
-	padding-bottom: 15px;
 	background: none;
 }
 .secondary .pbpform .tar td {
 	height: 92px;
+}
+.pbpform .tar td span {
+	position: relative;
+	top: -8px;
 }
 .pbpform label {
 	color: #333333;
