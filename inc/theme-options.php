@@ -169,7 +169,7 @@ function progo_field_layout() {
 	$options = progo_get_theme_options();
 	$layouton = absint($options['layout']);
 	if ( $layouton < 1 || $layouton > 4 ) {
-		$layouton = 2;
+		$layouton = 1;
 	}
 	$layouts = progo_slide_layouts();
 //	echo '<pre style="display:none">'. print_r($options,true) .'</pre>';
@@ -549,7 +549,7 @@ function progo_get_default_theme_options() {
 		"businessemail" => "",
 		"businesshours" => "",
 		// HOMEPAGE SETTINGS
-		"layout" => 2,
+		"layout" => 1,
 		"headline" => "Get Your Customers|What They Need Most!",
 		"form" => "",
 		"frontpage" => get_option( 'show_on_front' ),
@@ -1137,7 +1137,7 @@ function progo_customize_register( $wp_customize ) {
 	) );
 	
 	$wp_customize->add_control( 'progo_homeseconds', array(
-		'label'    => __( 'Slide Roation Speed', 'progo' ),
+		'label'    => __( 'Slide Rotation Speed', 'progo' ),
 		'section'  => 'progo_homepage',
 		'settings' => 'progo_options[homeseconds]',
 		'type'     => 'text',
@@ -1231,10 +1231,10 @@ if ( ! function_exists( 'progo_slide_layouts' ) ):
  */
 function progo_slide_layouts() {	
 	$layouts = array(
-		//1 => 'Lots of room for Text on the Left, Form on the Right',
-		2 => 'Text as Caption on Left, Form on Right',
-		3 => 'Text Left, Image Right, Form below',
-		4 => 'Text on the Right, Form below'
+		1 => 'Text on the Right, Form below',
+		2 => 'Text Left, Image Right, Form below',
+		3 => 'Text as Caption on Left, Form on Right',
+		//4 => 'Lots of room for Text on the Left, Form on the Right',
 	);
 	return $layouts;
 }

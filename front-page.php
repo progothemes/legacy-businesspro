@@ -12,18 +12,6 @@ if ( isset( $options['layout'] ) == false ) {
 	$options['layout'] = 1;
 }
 $pagetopW = 12;
-/*
-switch( $options['layout'] ) {
-	case 1:
-	case 2:
-		$pagetopW = 8;
-		break;
-	case 3:
-	case 4:
-		$pagetopW = 12;
-		break;
-}
-*/
 ?>
 	<div id="bg">
     <div id="homeslides" class="container_12">
@@ -45,7 +33,7 @@ foreach ( $slides as $s ) {
 	$bg = ' Light';
 	$imgsize = 'homeslide';
 	$thmsrc = get_bloginfo( 'template_url' ) .'/images/slides/businesspeoples';
-	if( $options['layout'] == 3 ) {
+	if( $options['layout'] == 2 ) {
 		$imgsize .= '3';
 		$thmsrc .= '-480';
 	}
@@ -56,7 +44,7 @@ foreach ( $slides as $s ) {
 		$thmsrc = substr($thm, $thmsrc, strpos($thm,'"',$thmsrc+1)-$thmsrc);
 	}
 		
-	if ( $options['layout'] == 3 ) {
+	if ( $options['layout'] == 2 ) {
 		$bg .= ' custombg "><img src="'. $thmsrc;
 	} else {
 		$bg .= ' custombg " style="background-image: url('. $thmsrc .')';
@@ -64,7 +52,7 @@ foreach ( $slides as $s ) {
 	
 	echo '<div class="textslide slide'. $on . $bg .'"><div class="inside">';
 	echo '<div class="page-title">'. str_replace('|', '<br />', wp_kses($s->post_title,array())) .'</div>';
-	if ( $options['layout'] != 2 ) {
+	if ( $options['layout'] != 3 ) {
 		echo '<div class="content productcol">'. apply_filters('the_content',$s->post_content) .'</div>';
 	}
 	echo '</div>'. ($pagetopW==12 ? '<div class="shadow"></div>' : '') .'</div>';
@@ -82,7 +70,7 @@ if ($pagetopW==8) echo '<div class="shadow"></div>';
 ?>
 </div>
 <?php
-if ( $options['layout'] < 3 ) {
+if ( $options['layout'] > 2 ) {
 	get_sidebar('pbpform');
 }
 ?>
@@ -124,7 +112,7 @@ switch ( $onfront ) {
 </div><!-- #main -->
 <div class="grid_4 secondary">
 <?php
-if ( $options['layout'] > 2 ) {
+if ( $options['layout'] < 3 ) {
 	get_sidebar('pbpform');
 }
 if($options['frontpage'] == 'posts') {

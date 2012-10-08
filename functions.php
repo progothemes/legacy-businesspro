@@ -494,8 +494,8 @@ function progo_admin_init() {
 				'menus' => array( 'mainmenu', 'ppcmenu' )
 			),
 			'about' => array(
-				'title' => __( 'About', 'progo' ),
-				'content' => "<h2>This Page could have info about your site/store</h2>\n$lipsum",
+				'title' => __( 'About Us', 'progo' ),
+				'content' => "<h2>This Page could have info about your site</h2>\n$lipsum",
 				'id' => '',
 				'menus' => array( 'mainmenu', 'fbarlnx', 'ppcmenu' )
 			),
@@ -585,12 +585,12 @@ function progo_admin_init() {
 		}
 		// and lets also add our first HOMEPAGE SLIDE ?
 		$slide1 = wp_insert_post( array(
-			'post_title' 	=>	'Get Your Customers What|They Need Most!',
+			'post_title' 	=>	'Get Your Customers What They Need Most!',
 			'post_type' 	=>	'progo_homeslide',
 			'post_name'		=>	'slide1',
 			'comment_status'=>	'closed',
 			'ping_status' 	=>	'closed',
-			'post_content' 	=>	"Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ips\n\n<a href=\"". trailingslashit(get_bloginfo('url')) ."/about/\" class=\"button\">CALL TO ACTION</a>",
+			'post_content' 	=>	"Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam.  Lorem ips\n\n<a href=\"". trailingslashit(get_bloginfo('url')) ."about/\" class=\"button\">CALL TO ACTION</a>",
 			'post_status' 	=>	'publish',
 			'post_author' 	=>	1,
 			'menu_order'	=>	1

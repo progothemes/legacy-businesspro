@@ -19,7 +19,7 @@ ul#nav li a.first:hover {
 	color: #5C3C27;
 }
 */
-.Layout4 .inside {
+.Layout1 .inside {
 	background: url(../images/colors/GreenWhite/slide.jpg) repeat 0 0;
 }
 #pagetop {
@@ -28,7 +28,7 @@ ul#nav li a.first:hover {
 #pagetop .slide.Light {
 	color: #FFFFFF;
 }
-#pagetop.Layout3 .slide.Light {
+#pagetop.Layout2 .slide.Light {
 	color: #666666;
 }
 .pbpform .tar td {

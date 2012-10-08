@@ -26,13 +26,13 @@ ul#nav li a.first:hover {
 	color: #5C3C27;
 }
 
-.Layout4 .inside {
+.Layout1 .inside {
 	background: url(../images/colors/BrownBlue/slide.jpg) repeat 0 0;
 }
 #pagetop .slide.Light {
 	color: #666666;
 }
-#pagetop.Layout2 .slide.Light {
+#pagetop.Layout3 .slide.Light {
 	color: #FFFFFF;
 }
 .pbpform .tar td {

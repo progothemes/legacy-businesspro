@@ -15,7 +15,7 @@ a#logo .g {
 ul#nav, ul#nav li {
 	background-image: url(../images/colors/DarkerBlue/navli.png)
 }
-#pagetop.Layout4 .inside {
+#pagetop.Layout1 .inside {
 	background: #fff url(../images/colors/DarkerBlue/slide.jpg) repeat-x 0 0;
 	color: #333;
 }
