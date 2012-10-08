@@ -606,12 +606,14 @@ function progo_admin_init() {
 endif;
 if ( ! function_exists( 'progo_admin_head_fix' ) ):
 function progo_admin_head_fix(){
-global $post;
-
-echo' <style type="text/css">#postdiv.postarea, #postdivrich.postarea { margin:0; } #post-status-info { line-height:1.4em; font-size:13px; } #custom_editor .inside { margin:2px 6px 6px 6px; } #ed_toolbar { display:none; } #postdiv #ed_toolbar, #postdivrich #ed_toolbar { display:block; }
-</style>';
-
-	if ( get_post_type($post) == 'progo_facebooktabs') {
+	global $post;
+	$posttype = get_post_type($post);
+	if ( in_array( $posttype, array( 'progo_facebooktabs' , 'progo_ppc' ) ) ) {
+	echo' <style type="text/css">#postdiv.postarea, #postdivrich.postarea { margin:0; } #post-status-info { line-height:1.4em; font-size:13px; } #custom_editor .inside { margin:2px 6px 6px 6px; } #ed_toolbar { display:none; } #postdiv #ed_toolbar, #postdivrich #ed_toolbar { display:block; }
+	</style>';
+	}
+	
+	if ( $posttype == 'progo_facebooktabs') {
 ?>
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
 	
@@ -644,7 +646,7 @@ function show_hide_meta_box() {
 <?php
 	}
 	
-	if ( get_post_type($post) == 'progo_ppc') {
+	if ( $posttype == 'progo_ppc') {
 ?>
 <script type='text/javascript' src='https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js'></script>
 	
@@ -1031,7 +1033,7 @@ function progo_metabox_cleanup() {
 	global $post;
 	
 
-	foreach (array('page','post','progo_facebooktabs','progo_ppc') as $type)
+	foreach (array('progo_facebooktabs','progo_ppc') as $type)
 	{
 		add_meta_box('custom_editor', 'Content', 'blank', $type, 'normal', 'high');
 	}

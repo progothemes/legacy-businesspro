@@ -178,6 +178,12 @@ a.more-link,
 #container a {
 	text-decoration: underline;
 }
+#container h2.entry-title a,
+#container .entry-meta a,
+#container .entry-utility a,
+#container .secondary a {
+	text-decoration: none;
+}
 .screen-reader-text {
 	position: absolute;
 	left: -9000px;
